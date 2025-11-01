@@ -2,10 +2,14 @@
 
 import Hero from '@/components/ui/Hero';
 import PlanetSection from '@/components/ui/PlanetSection';
+import DecorativePlant from '@/components/ui/DecorativePlant';
 
 export default function Home() {
   return (
     <main className="relative">
+      {/* Half planet on right side */}
+      <DecorativePlant />
+
       {/* Scrollable content */}
       <div className="relative">
         <Hero />
