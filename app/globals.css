@@ -91,6 +91,36 @@ body::before {
   }
 }
 
+@keyframes universeGlowActivated {
+  0% {
+    filter: drop-shadow(0 0 0px rgba(139, 92, 246, 0));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(139, 92, 246, 1)) drop-shadow(0 0 60px rgba(59, 130, 246, 0.8));
+    transform: scale(1.05);
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.3));
+    transform: scale(1);
+  }
+}
+
+@keyframes universeGlowActivatedBW {
+  0% {
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1)) drop-shadow(0 0 60px rgba(255, 255, 255, 0.8));
+    transform: scale(1.05);
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+    transform: scale(1);
+  }
+}
+
 @keyframes subtleLineGlow {
   0% {
     opacity: 0.2;
@@ -103,6 +133,106 @@ body::before {
   100% {
     opacity: 0.2;
     transform: scaleX(0.95);
+  }
+}
+
+@keyframes spaceshipFly {
+  0% {
+    left: -5%;
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+  }
+  50% {
+    left: 105%;
+    opacity: 0;
+  }
+  100% {
+    left: 105%;
+    opacity: 0;
+  }
+}
+
+@keyframes spaceshipFlyToPlanet {
+  /* Draw the line (0-33%) */
+  0% {
+    left: -5%;
+    top: 50%;
+    opacity: 0;
+    transform: translateY(-50%) rotate(0deg);
+  }
+  8% {
+    opacity: 1;
+  }
+  33% {
+    left: 105%;
+    top: 50%;
+    opacity: 1;
+    transform: translateY(-50%) rotate(0deg);
+  }
+  /* Transition to planet (33-45%) */
+  45% {
+    left: calc(100vw + 60vh);
+    top: 50%;
+    opacity: 1;
+    transform: translateY(-50%) rotate(-45deg);
+  }
+  /* Orbit around planet (45-100%) */
+  55% {
+    left: calc(100vw + 60vh);
+    top: calc(50% - 80vh);
+    opacity: 1;
+    transform: translateY(-50%) rotate(-135deg);
+  }
+  70% {
+    left: calc(100vw + 60vh);
+    top: 50%;
+    opacity: 1;
+    transform: translateY(-50%) rotate(-225deg);
+  }
+  85% {
+    left: calc(100vw + 60vh);
+    top: calc(50% + 80vh);
+    opacity: 1;
+    transform: translateY(-50%) rotate(-315deg);
+  }
+  100% {
+    left: calc(100vw + 60vh);
+    top: calc(50% - 80vh);
+    opacity: 1;
+    transform: translateY(-50%) rotate(-405deg);
+  }
+}
+
+@keyframes lineDrawIn {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  50% {
+    width: 100%;
+    opacity: 1;
+  }
+  85% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes orbitPlanet {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(150vh) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(150vh) rotate(-360deg);
   }
 }
 

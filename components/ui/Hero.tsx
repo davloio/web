@@ -9,6 +9,9 @@ export default function Hero() {
   const sloganRef = useRef<HTMLParagraphElement>(null);
   const typewriterRef = useRef<HTMLSpanElement>(null);
   const [typewriterText, setTypewriterText] = useState('');
+  const [shuttleVisible, setShuttleVisible] = useState(false);
+  const [universeGlowing, setUniverseGlowing] = useState(false);
+  const [shuttleOrbiting, setShuttleOrbiting] = useState(false);
 
   useEffect(() => {
     // Animate title on mount
@@ -86,6 +89,27 @@ export default function Hero() {
         }
       );
     }
+
+    // Trigger shuttle animation once after delay
+    const shuttleTimer = setTimeout(() => {
+      setShuttleVisible(true);
+    }, 1500);
+
+    // Trigger universe glow when shuttle passes by (about 85% through the 4s flight)
+    const universeGlowTimer = setTimeout(() => {
+      setUniverseGlowing(true);
+    }, 4900); // 1500ms delay + 3400ms (85% through 4s flight)
+
+    // Start orbiting animation after the initial flight completes
+    const orbitTimer = setTimeout(() => {
+      setShuttleOrbiting(true);
+    }, 5500); // 1500ms delay + 4000ms (after 4s flight completes)
+
+    return () => {
+      clearTimeout(shuttleTimer);
+      clearTimeout(universeGlowTimer);
+      clearTimeout(orbitTimer);
+    };
   }, []);
 
   const titleText = 'davlo';
@@ -159,7 +183,7 @@ export default function Hero() {
           className="text-white/80 tracking-wide text-right"
           style={{
             fontSize: '24px',
-            fontWeight: 700,
+            fontWeight: 800,
             letterSpacing: '0.05em',
             position: 'relative',
             paddingBottom: '4px'
@@ -170,12 +194,9 @@ export default function Hero() {
               fontWeight: 600,
               fontStyle: 'italic',
               fontFamily: 'nexa, sans-serif',
-              background: 'linear-gradient(90deg, #8B5CF6, #3B82F6)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '0 0 30px rgba(139, 92, 246, 0.5)',
-              animation: 'universeGlow 3s ease-in-out infinite'
+              color: 'white',
+              textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+              animation: universeGlowing ? 'universeGlowActivatedBW 1.5s ease-out forwards' : 'none'
             }}
           >universe</span>
           <span
@@ -185,10 +206,70 @@ export default function Hero() {
               right: 0,
               width: '100%',
               height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3) 50%, transparent)',
-              animation: 'subtleLineGlow 4s ease-in-out infinite'
+              overflow: 'visible'
             }}
-          />
+          >
+            {/* Animated line that gets drawn */}
+            <span
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                height: '1px',
+                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3) 50%, transparent)',
+                animation: shuttleVisible ? 'lineDrawIn 8s ease-in-out forwards' : 'none',
+                width: '0%',
+              }}
+            />
+            {shuttleVisible && (
+              <svg
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '28px',
+                  height: '28px',
+                  animation: 'spaceshipFlyToPlanet 6s ease-in-out forwards',
+                  filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
+                }}
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+              {/* Main body */}
+              <path
+                d="M20 8L26 16L20 24L18 22V10L20 8Z"
+                fill="white"
+              />
+              {/* Nose cone */}
+              <path
+                d="M26 16L30 16L28 14L26 16L28 18L30 16Z"
+                fill="white"
+                opacity="0.9"
+              />
+              {/* Wings */}
+              <path
+                d="M18 12L14 10L16 16L14 22L18 20V12Z"
+                fill="white"
+                opacity="0.7"
+              />
+              {/* Window */}
+              <circle
+                cx="20"
+                cy="16"
+                r="2"
+                fill="#666666"
+              />
+              {/* Thruster flame */}
+              <path
+                d="M14 14L10 16L14 18L12 16L14 14Z"
+                fill="#CCCCCC"
+                opacity="0.6"
+              />
+              </svg>
+            )}
+          </span>
         </motion.p>
         </div>
 
