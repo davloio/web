@@ -189,7 +189,7 @@ export default function Hero() {
             paddingBottom: '4px'
           }}
         >
-          software for the <span
+          <span style={{ fontFamily: 'var(--font-geist-mono)' }}>software</span> for the <span
             style={{
               fontWeight: 600,
               fontStyle: 'italic',
@@ -272,33 +272,6 @@ export default function Hero() {
           </span>
         </motion.p>
         </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-12 left-1/2 -translate-x-1/2"
-          animate={{
-            y: [0, 10, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-            <motion.div
-              className="w-1 h-2 bg-white/60 rounded-full"
-              animate={{
-                y: [0, 12, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          </div>
-        </motion.div>
       </div>
     </section>
   );
