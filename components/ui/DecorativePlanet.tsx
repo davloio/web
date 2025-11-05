@@ -14,7 +14,7 @@ export default function DecorativePlanet() {
     if (!isMounted) return [];
 
     const result = [];
-    const asteroidCount = 120;
+    const asteroidCount = 180;
 
     // Simple seeded random function for consistent results
     let seed = 12345;
@@ -34,12 +34,30 @@ export default function DecorativePlanet() {
       }
     };
 
+    // Generate irregular asteroid shape
+    const generateAsteroidShape = (size: number) => {
+      const points = [];
+      const numPoints = 6 + Math.floor(seededRandom() * 4); // 6-9 points
+
+      for (let j = 0; j < numPoints; j++) {
+        const angle = (j / numPoints) * Math.PI * 2;
+        // Vary the radius for each point to create irregular shape
+        const radiusVariation = 0.6 + seededRandom() * 0.5; // 0.6 to 1.1
+        const radius = size * radiusVariation;
+        const px = Math.cos(angle) * radius * 0.24; // horizontal scaling for aspect ratio
+        const py = Math.sin(angle) * radius;
+        points.push(`${px},${py}`);
+      }
+
+      return points.join(' ');
+    };
+
     for (let i = 0; i < asteroidCount; i++) {
       const x = (i / asteroidCount) * 500;
       const baseY = getCurveY(x);
 
       // Add some vertical spread within the belt height
-      const verticalSpread = (seededRandom() - 0.5) * 40;
+      const verticalSpread = (seededRandom() - 0.5) * 50;
       const y = baseY + verticalSpread;
 
       // Random asteroid size - larger for visibility
@@ -51,6 +69,45 @@ export default function DecorativePlanet() {
         y,
         size,
         opacity: 0.85 + seededRandom() * 0.15,
+        shape: generateAsteroidShape(size),
+      });
+    }
+
+    // Add 6 bigger asteroids at strategic positions
+    const bigAsteroidPositions = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9]; // Positions along the belt (0-1)
+    bigAsteroidPositions.forEach((pos, idx) => {
+      const x = pos * 500;
+      const baseY = getCurveY(x);
+      const verticalSpread = (seededRandom() - 0.5) * 40;
+      const y = baseY + verticalSpread;
+      const size = 10 + seededRandom() * 6; // Much larger: 10-16
+
+      result.push({
+        id: `big-${idx}`,
+        x,
+        y,
+        size,
+        opacity: 0.9 + seededRandom() * 0.1,
+        shape: generateAsteroidShape(size),
+      });
+    });
+
+    // Add many tiny asteroids (almost like dust)
+    const tinyAsteroidCount = 700;
+    for (let i = 0; i < tinyAsteroidCount; i++) {
+      const x = seededRandom() * 500;
+      const baseY = getCurveY(x);
+      const verticalSpread = (seededRandom() - 0.5) * 55;
+      const y = baseY + verticalSpread;
+      const size = 0.8 + seededRandom() * 0.8; // Very small: 0.8-1.6
+
+      result.push({
+        id: `tiny-${i}`,
+        x,
+        y,
+        size,
+        opacity: 0.6 + seededRandom() * 0.3,
+        shape: generateAsteroidShape(size),
       });
     }
 
@@ -59,6 +116,28 @@ export default function DecorativePlanet() {
 
   return (
     <div className="fixed top-1/2 -translate-y-1/2 pointer-events-none overflow-visible" style={{ right: '-240vh' }}>
+      <style jsx>{`
+        @keyframes orbitMoonVertical {
+          0% { transform: translateX(1.55vh) translateY(-5.8vh); z-index: 16; }
+          6.25% { transform: translateX(2.18vh) translateY(-5.15vh); z-index: 16; }
+          12.5% { transform: translateX(2.46vh) translateY(-3.99vh); z-index: 16; }
+          18.75% { transform: translateX(2.39vh) translateY(-2.63vh); z-index: 16; }
+          25% { transform: translateX(1.93vh) translateY(-0.52vh); z-index: 16; }
+          31.25% { transform: translateX(1.19vh) translateY(1.63vh); z-index: 16; }
+          37.5% { transform: translateX(0.26vh) translateY(3.54vh); z-index: 16; }
+          43.75% { transform: translateX(-0.69vh) translateY(5.11vh); z-index: 16; }
+          50% { transform: translateX(-1.55vh) translateY(5.8vh); z-index: 14; }
+          56.25% { transform: translateX(-2.18vh) translateY(5.15vh); z-index: 14; }
+          62.5% { transform: translateX(-2.46vh) translateY(3.99vh); z-index: 14; }
+          68.75% { transform: translateX(-2.39vh) translateY(2.63vh); z-index: 14; }
+          75% { transform: translateX(-1.93vh) translateY(0.52vh); z-index: 14; }
+          81.25% { transform: translateX(-1.19vh) translateY(-1.63vh); z-index: 14; }
+          87.5% { transform: translateX(-0.26vh) translateY(-3.54vh); z-index: 14; }
+          93.75% { transform: translateX(0.69vh) translateY(-5.11vh); z-index: 16; }
+          100% { transform: translateX(1.55vh) translateY(-5.8vh); z-index: 16; }
+        }
+      `}</style>
+
       {/* Planet (background layer) */}
       <div
         className="w-[300vh] h-[300vh] rounded-full relative"
@@ -69,6 +148,47 @@ export default function DecorativePlanet() {
         }}
       />
 
+      {/* Small Black Planet - above asteroid belt */}
+      <div
+        className="absolute w-[8vh] h-[8vh] rounded-full"
+        style={{
+          left: '40vh',
+          top: '35%',
+          background: 'radial-gradient(circle at 30% 40%, #2d2d2d, #000000 70%)',
+          boxShadow: 'inset -0.5vh 0 1vh rgba(0, 0, 0, 0.5), 0 0 1vh rgba(0, 0, 0, 0.3)',
+          zIndex: 15,
+        }}
+      />
+
+      {/* Moon orbiting the black planet */}
+      <div
+        className="absolute"
+        style={{
+          left: '44vh', // Center of black planet (40vh + 4vh)
+          top: 'calc(35% + 4vh)', // Center of black planet
+          width: 0,
+          height: 0,
+        }}
+      >
+        <div
+          style={{
+            animation: 'orbitMoonVertical 8s linear infinite',
+            width: 0,
+            height: 0,
+            position: 'relative',
+          }}
+        >
+          <div
+            className="w-[1.5vh] h-[1.5vh] rounded-full"
+            style={{
+              background: 'radial-gradient(circle at 35% 35%, #3a3a3a, #1a1a1a)',
+              boxShadow: '0 0 0.5vh rgba(0, 0, 0, 0.5)',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
+        </div>
+      </div>
+
       {/* Asteroid Belt - individual asteroids along curved path */}
       {isMounted && (
         <div
@@ -77,21 +197,19 @@ export default function DecorativePlanet() {
             left: '-20vh',
             top: '50%',
             width: '280vh',
-            height: '12vh',
+            height: '16vh',
             transform: 'translateY(-50%)',
             zIndex: 20,
           }}
         >
           <svg width="100%" height="100%" viewBox="0 0 500 120" preserveAspectRatio="none">
             {asteroids.map((asteroid) => (
-              <ellipse
+              <polygon
                 key={asteroid.id}
-                cx={asteroid.x}
-                cy={asteroid.y}
-                rx={asteroid.size * 0.18}
-                ry={asteroid.size}
+                points={asteroid.shape}
                 fill="#000000"
                 opacity={asteroid.opacity}
+                transform={`translate(${asteroid.x}, ${asteroid.y})`}
               />
             ))}
           </svg>
