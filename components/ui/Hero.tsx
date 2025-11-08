@@ -6,68 +6,89 @@ import gsap from 'gsap';
 
 export default function Hero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const sloganRef = useRef<HTMLParagraphElement>(null);
+  const sloganRef = useRef<HTMLDivElement>(null);
   const typewriterRef = useRef<HTMLSpanElement>(null);
   const [typewriterText, setTypewriterText] = useState('');
+  const [showCursor, setShowCursor] = useState(false);
+  const [cursorFading, setCursorFading] = useState(false);
+  const [typingComplete, setTypingComplete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showAsHeader, setShowAsHeader] = useState(false);
+  const [headerText, setHeaderText] = useState('');
   const [shuttleVisible, setShuttleVisible] = useState(false);
   const [universeGlowing, setUniverseGlowing] = useState(false);
   const [shuttleOrbiting, setShuttleOrbiting] = useState(false);
 
   useEffect(() => {
-    // Animate title on mount
-    if (titleRef.current) {
-      const letters = titleRef.current.querySelectorAll('.letter');
-      gsap.fromTo(
-        letters,
-        {
-          y: 100,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.05,
-          ease: 'power3.out',
-          delay: 0.3,
-        }
-      );
-    }
-
-    // Typewriter effect for ".io" (IntelliJ-style autocomplete)
+    // Typewriter effect for complete title "davlo.io" (IntelliJ-style autocomplete)
     const typewriterSequence = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for davlo to animate
+      // Initial delay
+      await new Promise(resolve => setTimeout(resolve, 1200));
 
-      const type = async () => {
-        // Random pause before starting
-        setTypewriterText('');
-        await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
+      // Show cursor
+      setShowCursor(true);
+      await new Promise(resolve => setTimeout(resolve, 600));
 
-        // Type "." - this triggers autocomplete (random timing)
-        setTypewriterText('.');
-        await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 200));
+      // Type "d"
+      setTypewriterText('d');
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-        // Show autocomplete suggestion "io" - hold with random duration
-        setTypewriterText('.{suggestion}io');
-        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 500));
+      // Type "a"
+      setTypewriterText('da');
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-        // Accept autocomplete - full text appears (random pause)
-        setTypewriterText('.io');
-        await new Promise(resolve => setTimeout(resolve, 2500 + Math.random() * 1000));
+      // Show autocomplete suggestion "vlo.io"
+      setTypewriterText('da{suggestion}vlo.io');
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Delete with backspace (random timing between deletions)
-        setTypewriterText('.i');
-        await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 80));
-        setTypewriterText('.');
-        await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 80));
-        setTypewriterText('');
-        await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 600));
+      // Accept autocomplete - full text appears
+      setTypewriterText('davlo.io');
+      await new Promise(resolve => setTimeout(resolve, 400));
 
-        // Repeat
-        type();
-      };
+      // Mark typing as complete (cursor keeps blinking)
+      setTypingComplete(true);
 
-      type();
+      // Wait 5 seconds before deleting
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      // Start deleting
+      setIsDeleting(true);
+      const fullText = 'davlo.io';
+      for (let i = fullText.length - 1; i >= 0; i--) {
+        setTypewriterText(fullText.substring(0, i));
+        // Random delay between 40-120ms for each deletion
+        await new Promise(resolve => setTimeout(resolve, 40 + Math.random() * 80));
+      }
+
+      // Hide main title elements
+      setShowCursor(false);
+      setIsDeleting(false);
+
+      // Small delay before showing header
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Switch to header mode
+      setShowAsHeader(true);
+      setShowCursor(true);
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Type out header text letter by letter (no autocomplete)
+      const headerFullText = 'davlo.io';
+      for (let i = 0; i <= headerFullText.length; i++) {
+        setHeaderText(headerFullText.substring(0, i));
+        // Random delay between 80-220ms for each letter (slower with more variation)
+        await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 140));
+      }
+
+      // Hide cursor after header is complete (wait for 4 blinks - 1.5s per blink = 6s)
+      await new Promise(resolve => setTimeout(resolve, 6000));
+
+      // Start fade out
+      setCursorFading(true);
+
+      // Wait for fade animation to complete (1s), then hide cursor
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setShowCursor(false);
     };
 
     typewriterSequence();
@@ -85,7 +106,7 @@ export default function Hero() {
           opacity: 1,
           duration: 1,
           ease: 'power2.out',
-          delay: 1.2,
+          delay: 2.5,
         }
       );
     }
@@ -93,17 +114,17 @@ export default function Hero() {
     // Trigger shuttle animation once after delay
     const shuttleTimer = setTimeout(() => {
       setShuttleVisible(true);
-    }, 1500);
+    }, 2800);
 
-    // Trigger universe glow when shuttle passes by (about 85% through the 4s flight)
+    // Trigger universe glow when shuttle passes by (about 75% through the line drawing)
     const universeGlowTimer = setTimeout(() => {
       setUniverseGlowing(true);
-    }, 4900); // 1500ms delay + 3400ms (85% through 4s flight)
+    }, 4800); // Adjusted for new timing
 
     // Start orbiting animation after the initial flight completes
     const orbitTimer = setTimeout(() => {
       setShuttleOrbiting(true);
-    }, 5500); // 1500ms delay + 4000ms (after 4s flight completes)
+    }, 6800); // Adjusted for new timing
 
     return () => {
       clearTimeout(shuttleTimer);
@@ -112,35 +133,93 @@ export default function Hero() {
     };
   }, []);
 
-  const titleText = 'davlo';
-  const letters = titleText.split('');
-
   return (
     <section className="relative min-h-screen flex flex-col items-start justify-center px-12">
-      <div className="text-left" style={{ marginTop: '10vh' }}>
-        <div style={{ width: '575px' }}>
-        {/* Animated title */}
-        <h1
-          ref={titleRef}
-          className="mb-1 overflow-hidden"
-          style={{
-            fontSize: '160px',
-            lineHeight: 1.1,
+      {/* Header version (after animation) */}
+      {showAsHeader && (
+        <div className="fixed top-8 left-12 z-50">
+          <h2 style={{
+            fontSize: '32px',
             fontWeight: 900,
             letterSpacing: '-0.06em',
             fontFamily: 'nexa, sans-serif',
-            fontStyle: 'normal'
-          }}
-        >
-          {letters.map((letter, i) => (
-            <span
-              key={i}
-              className="letter inline-block"
-            >
-              {letter}
+            color: 'white'
+          }}>
+            {headerText}
+            {showCursor && (
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '2px',
+                  height: '0.8em',
+                  backgroundColor: 'white',
+                  animation: cursorFading ? 'none' : 'subtleBlink 1.5s ease-in-out infinite',
+                  verticalAlign: 'middle',
+                  marginLeft: '2px',
+                  marginBottom: '0.1em',
+                  opacity: cursorFading ? 0 : 1,
+                  transition: 'opacity 1s ease-out'
+                }}
+              />
+            )}
+          </h2>
+        </div>
+      )}
+
+      {/* Title with IDE context (initial animation) */}
+      {!showAsHeader && (
+        <div className="text-left">
+          {/* IDE window header */}
+          <div style={{
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            opacity: 0.6
+          }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FF5F56' }}></div>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FFBD2E' }}></div>
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27C93F' }}></div>
+            </div>
+            <span style={{
+              fontFamily: 'var(--font-geist-mono)',
+              fontSize: '13px',
+              color: '#888',
+              fontWeight: 500
+            }}>
+              index.tsx
             </span>
-          ))}
-          <span ref={typewriterRef} className="inline-block relative" style={{ minWidth: '120px', display: 'inline-block' }}>
+          </div>
+
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+            {/* Line number */}
+            <div style={{
+              fontFamily: 'var(--font-geist-mono)',
+              fontSize: '14px',
+              color: '#444',
+              paddingTop: '8px',
+              userSelect: 'none',
+              fontWeight: 600
+            }}>
+              1
+            </div>
+
+            <div>
+              {/* Animated title with typewriter */}
+              <h1
+                ref={titleRef}
+                className="mb-1 overflow-hidden"
+                style={{
+                  fontSize: '140px',
+                  lineHeight: 1.1,
+                  fontWeight: 900,
+                  letterSpacing: '-0.06em',
+                  fontFamily: 'nexa, sans-serif',
+                  fontStyle: 'normal'
+                }}
+              >
+          <span ref={typewriterRef} className="inline-block relative">
             {typewriterText.includes('{suggestion}') ? (
               <>
                 <span>{typewriterText.split('{suggestion}')[0]}</span>
@@ -149,9 +228,9 @@ export default function Hero() {
                     color: '#8B5CF6',
                     opacity: 0.65,
                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                    padding: '2px 4px',
-                    borderRadius: '4px',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
                   }}
                 >
                   {typewriterText.split('{suggestion}')[1]}
@@ -160,7 +239,7 @@ export default function Hero() {
             ) : (
               <span>{typewriterText}</span>
             )}
-            {typewriterText && (
+            {showCursor && (
               <span
                 className="ml-1"
                 style={{
@@ -168,45 +247,61 @@ export default function Hero() {
                   width: '3px',
                   height: '0.8em',
                   backgroundColor: 'white',
-                  animation: 'subtleBlink 1.5s ease-in-out infinite',
+                  animation: typingComplete && !cursorFading ? 'subtleBlink 1.5s ease-in-out infinite' : 'none',
                   verticalAlign: 'middle',
-                  marginBottom: '0.1em'
+                  marginBottom: '0.1em',
+                  opacity: cursorFading ? 0 : 1,
+                  transition: 'opacity 1s ease-out'
                 }}
               />
             )}
           </span>
         </h1>
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* Slogan */}
-        <motion.p
-          ref={sloganRef}
-          className="text-white/80 tracking-wide text-right"
+      {/* Slogan at the bottom */}
+      <motion.div
+        ref={sloganRef}
+        className="absolute bottom-0 text-white text-center w-full"
+        style={{
+          fontSize: '80px',
+          fontWeight: 900,
+          letterSpacing: '-0.06em',
+          fontFamily: 'nexa, sans-serif',
+          marginBottom: '10vh',
+          mixBlendMode: 'difference',
+          lineHeight: '0.9'
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          software for the
+        </div>
+        <div
           style={{
-            fontSize: '24px',
-            fontWeight: 800,
-            letterSpacing: '0.05em',
+            fontWeight: 900,
+            fontFamily: 'nexa, sans-serif',
+            color: 'white',
+            textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
+            animation: universeGlowing ? 'universeGlowActivatedBW 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards' : 'none',
             position: 'relative',
             paddingBottom: '4px'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-geist-mono)' }}>software</span> for the <span
-            style={{
-              fontWeight: 600,
-              fontStyle: 'italic',
-              fontFamily: 'nexa, sans-serif',
-              color: 'white',
-              textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
-              animation: universeGlowing ? 'universeGlowActivatedBW 1.5s ease-out forwards' : 'none'
-            }}
-          >universe</span>
+          universe
+          {/* Spaceship line at the bottom of universe */}
           <span
             style={{
               position: 'absolute',
-              bottom: 0,
-              right: 0,
-              width: '100%',
+              top: '0.15em',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '400px',
               height: '1px',
-              overflow: 'visible'
+              overflow: 'visible',
+              pointerEvents: 'none'
             }}
           >
             {/* Animated line that gets drawn */}
@@ -270,9 +365,8 @@ export default function Hero() {
               </svg>
             )}
           </span>
-        </motion.p>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

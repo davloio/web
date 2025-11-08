@@ -82,6 +82,17 @@ body::before {
   }
 }
 
+@keyframes autocompletePopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes universeGlow {
   0%, 100% {
     filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.3));
@@ -108,16 +119,16 @@ body::before {
 
 @keyframes universeGlowActivatedBW {
   0% {
-    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
-    transform: scale(1);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    opacity: 0.8;
   }
-  50% {
-    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1)) drop-shadow(0 0 60px rgba(255, 255, 255, 0.8));
-    transform: scale(1.05);
+  20% {
+    text-shadow: 0 0 50px rgba(255, 255, 255, 1), 0 0 80px rgba(255, 255, 255, 0.6), 0 0 120px rgba(255, 255, 255, 0.3);
+    opacity: 1;
   }
   100% {
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
-    transform: scale(1);
+    text-shadow: 0 0 35px rgba(255, 255, 255, 0.7), 0 0 60px rgba(255, 255, 255, 0.4);
+    opacity: 1;
   }
 }
 
