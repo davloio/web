@@ -197,13 +197,14 @@ export default function DecorativePlanet() {
           style={{
             left: '-20vh',
             top: '50%',
-            width: '280vh',
+            width: '560vh',
             height: '16vh',
             transform: 'translateY(-50%)',
             zIndex: 20,
+            animation: 'asteroidMarquee 360s linear infinite',
           }}
         >
-          <svg width="100%" height="100%" viewBox="0 0 500 120" preserveAspectRatio="none">
+          <svg width="100%" height="100%" viewBox="0 0 1000 120" preserveAspectRatio="none">
             {asteroids.map((asteroid) => (
               <polygon
                 key={asteroid.id}
@@ -211,6 +212,16 @@ export default function DecorativePlanet() {
                 fill="#000000"
                 opacity={asteroid.opacity}
                 transform={`translate(${asteroid.x}, ${asteroid.y})`}
+              />
+            ))}
+            {/* Duplicate asteroids for seamless loop */}
+            {asteroids.map((asteroid) => (
+              <polygon
+                key={`${asteroid.id}-duplicate`}
+                points={asteroid.shape}
+                fill="#000000"
+                opacity={asteroid.opacity}
+                transform={`translate(${asteroid.x + 500}, ${asteroid.y})`}
               />
             ))}
           </svg>

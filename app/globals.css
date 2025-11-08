@@ -149,6 +149,30 @@ body::before {
   }
 }
 
+@keyframes asteroidMarquee {
+  0% {
+    transform: translateX(0) translateY(-50%);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-50%);
+  }
+}
+
+@keyframes asteroidWobble {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-1px) scale(1.01);
+  }
+  50% {
+    transform: translateY(1px) scale(0.99);
+  }
+  75% {
+    transform: translateY(-0.5px) scale(1.005);
+  }
+}
+
 @keyframes universeGlow {
   0%, 100% {
     filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.3));
