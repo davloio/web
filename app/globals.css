@@ -93,6 +93,62 @@ body::before {
   }
 }
 
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes logoEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes logoShimmer {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.2));
+  }
+}
+
+@keyframes planetPulse {
+  0%, 100% {
+    box-shadow: inset -20px 0 40px rgba(0, 0, 0, 0.15), 0 0 80px rgba(255, 255, 255, 0.3), 0 0 120px rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    box-shadow: inset -20px 0 40px rgba(0, 0, 0, 0.15), 0 0 100px rgba(255, 255, 255, 0.4), 0 0 160px rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes planetGradientShift {
+  0% {
+    background: radial-gradient(circle at 40% 40%, #ffffff, #ebebeb 50%, #d4d4d4 100%);
+  }
+  25% {
+    background: radial-gradient(circle at 60% 35%, #ffffff, #ebebeb 50%, #d4d4d4 100%);
+  }
+  50% {
+    background: radial-gradient(circle at 55% 55%, #ffffff, #ebebeb 50%, #d4d4d4 100%);
+  }
+  75% {
+    background: radial-gradient(circle at 35% 50%, #ffffff, #ebebeb 50%, #d4d4d4 100%);
+  }
+  100% {
+    background: radial-gradient(circle at 40% 40%, #ffffff, #ebebeb 50%, #d4d4d4 100%);
+  }
+}
+
 @keyframes universeGlow {
   0%, 100% {
     filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 20px rgba(59, 130, 246, 0.3));
@@ -169,43 +225,41 @@ body::before {
 }
 
 @keyframes spaceshipFlyToPlanet {
-  /* Draw the line (0-33%) */
+  /* Fly in from far left and draw the line in one smooth movement (0-45%) */
   0% {
-    left: -5%;
+    left: -30%;
     top: 50%;
-    opacity: 0;
-    transform: translateY(-50%) rotate(0deg);
-  }
-  8% {
     opacity: 1;
+    transform: translateY(-50%) rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  33% {
+  45% {
     left: 105%;
     top: 50%;
     opacity: 1;
     transform: translateY(-50%) rotate(0deg);
   }
-  /* Transition to planet (33-45%) */
-  45% {
+  /* Transition to planet (45-55%) */
+  55% {
     left: calc(100vw + 60vh);
     top: 50%;
     opacity: 1;
     transform: translateY(-50%) rotate(-45deg);
   }
-  /* Orbit around planet (45-100%) */
-  55% {
+  /* Orbit around planet (55-100%) */
+  65% {
     left: calc(100vw + 60vh);
     top: calc(50% - 80vh);
     opacity: 1;
     transform: translateY(-50%) rotate(-135deg);
   }
-  70% {
+  78% {
     left: calc(100vw + 60vh);
     top: 50%;
     opacity: 1;
     transform: translateY(-50%) rotate(-225deg);
   }
-  85% {
+  90% {
     left: calc(100vw + 60vh);
     top: calc(50% + 80vh);
     opacity: 1;
@@ -224,13 +278,17 @@ body::before {
     width: 0%;
     opacity: 1;
   }
-  50% {
+  45% {
     width: 100%;
     opacity: 1;
   }
-  85% {
+  60% {
     width: 100%;
     opacity: 1;
+  }
+  75% {
+    width: 100%;
+    opacity: 0;
   }
   100% {
     width: 100%;

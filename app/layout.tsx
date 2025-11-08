@@ -5,9 +5,14 @@ import './globals.css';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 
 export const metadata: Metadata = {
-  title: 'davlo.io - Software for the Universe',
+  title: 'davlo.io',
   description: 'Next generation blockchain explorers and software for blockchains',
   keywords: ['blockchain', 'explorer', 'crypto', 'software'],
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+  },
 };
 
 export default function RootLayout({

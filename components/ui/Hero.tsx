@@ -22,8 +22,8 @@ export default function Hero() {
   useEffect(() => {
     // Typewriter effect for complete title "davlo.io" (IntelliJ-style autocomplete)
     const typewriterSequence = async () => {
-      // Initial delay
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // Initial delay - wait for slogan to appear first
+      await new Promise(resolve => setTimeout(resolve, 2500));
 
       // Show cursor
       setShowCursor(true);
@@ -48,8 +48,8 @@ export default function Hero() {
       // Mark typing as complete (cursor keeps blinking)
       setTypingComplete(true);
 
-      // Wait 5 seconds before deleting
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      // Wait 2.5 seconds before deleting
+      await new Promise(resolve => setTimeout(resolve, 2500));
 
       // Start deleting
       setIsDeleting(true);
@@ -93,7 +93,7 @@ export default function Hero() {
 
     typewriterSequence();
 
-    // Animate slogan
+    // Animate slogan (appears first)
     if (sloganRef.current) {
       gsap.fromTo(
         sloganRef.current,
@@ -106,25 +106,25 @@ export default function Hero() {
           opacity: 1,
           duration: 1,
           ease: 'power2.out',
-          delay: 2.5,
+          delay: 0.8,
         }
       );
     }
 
-    // Trigger shuttle animation once after delay
+    // Trigger shuttle animation once after delay (starts during/after IDE animation)
     const shuttleTimer = setTimeout(() => {
       setShuttleVisible(true);
-    }, 2800);
+    }, 4100);
 
     // Trigger universe glow when shuttle passes by (about 75% through the line drawing)
     const universeGlowTimer = setTimeout(() => {
       setUniverseGlowing(true);
-    }, 4800); // Adjusted for new timing
+    }, 6100);
 
     // Start orbiting animation after the initial flight completes
     const orbitTimer = setTimeout(() => {
       setShuttleOrbiting(true);
-    }, 6800); // Adjusted for new timing
+    }, 8100);
 
     return () => {
       clearTimeout(shuttleTimer);
@@ -137,7 +137,29 @@ export default function Hero() {
     <section className="relative min-h-screen flex flex-col items-start justify-center px-12">
       {/* Header version (after animation) */}
       {showAsHeader && (
-        <div className="fixed top-8 left-12 z-50">
+        <div className="fixed top-8 left-12 z-50 flex items-center gap-4">
+          {/* Logo with shimmer wrapper */}
+          <div
+            style={{
+              animation: 'logoShimmer 3s ease-in-out 1.2s infinite'
+            }}
+          >
+            <img
+              src="/logo.svg"
+              alt="davlo.io"
+              style={{
+                width: '28px',
+                height: '28px',
+                opacity: 0,
+                transform: 'translateY(-10px) scale(0.8)',
+                animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                animationDelay: '0.2s',
+                display: 'block'
+              }}
+            />
+          </div>
+
+          {/* Text */}
           <h2 style={{
             fontSize: '32px',
             fontWeight: 900,

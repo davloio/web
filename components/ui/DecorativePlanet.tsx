@@ -145,6 +145,7 @@ export default function DecorativePlanet() {
           background: 'radial-gradient(circle at 40% 40%, #ffffff, #ebebeb 50%, #d4d4d4 100%)',
           boxShadow: 'inset -20px 0 40px rgba(0, 0, 0, 0.15), 0 0 100px rgba(255, 255, 255, 0.5)',
           zIndex: 1,
+          animation: 'planetPulse 5s ease-in-out infinite, planetGradientShift 12s ease-in-out infinite',
         }}
       />
 
