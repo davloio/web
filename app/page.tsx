@@ -6,7 +6,12 @@ import SpaceBackground from '@/components/canvas/SpaceBackground';
 
 export default function Home() {
   return (
-    <main className="relative">
+    <main
+      className="relative"
+      style={{
+        animation: 'pageZoomOut 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+      }}
+    >
       {/* Space background with stars and nebulae */}
       <SpaceBackground />
 

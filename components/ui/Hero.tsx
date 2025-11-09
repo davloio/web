@@ -93,7 +93,7 @@ export default function Hero() {
 
     typewriterSequence();
 
-    // Animate slogan (appears first)
+    // Animate slogan (appears after zoom-out completes)
     if (sloganRef.current) {
       gsap.fromTo(
         sloganRef.current,
@@ -106,7 +106,7 @@ export default function Hero() {
           opacity: 1,
           duration: 1,
           ease: 'power2.out',
-          delay: 0.8,
+          delay: 2.0, // Appears 2 seconds after page load
         }
       );
     }
@@ -295,7 +295,8 @@ export default function Hero() {
           fontFamily: 'nexa, sans-serif',
           marginBottom: '10vh',
           mixBlendMode: 'difference',
-          lineHeight: '0.9'
+          lineHeight: '0.9',
+          opacity: 0, // Start hidden, GSAP will animate it in
         }}
       >
         <div style={{ position: 'relative' }}>

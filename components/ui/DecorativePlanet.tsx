@@ -199,9 +199,8 @@ export default function DecorativePlanet() {
             top: '50%',
             width: '560vh',
             height: '16vh',
-            transform: 'translateY(-50%)',
             zIndex: 20,
-            animation: 'asteroidMarquee 360s linear infinite',
+            animation: 'asteroidBeltZoom 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, asteroidMarquee 360s linear infinite',
           }}
         >
           <svg width="100%" height="100%" viewBox="0 0 1000 120" preserveAspectRatio="none">

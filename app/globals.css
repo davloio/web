@@ -329,6 +329,37 @@ body::before {
   }
 }
 
+@keyframes pageZoomOut {
+  0% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes smallPlanetSlideIn {
+  0% {
+    transform: translateX(100vh);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes asteroidBeltZoom {
+  0% {
+    transform: translateX(0) translateY(-50%) scale(1.3);
+  }
+  100% {
+    transform: translateX(0) translateY(-50%) scale(1);
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
