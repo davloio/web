@@ -4,6 +4,97 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
+// Separate Header component that can be rendered outside the zoom wrapper
+export function HeroHeader() {
+  const [showAsHeader, setShowAsHeader] = useState(false);
+  const [headerText, setHeaderText] = useState('');
+  const [showCursor, setShowCursor] = useState(false);
+  const [cursorFading, setCursorFading] = useState(false);
+
+  useEffect(() => {
+    // Listen for header show event
+    const handleShowHeader = (e: CustomEvent) => {
+      setShowAsHeader(true);
+      setShowCursor(true);
+
+      // Type out header text
+      const typeHeader = async () => {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const headerFullText = 'davlo.io';
+        for (let i = 0; i <= headerFullText.length; i++) {
+          setHeaderText(headerFullText.substring(0, i));
+          await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 140));
+        }
+
+        // Hide cursor after header is complete
+        await new Promise(resolve => setTimeout(resolve, 6000));
+        setCursorFading(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setShowCursor(false);
+      };
+
+      typeHeader();
+    };
+
+    window.addEventListener('showHeader' as any, handleShowHeader);
+    return () => window.removeEventListener('showHeader' as any, handleShowHeader);
+  }, []);
+
+  if (!showAsHeader) return null;
+
+  return (
+    <div className="fixed top-8 left-12 z-[100] flex items-center gap-4">
+      {/* Logo with shimmer wrapper */}
+      <div
+        style={{
+          animation: 'logoShimmer 3s ease-in-out 1.2s infinite'
+        }}
+      >
+        <img
+          src="/logo.svg"
+          alt="davlo.io"
+          style={{
+            width: '28px',
+            height: '28px',
+            opacity: 0,
+            transform: 'translateY(-10px) scale(0.8)',
+            animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            animationDelay: '0.2s',
+            display: 'block'
+          }}
+        />
+      </div>
+
+      {/* Text */}
+      <h2 style={{
+        fontSize: '32px',
+        fontWeight: 900,
+        letterSpacing: '-0.06em',
+        fontFamily: 'nexa, sans-serif',
+        color: 'white'
+      }}>
+        {headerText}
+        {showCursor && (
+          <span
+            style={{
+              display: 'inline-block',
+              width: '2px',
+              height: '0.8em',
+              backgroundColor: 'white',
+              animation: cursorFading ? 'none' : 'subtleBlink 1.5s ease-in-out infinite',
+              verticalAlign: 'middle',
+              marginLeft: '2px',
+              marginBottom: '0.1em',
+              opacity: cursorFading ? 0 : 1,
+              transition: 'opacity 1s ease-out'
+            }}
+          />
+        )}
+      </h2>
+    </div>
+  );
+}
+
 export default function Hero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const sloganRef = useRef<HTMLDivElement>(null);
@@ -13,8 +104,7 @@ export default function Hero() {
   const [cursorFading, setCursorFading] = useState(false);
   const [typingComplete, setTypingComplete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showAsHeader, setShowAsHeader] = useState(false);
-  const [headerText, setHeaderText] = useState('');
+  const [showIDE, setShowIDE] = useState(true);
   const [shuttleVisible, setShuttleVisible] = useState(false);
   const [universeGlowing, setUniverseGlowing] = useState(false);
   const [shuttleOrbiting, setShuttleOrbiting] = useState(false);
@@ -64,31 +154,14 @@ export default function Hero() {
       setShowCursor(false);
       setIsDeleting(false);
 
-      // Small delay before showing header
+      // Hide IDE animation
+      setShowIDE(false);
+
+      // Small delay before triggering header
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Switch to header mode
-      setShowAsHeader(true);
-      setShowCursor(true);
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Type out header text letter by letter (no autocomplete)
-      const headerFullText = 'davlo.io';
-      for (let i = 0; i <= headerFullText.length; i++) {
-        setHeaderText(headerFullText.substring(0, i));
-        // Random delay between 80-220ms for each letter (slower with more variation)
-        await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 140));
-      }
-
-      // Hide cursor after header is complete (wait for 4 blinks - 1.5s per blink = 6s)
-      await new Promise(resolve => setTimeout(resolve, 6000));
-
-      // Start fade out
-      setCursorFading(true);
-
-      // Wait for fade animation to complete (1s), then hide cursor
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setShowCursor(false);
+      // Dispatch event to show header (outside zoom wrapper)
+      window.dispatchEvent(new CustomEvent('showHeader'));
     };
 
     typewriterSequence();
@@ -135,61 +208,8 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col items-start justify-center px-12">
-      {/* Header version (after animation) */}
-      {showAsHeader && (
-        <div className="fixed top-8 left-12 z-50 flex items-center gap-4">
-          {/* Logo with shimmer wrapper */}
-          <div
-            style={{
-              animation: 'logoShimmer 3s ease-in-out 1.2s infinite'
-            }}
-          >
-            <img
-              src="/logo.svg"
-              alt="davlo.io"
-              style={{
-                width: '28px',
-                height: '28px',
-                opacity: 0,
-                transform: 'translateY(-10px) scale(0.8)',
-                animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                animationDelay: '0.2s',
-                display: 'block'
-              }}
-            />
-          </div>
-
-          {/* Text */}
-          <h2 style={{
-            fontSize: '32px',
-            fontWeight: 900,
-            letterSpacing: '-0.06em',
-            fontFamily: 'nexa, sans-serif',
-            color: 'white'
-          }}>
-            {headerText}
-            {showCursor && (
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: '2px',
-                  height: '0.8em',
-                  backgroundColor: 'white',
-                  animation: cursorFading ? 'none' : 'subtleBlink 1.5s ease-in-out infinite',
-                  verticalAlign: 'middle',
-                  marginLeft: '2px',
-                  marginBottom: '0.1em',
-                  opacity: cursorFading ? 0 : 1,
-                  transition: 'opacity 1s ease-out'
-                }}
-              />
-            )}
-          </h2>
-        </div>
-      )}
-
-      {/* Title with IDE context (initial animation) */}
-      {!showAsHeader && (
+      {/* Title with IDE context (initial animation) - will zoom out with page */}
+      {showIDE && (
         <div className="text-left">
           {/* IDE window header */}
           <div style={{

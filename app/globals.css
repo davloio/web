@@ -36,10 +36,13 @@ html.lenis body {
 body {
   background: #000000;
   color: #ffffff;
-  overflow-x: hidden;
+  overflow: hidden; /* Prevent all scrolling - camera zoom only */
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100vh; /* Fixed height */
+  position: fixed; /* Keep body fixed */
+  width: 100%;
 }
 
 /* Selection colors */

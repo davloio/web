@@ -59,7 +59,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="fixed bottom-0 left-0 z-50 p-8 flex flex-col gap-6">
+    <footer className="flex flex-col gap-6">
       {/* Links */}
       <nav className="flex flex-col gap-3">
         {links.map((link) => (

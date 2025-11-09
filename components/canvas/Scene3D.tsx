@@ -1,0 +1,105 @@
+'use client';
+
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Suspense, useEffect, useState, useRef } from 'react';
+import { useWheelZoom } from '@/hooks/useWheelZoom';
+import { getScrollZone } from '@/utils/scrollZones';
+import * as THREE from 'three';
+
+/**
+ * Camera controller that moves based on wheel zoom
+ */
+function CameraController() {
+  const { progress } = useWheelZoom();
+  const { camera } = useThree();
+  const currentZone = getScrollZone(progress);
+
+  // Debug: Log zoom progress and zone
+  useEffect(() => {
+    console.log(`Zoom: ${progress.toFixed(1)}% | Zone: ${currentZone}`);
+  }, [progress, currentZone]);
+
+  useFrame(() => {
+    // Map progress (0-100) to camera Z position
+    // Start at Z=50, zoom in to Z=5 at 100% progress
+    const startZ = 50;
+    const endZ = 5;
+    const targetZ = startZ - ((progress / 100) * (startZ - endZ));
+
+    // Smooth camera movement
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.1);
+  });
+
+  return null;
+}
+
+/**
+ * Main 3D scene component using React Three Fiber
+ * Handles camera, lighting, and all 3D planet elements
+ * Wheel scrolling zooms the camera instead of scrolling the page
+ */
+export default function Scene3D() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
+  return (
+    <div className="fixed inset-0 pointer-events-auto" style={{ zIndex: 5 }}>
+      <Canvas
+        camera={{
+          position: [0, 0, 50],
+          fov: 75,
+          near: 0.1,
+          far: 1000,
+        }}
+        gl={{
+          antialias: true,
+          alpha: true,
+        }}
+        dpr={[1, 2]} // Responsive pixel ratio
+      >
+        <Suspense fallback={null}>
+          {/* Camera controller for wheel zoom */}
+          <CameraController />
+
+          {/* Ambient light for overall illumination */}
+          <ambientLight intensity={0.3} />
+
+          {/* Main directional light (sun-like) */}
+          <directionalLight
+            position={[10, 10, 5]}
+            intensity={1}
+            castShadow
+          />
+
+          {/* Fill light from opposite side */}
+          <directionalLight
+            position={[-10, -10, -5]}
+            intensity={0.3}
+          />
+
+          {/* Point light for planet highlights */}
+          <pointLight
+            position={[0, 5, 10]}
+            intensity={0.5}
+            color="#ffffff"
+          />
+
+          {/* Temporary test sphere to verify zoom is working */}
+          <mesh position={[0, 0, 0]}>
+            <sphereGeometry args={[2, 32, 32]} />
+            <meshStandardMaterial
+              color="#ffffff"
+              emissive="#ffffff"
+              emissiveIntensity={0.2}
+            />
+          </mesh>
+        </Suspense>
+      </Canvas>
+    </div>
+  );
+}
