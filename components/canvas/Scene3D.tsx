@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import { useWheelZoom } from '@/hooks/useWheelZoom';
 import { getScrollZone } from '@/utils/scrollZones';
 import * as THREE from 'three';
+import Planet3D from './Planet3D';
 
 /**
  * Camera controller that moves based on wheel zoom
@@ -98,16 +99,17 @@ export default function Scene3D() {
             color="#ffffff"
           />
 
-          {/* Temporary test sphere to verify zoom is working */}
-          {/* Position: centered in 3D space, camera angle makes it appear left/up */}
-          <mesh position={[0, 0, 0]}>
-            <sphereGeometry args={[4, 64, 64]} />
-            <meshStandardMaterial
-              color="#ffffff"
-              emissive="#ffffff"
-              emissiveIntensity={0.2}
-            />
-          </mesh>
+          {/* Test Planet - White Planet (davlo.io) */}
+          <Planet3D
+            position={[0, 0, 0]}
+            scale={4}
+            color="#ffffff"
+            emissive="#ffffff"
+            emissiveIntensity={0.5}
+            name="davlo.io"
+            roughness={0.7}
+            metalness={0.1}
+          />
         </Suspense>
       </Canvas>
     </div>
