@@ -44,8 +44,8 @@ export function useWheelZoom(): WheelZoomState {
       setIsZooming(true);
 
       // Update progress
-      // Sensitivity: 1 wheel unit = 0.05% progress (adjust for feel)
-      const sensitivity = 0.05;
+      // Sensitivity: 1 wheel unit = 0.08% progress (increased for more responsive feel)
+      const sensitivity = 0.08;
       setProgress((prev) => {
         const newProgress = prev + (e.deltaY * sensitivity);
         // Clamp between 0 and 100

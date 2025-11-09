@@ -20,14 +20,23 @@ function CameraController() {
   }, [progress, currentZone]);
 
   useFrame(() => {
-    // Map progress (0-100) to camera Z position
-    // Start at Z=50, zoom in to Z=5 at 100% progress
-    const startZ = 50;
-    const endZ = 5;
-    const targetZ = startZ - ((progress / 100) * (startZ - endZ));
+    // Planet is at origin [0, 0, 0]
+    // Camera tilts from looking left/up to looking at center as it zooms
+    const normalizedProgress = progress / 100;
 
-    // Smooth camera movement
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.1);
+    // Camera moves forward in Z only
+    const startZ = 50;
+    const endZ = 8; // Closer to planet for bigger zoom
+    camera.position.set(0, 0, startZ - (startZ - endZ) * normalizedProgress);
+
+    // Interpolate camera lookAt target
+    // Start: looking right and down (10, -10, 0) -> planet appears left and up
+    // End: looking at center (0, 0, 0) -> planet centered
+    const lookAtX = 10 - (10 * normalizedProgress);  // 10 -> 0
+    const lookAtY = -10 + (10 * normalizedProgress); // -10 -> 0
+    const lookAtZ = 0;
+
+    camera.lookAt(lookAtX, lookAtY, lookAtZ);
   });
 
   return null;
@@ -48,7 +57,7 @@ export default function Scene3D() {
   if (!isMounted) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-auto" style={{ zIndex: 5 }}>
+    <div className="fixed inset-0 pointer-events-auto" style={{ zIndex: 2 }}>
       <Canvas
         camera={{
           position: [0, 0, 50],
@@ -90,8 +99,9 @@ export default function Scene3D() {
           />
 
           {/* Temporary test sphere to verify zoom is working */}
+          {/* Position: centered in 3D space, camera angle makes it appear left/up */}
           <mesh position={[0, 0, 0]}>
-            <sphereGeometry args={[2, 32, 32]} />
+            <sphereGeometry args={[4, 64, 64]} />
             <meshStandardMaterial
               color="#ffffff"
               emissive="#ffffff"

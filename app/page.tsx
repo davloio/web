@@ -18,10 +18,13 @@ export default function Home() {
     setIsMounted(true);
   }, []);
 
-  // Calculate scale based on zoom progress
+  // Calculate scale based on zoom progress with easing
   // 0% = scale 1 (normal)
   // 100% = scale 10 (zoomed in 10x)
-  const scale = 1 + (progress / 100) * 9;
+  // Apply ease-out curve for smoother acceleration
+  const normalizedProgress = progress / 100;
+  const easedProgress = 1 - Math.pow(1 - normalizedProgress, 3); // Cubic ease-out
+  const scale = 1 + easedProgress * 9;
 
   // Calculate opacity - fade out as we zoom
   // Start fading at 10% progress, fully gone by 30%
@@ -29,13 +32,19 @@ export default function Home() {
 
   return (
     <>
-      {/* Main content that zooms - everything except footer/header */}
+      {/* Space background - FIXED, never zooms, always crisp */}
+      <div className="fixed inset-0" style={{ zIndex: 0 }}>
+        <SpaceBackground />
+      </div>
+
+      {/* Main content that zooms - everything except footer/header/background */}
       <div
         className="fixed inset-0 origin-center"
         style={{
           transform: isMounted ? `scale(${scale})` : 'scale(1)',
           transition: 'none', // Smooth via transform updates
           pointerEvents: opacity > 0 ? 'auto' : 'none',
+          zIndex: 1,
         }}
       >
         <main
@@ -45,9 +54,6 @@ export default function Home() {
             opacity,
           }}
         >
-          {/* Space background with stars and nebulae */}
-          <SpaceBackground />
-
           {/* Half planet on right side */}
           <DecorativePlanet />
 
