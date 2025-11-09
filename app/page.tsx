@@ -3,6 +3,7 @@
 import Hero from '@/components/ui/Hero';
 import DecorativePlanet from '@/components/ui/DecorativePlanet';
 import SpaceBackground from '@/components/canvas/SpaceBackground';
+import Footer from '@/components/ui/Footer';
 
 export default function Home() {
   return (
@@ -20,6 +21,9 @@ export default function Home() {
 
       {/* Hero content only */}
       <Hero />
+
+      {/* Footer with links and watermark */}
+      <Footer />
     </main>
   );
 }

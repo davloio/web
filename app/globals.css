@@ -82,6 +82,40 @@ body::before {
   }
 }
 
+@keyframes spaceshipJiggle {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  50% {
+    transform: translate(-1px, 1px) rotate(-1deg);
+  }
+  75% {
+    transform: translate(1px, 0px) rotate(0.5deg);
+  }
+}
+
+@keyframes flameFlicker {
+  0%, 100% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+  25% {
+    opacity: 0.7;
+    transform: scaleX(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.1);
+  }
+  75% {
+    opacity: 0.8;
+    transform: scaleX(0.9);
+  }
+}
+
 @keyframes autocompletePopIn {
   0% {
     opacity: 0;
