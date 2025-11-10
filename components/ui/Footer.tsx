@@ -7,9 +7,20 @@ export default function Footer() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [inDetailView, setInDetailView] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Listen for detail view changes
+  useEffect(() => {
+    const handleDetailViewChange = (e: CustomEvent) => {
+      setInDetailView(e.detail.inDetailView);
+    };
+
+    window.addEventListener('detailViewChange' as any, handleDetailViewChange);
+    return () => window.removeEventListener('detailViewChange' as any, handleDetailViewChange);
   }, []);
 
   // Track cursor position
@@ -52,14 +63,26 @@ export default function Footer() {
 
   if (!isMounted) return null;
 
+  const handleAboutClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Dispatch event to zoom to planet and open detail view
+    window.dispatchEvent(new CustomEvent('navigateToAbout'));
+  };
+
   const links = [
     { name: 'projects', href: '#projects', hoverText: 'ready for time travel?' },
-    { name: 'about', href: '#about', hoverText: 'well, thats a shorter trip' },
+    { name: 'about', href: '#about', hoverText: 'well, thats a shorter trip', onClick: handleAboutClick },
     { name: 'contact', href: 'mailto:hello@davlo.io', hoverIcon: 'spaceship' },
   ];
 
+  const textColor = inDetailView ? 'black' : 'white';
+  const linkIdleColor = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+  const linkHoverColor = inDetailView ? 'black' : 'white';
+  const tooltipColor = inDetailView ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';
+  const watermarkColor = inDetailView ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+
   return (
-    <footer className="flex flex-col gap-6">
+    <footer className="flex flex-col gap-6" style={{ transition: 'color 0.5s ease' }}>
       {/* Links */}
       <nav className="flex flex-col gap-3">
         {links.map((link) => (
@@ -68,10 +91,21 @@ export default function Footer() {
               href={link.href}
               target={link.href.startsWith('http') ? '_blank' : undefined}
               rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              className="text-white/60 hover:text-white transition-colors duration-300 text-base font-normal tracking-wide"
-              style={{ fontFamily: 'var(--font-geist-sans)' }}
-              onMouseEnter={() => (link.hoverText || link.hoverIcon) && setHoveredLink(link.name)}
-              onMouseLeave={() => setHoveredLink(null)}
+              className="text-base font-normal tracking-wide transition-colors duration-300"
+              style={{
+                fontFamily: 'var(--font-geist-sans)',
+                color: linkIdleColor,
+                transition: 'color 0.5s ease'
+              }}
+              onClick={(link as any).onClick}
+              onMouseEnter={(e) => {
+                (link.hoverText || link.hoverIcon) && setHoveredLink(link.name);
+                e.currentTarget.style.color = linkHoverColor;
+              }}
+              onMouseLeave={(e) => {
+                setHoveredLink(null);
+                e.currentTarget.style.color = linkIdleColor;
+              }}
             >
               {link.name}
             </a>
@@ -86,7 +120,13 @@ export default function Footer() {
                   top: `${cursorPosition.y - 32}px`,
                 }}
               >
-                <span className="text-white/40 text-xs font-light tracking-wider">
+                <span
+                  className="text-xs font-light tracking-wider"
+                  style={{
+                    color: tooltipColor,
+                    transition: 'color 0.5s ease'
+                  }}
+                >
                   {typewriterText}
                 </span>
               </div>
@@ -101,7 +141,9 @@ export default function Footer() {
                   top: `${cursorPosition.y - 12}px`,
                   width: '24px',
                   height: '24px',
-                  filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
+                  filter: inDetailView
+                    ? 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))'
+                    : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
                   animation: 'spaceshipJiggle 0.6s ease-in-out infinite',
                 }}
                 viewBox="0 0 32 32"
@@ -111,18 +153,18 @@ export default function Footer() {
                 {/* Main body */}
                 <path
                   d="M20 8L26 16L20 24L18 22V10L20 8Z"
-                  fill="white"
+                  fill={inDetailView ? 'black' : 'white'}
                 />
                 {/* Nose cone */}
                 <path
                   d="M26 16L30 16L28 14L26 16L28 18L30 16Z"
-                  fill="white"
+                  fill={inDetailView ? 'black' : 'white'}
                   opacity="0.9"
                 />
                 {/* Wings */}
                 <path
                   d="M18 12L14 10L16 16L14 22L18 20V12Z"
-                  fill="white"
+                  fill={inDetailView ? 'black' : 'white'}
                   opacity="0.7"
                 />
                 {/* Window */}
@@ -130,12 +172,12 @@ export default function Footer() {
                   cx="20"
                   cy="16"
                   r="2"
-                  fill="#666666"
+                  fill={inDetailView ? '#cccccc' : '#666666'}
                 />
                 {/* Thruster flame - original (static) */}
                 <path
                   d="M14 14L10 16L14 18L12 16L14 14Z"
-                  fill="#CCCCCC"
+                  fill={inDetailView ? '#666666' : '#CCCCCC'}
                   opacity="0.6"
                 />
 
@@ -144,20 +186,20 @@ export default function Footer() {
                   {/* Main flame */}
                   <path
                     d="M14 15L6 16L14 17L8 16L14 15Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.9"
-                    filter="url(#flameGlow)"
+                    filter={inDetailView ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
                   />
                   {/* Secondary flame */}
                   <path
                     d="M12 15.5L4 16L12 16.5L6 16L12 15.5Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.7"
                   />
                   {/* Tertiary flame (longest trail) */}
                   <path
                     d="M10 15.7L2 16L10 16.3L4 16L10 15.7Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.5"
                   />
                 </g>
@@ -166,7 +208,7 @@ export default function Footer() {
                 <g style={{ animation: 'flameFlicker 0.3s ease-in-out infinite 0.15s' }}>
                   <path
                     d="M13 14.5L5 16L13 17.5L7 16L13 14.5Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.6"
                   />
                 </g>
@@ -175,13 +217,13 @@ export default function Footer() {
                 <g style={{ animation: 'flameFlicker 0.25s ease-in-out infinite 0.1s' }}>
                   <path
                     d="M14 13.5L6 14L14 14.5L8 14L14 13.5Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.8"
-                    filter="url(#flameGlow)"
+                    filter={inDetailView ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
                   />
                   <path
                     d="M12 13.7L4 14L12 14.3L6 14L12 13.7Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.6"
                   />
                 </g>
@@ -190,20 +232,27 @@ export default function Footer() {
                 <g style={{ animation: 'flameFlicker 0.28s ease-in-out infinite 0.05s' }}>
                   <path
                     d="M14 17.5L6 18L14 18.5L8 18L14 17.5Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.8"
-                    filter="url(#flameGlow)"
+                    filter={inDetailView ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
                   />
                   <path
                     d="M12 17.7L4 18L12 18.3L6 18L12 17.7Z"
-                    fill="white"
+                    fill={inDetailView ? 'black' : 'white'}
                     opacity="0.6"
                   />
                 </g>
 
-                {/* Glow filter for flames */}
+                {/* Glow filters for flames */}
                 <defs>
                   <filter id="flameGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="flameGlowBlack" x="-50%" y="-50%" width="200%" height="200%">
                     <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
                     <feMerge>
                       <feMergeNode in="coloredBlur"/>
@@ -221,7 +270,17 @@ export default function Footer() {
           href="https://github.com/davloio"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-white/60 hover:text-white transition-colors duration-300 mt-2"
+          className="mt-2 transition-colors duration-300"
+          style={{
+            color: linkIdleColor,
+            transition: 'color 0.5s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = linkHoverColor;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = linkIdleColor;
+          }}
           aria-label="GitHub"
         >
           <svg
@@ -237,7 +296,13 @@ export default function Footer() {
       </nav>
 
       {/* Watermark */}
-      <div className="text-white/30 text-xs font-light tracking-wider flex flex-col gap-1">
+      <div
+        className="text-xs font-light tracking-wider flex flex-col gap-1"
+        style={{
+          color: watermarkColor,
+          transition: 'color 0.5s ease'
+        }}
+      >
         <span>© 2025</span>
         <span>not an ordinary software team</span>
       </div>

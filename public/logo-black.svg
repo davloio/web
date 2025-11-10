@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 160 160">
+  <!-- Generator: Adobe Illustrator 29.5.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 141)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #fff;
+        stroke: #fff;
+      }
+
+      .st0, .st1 {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+
+      .st1 {
+        stroke: #000;
+      }
+    </style>
+  </defs>
+  <g id="SVGRepo_iconCarrier">
+    <circle class="st1" cx="80" cy="80" r="68.9"/>
+    <path class="st0" d="M80,32.63l7.53,27.96c.92,3.41,1.38,5.12,2.28,6.51.8,1.23,1.85,2.29,3.09,3.09,1.39.91,3.1,1.37,6.51,2.28l27.96,7.53-27.96,7.53c-3.41.92-5.12,1.38-6.51,2.28-1.23.8-2.29,1.85-3.09,3.09-.91,1.39-1.37,3.1-2.28,6.51l-7.53,27.96-7.53-27.96c-.92-3.41-1.38-5.12-2.28-6.51-.8-1.23-1.85-2.29-3.09-3.09-1.39-.91-3.1-1.37-6.51-2.28l-27.96-7.53,27.96-7.53c3.41-.92,5.12-1.38,6.51-2.28,1.23-.8,2.29-1.85,3.09-3.09.91-1.39,1.37-3.1,2.28-6.51l7.53-27.96Z"/>
+  </g>
+</svg>

@@ -11,11 +11,39 @@ import { useWheelZoom } from '@/hooks/useWheelZoom';
 const Scene3D = lazy(() => import('@/components/canvas/Scene3D'));
 
 export default function Home() {
-  const { progress } = useWheelZoom();
   const [isMounted, setIsMounted] = useState(false);
+  const [whitePageOpen, setWhitePageOpen] = useState(false);
+
+  // Disable wheel zoom when white page is open to allow scrolling
+  const { progress } = useWheelZoom(whitePageOpen);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  // Listen for white page open/close events
+  useEffect(() => {
+    const handleWhitePageOpen = () => setWhitePageOpen(true);
+    const handleWhitePageClose = () => setWhitePageOpen(false);
+
+    window.addEventListener('whitePageOpen' as any, handleWhitePageOpen);
+    window.addEventListener('whitePageClose' as any, handleWhitePageClose);
+
+    return () => {
+      window.removeEventListener('whitePageOpen' as any, handleWhitePageOpen);
+      window.removeEventListener('whitePageClose' as any, handleWhitePageClose);
+    };
+  }, []);
+
+  // Listen for navigate to about event from footer
+  useEffect(() => {
+    const handleNavigateToAbout = () => {
+      // Dispatch event to trigger zoom and planet click
+      window.dispatchEvent(new CustomEvent('zoomToPlanetAndOpen'));
+    };
+
+    window.addEventListener('navigateToAbout' as any, handleNavigateToAbout);
+    return () => window.removeEventListener('navigateToAbout' as any, handleNavigateToAbout);
   }, []);
 
   // Calculate scale based on zoom progress with easing
@@ -32,19 +60,27 @@ export default function Home() {
 
   return (
     <>
-      {/* Space background - FIXED, never zooms, always crisp */}
-      <div className="fixed inset-0" style={{ zIndex: 0 }}>
+      {/* Space background - FIXED, never zooms, always crisp - hide when white page open */}
+      <div
+        className="fixed inset-0 transition-opacity duration-800"
+        style={{
+          zIndex: 0,
+          opacity: whitePageOpen ? 0 : 1,
+          pointerEvents: whitePageOpen ? 'none' : 'auto',
+        }}
+      >
         <SpaceBackground />
       </div>
 
-      {/* Main content that zooms - everything except footer/header/background */}
+      {/* Main content that zooms - everything except footer/header/background - hide when white page open */}
       <div
-        className="fixed inset-0 origin-center"
+        className="fixed inset-0 origin-center transition-opacity duration-800"
         style={{
           transform: isMounted ? `scale(${scale})` : 'scale(1)',
-          transition: 'none', // Smooth via transform updates
-          pointerEvents: opacity > 0 ? 'auto' : 'none',
+          transition: 'opacity 0.8s ease',
+          pointerEvents: (opacity > 0 && !whitePageOpen) ? 'auto' : 'none',
           zIndex: 1,
+          opacity: whitePageOpen ? 0 : 1,
         }}
       >
         <main
@@ -64,7 +100,7 @@ export default function Home() {
 
       {/* 3D Scene Layer - Becomes visible as hero fades */}
       <Suspense fallback={null}>
-        <Scene3D />
+        <Scene3D progress={progress} />
       </Suspense>
 
       {/* Footer - ALWAYS visible, never scales */}

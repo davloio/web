@@ -10,6 +10,7 @@ export function HeroHeader() {
   const [headerText, setHeaderText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const [cursorFading, setCursorFading] = useState(false);
+  const [inDetailView, setInDetailView] = useState(false);
 
   useEffect(() => {
     // Listen for header show event
@@ -40,57 +41,131 @@ export function HeroHeader() {
     return () => window.removeEventListener('showHeader' as any, handleShowHeader);
   }, []);
 
+  // Listen for detail view changes
+  useEffect(() => {
+    const handleDetailViewChange = (e: CustomEvent) => {
+      setInDetailView(e.detail.inDetailView);
+    };
+
+    window.addEventListener('detailViewChange' as any, handleDetailViewChange);
+    return () => window.removeEventListener('detailViewChange' as any, handleDetailViewChange);
+  }, []);
+
   if (!showAsHeader) return null;
 
-  return (
-    <div className="fixed top-8 left-12 z-[100] flex items-center gap-4">
-      {/* Logo with shimmer wrapper */}
-      <div
-        style={{
-          animation: 'logoShimmer 3s ease-in-out 1.2s infinite'
-        }}
-      >
-        <img
-          src="/logo.svg"
-          alt="davlo.io"
-          style={{
-            width: '28px',
-            height: '28px',
-            opacity: 0,
-            transform: 'translateY(-10px) scale(0.8)',
-            animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-            animationDelay: '0.2s',
-            display: 'block'
-          }}
-        />
-      </div>
+  const textColor = inDetailView ? 'black' : 'white';
+  const logoSrc = inDetailView ? '/logo-black.svg' : '/logo-white.svg';
 
-      {/* Text */}
-      <h2 style={{
-        fontSize: '32px',
-        fontWeight: 900,
-        letterSpacing: '-0.06em',
-        fontFamily: 'nexa, sans-serif',
-        color: 'white'
-      }}>
-        {headerText}
-        {showCursor && (
-          <span
+  const handleBackClick = () => {
+    window.dispatchEvent(new CustomEvent('exitDetailView'));
+  };
+
+  return (
+    <div className="fixed top-8 left-12 z-[100] flex flex-col gap-4">
+      {/* Logo and Text Row */}
+      <div className="flex items-center gap-4">
+        {/* Logo with shimmer wrapper */}
+        <div
+          style={{
+            animation: inDetailView
+              ? 'logoShimmerBlack 3s ease-in-out 1.2s infinite'
+              : 'logoShimmer 3s ease-in-out 1.2s infinite',
+            transition: 'filter 0.5s ease'
+          }}
+        >
+          <img
+            src={logoSrc}
+            alt="davlo.io"
             style={{
-              display: 'inline-block',
-              width: '2px',
-              height: '0.8em',
-              backgroundColor: 'white',
-              animation: cursorFading ? 'none' : 'subtleBlink 1.5s ease-in-out infinite',
-              verticalAlign: 'middle',
-              marginLeft: '2px',
-              marginBottom: '0.1em',
-              opacity: cursorFading ? 0 : 1,
-              transition: 'opacity 1s ease-out'
+              width: '28px',
+              height: '28px',
+              opacity: 0,
+              transform: 'translateY(-10px) scale(0.8)',
+              animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              animationDelay: '0.2s',
+              display: 'block',
+              transition: 'opacity 0.5s ease'
             }}
           />
-        )}
-      </h2>
+        </div>
+
+        {/* Text */}
+        <h2 style={{
+          fontSize: '32px',
+          fontWeight: 900,
+          letterSpacing: '-0.06em',
+          fontFamily: 'nexa, sans-serif',
+          color: textColor,
+          transition: 'color 0.5s ease'
+        }}>
+          {headerText}
+          {showCursor && (
+            <span
+              style={{
+                display: 'inline-block',
+                width: '2px',
+                height: '0.8em',
+                backgroundColor: textColor,
+                animation: cursorFading ? 'none' : 'subtleBlink 1.5s ease-in-out infinite',
+                verticalAlign: 'middle',
+                marginLeft: '2px',
+                marginBottom: '0.1em',
+                opacity: cursorFading ? 0 : 1,
+                transition: 'background-color 0.5s ease, opacity 1s ease-out'
+              }}
+            />
+          )}
+        </h2>
+      </div>
+
+      {/* Back Button - Only visible in detail view */}
+      {inDetailView && (
+        <button
+          onClick={handleBackClick}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '11px',
+            fontWeight: 400,
+            letterSpacing: '0.03em',
+            fontFamily: 'var(--font-geist-sans)',
+            color: inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+            background: 'none',
+            border: 'none',
+            padding: '0',
+            cursor: 'pointer',
+            opacity: 0,
+            transform: 'translateX(-10px)',
+            animation: 'fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards',
+            transition: 'color 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = inDetailView ? 'black' : 'white';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+          }}
+        >
+          {/* Animated arrow icon */}
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 12L6 8L10 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>back to space</span>
+        </button>
+      )}
     </div>
   );
 }

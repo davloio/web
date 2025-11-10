@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, CanvasTexture } from 'three';
 import { Planet3DProps } from '@/types/planet';
@@ -26,12 +26,14 @@ export default function Planet3D({
   metalness = 0.1,
   onClick,
   onHover,
+  disableHover = false,
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<any>(null);
   const glowSpriteRef = useRef<any>(null);
   const [hovered, setHovered] = useState(false);
   const [currentGlow, setCurrentGlow] = useState(emissiveIntensity);
+  const [currentScale, setCurrentScale] = useState(1);
 
   // Create radial gradient texture for glow (like CSS box-shadow blur)
   const glowTexture = useMemo(() => {
@@ -59,11 +61,19 @@ export default function Planet3D({
     if (meshRef.current) {
       // More visible rotation speed
       meshRef.current.rotation.y += 0.005;
+
+      // Smooth scale transition for hover effect
+      if (!disableHover) {
+        const targetScale = hovered ? 1.02 : 1;
+        const newScale = currentScale + (targetScale - currentScale) * 0.1;
+        setCurrentScale(newScale);
+        meshRef.current.scale.setScalar(newScale);
+      }
     }
 
-    // Smooth glow transition
-    if (materialRef.current) {
-      const targetGlow = hovered ? emissiveIntensity * 2 : emissiveIntensity;
+    // Smooth glow transition - disabled when disableHover is true
+    if (materialRef.current && !disableHover) {
+      const targetGlow = hovered ? emissiveIntensity * 2.5 : emissiveIntensity;
       const newGlow = currentGlow + (targetGlow - currentGlow) * 0.1;
       setCurrentGlow(newGlow);
       materialRef.current.emissiveIntensity = newGlow;
@@ -76,20 +86,32 @@ export default function Planet3D({
   });
 
   const handlePointerOver = () => {
-    setHovered(true);
-    onHover?.(true);
-    document.body.style.cursor = 'pointer';
+    if (!disableHover) {
+      setHovered(true);
+      onHover?.(true);
+      document.body.style.cursor = 'pointer'; // Show pointer cursor
+    }
   };
 
   const handlePointerOut = () => {
-    setHovered(false);
-    onHover?.(false);
-    document.body.style.cursor = 'auto';
+    if (!disableHover) {
+      setHovered(false);
+      onHover?.(false);
+      document.body.style.cursor = 'auto'; // Reset cursor
+    }
   };
 
   const handleClick = () => {
     onClick?.();
   };
+
+  // Reset cursor when hover is disabled (e.g., when modal opens or zoom level changes)
+  useEffect(() => {
+    if (disableHover) {
+      document.body.style.cursor = 'auto';
+      setHovered(false);
+    }
+  }, [disableHover]);
 
   return (
     <group position={position} scale={scale}>

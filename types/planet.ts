@@ -34,4 +34,5 @@ export interface Planet3DProps {
   metalness?: number;
   onClick?: () => void;
   onHover?: (isHovered: boolean) => void;
+  disableHover?: boolean;
 }

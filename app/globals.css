@@ -159,6 +159,37 @@ body::before {
   }
 }
 
+@keyframes logoShimmerBlack {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 12px rgba(0, 0, 0, 0.2));
+  }
+}
+
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Disable all hover effects */
+.no-hover-effect,
+.no-hover-effect:hover,
+.no-hover-effect:focus,
+.no-hover-effect:active {
+  color: inherit !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+
 @keyframes planetPulse {
   0%, 100% {
     box-shadow: inset -20px 0 40px rgba(0, 0, 0, 0.15), 0 0 80px rgba(255, 255, 255, 0.3), 0 0 120px rgba(255, 255, 255, 0.15);
