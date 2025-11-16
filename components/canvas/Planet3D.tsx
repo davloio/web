@@ -33,7 +33,8 @@ export default function Planet3D({
   const glowSpriteRef = useRef<any>(null);
   const [hovered, setHovered] = useState(false);
   const [currentGlow, setCurrentGlow] = useState(emissiveIntensity);
-  const [currentScale, setCurrentScale] = useState(1);
+  const [currentGlowScale, setCurrentGlowScale] = useState(1);
+  const [currentGlowOpacity, setCurrentGlowOpacity] = useState(0.7);
 
   // Create radial gradient texture for glow (like CSS box-shadow blur)
   const glowTexture = useMemo(() => {
@@ -61,27 +62,35 @@ export default function Planet3D({
     if (meshRef.current) {
       // More visible rotation speed
       meshRef.current.rotation.y += 0.005;
-
-      // Smooth scale transition for hover effect
-      if (!disableHover) {
-        const targetScale = hovered ? 1.02 : 1;
-        const newScale = currentScale + (targetScale - currentScale) * 0.1;
-        setCurrentScale(newScale);
-        meshRef.current.scale.setScalar(newScale);
-      }
     }
 
     // Smooth glow transition - disabled when disableHover is true
     if (materialRef.current && !disableHover) {
-      const targetGlow = hovered ? emissiveIntensity * 2.5 : emissiveIntensity;
+      const targetGlow = hovered ? emissiveIntensity * 2 : emissiveIntensity;
       const newGlow = currentGlow + (targetGlow - currentGlow) * 0.1;
       setCurrentGlow(newGlow);
       materialRef.current.emissiveIntensity = newGlow;
     }
 
-    // Make glow sprite always face camera
+    // Animate glow sprite on hover
     if (glowSpriteRef.current) {
+      // Make sprite always face camera
       glowSpriteRef.current.quaternion.copy(camera.quaternion);
+
+      // Animate glow size and opacity on hover
+      if (!disableHover) {
+        const targetGlowScale = hovered ? 1.15 : 1;
+        const targetGlowOpacity = hovered ? 1.1 : 0.7;
+
+        const newGlowScale = currentGlowScale + (targetGlowScale - currentGlowScale) * 0.1;
+        const newGlowOpacity = currentGlowOpacity + (targetGlowOpacity - currentGlowOpacity) * 0.1;
+
+        setCurrentGlowScale(newGlowScale);
+        setCurrentGlowOpacity(newGlowOpacity);
+
+        glowSpriteRef.current.scale.set(4.5 * newGlowScale, 4.5 * newGlowScale, 1);
+        glowSpriteRef.current.material.opacity = newGlowOpacity;
+      }
     }
   });
 
@@ -120,7 +129,7 @@ export default function Planet3D({
         <spriteMaterial
           map={glowTexture}
           transparent={true}
-          opacity={1.0}
+          opacity={currentGlowOpacity}
           depthWrite={false}
           depthTest={false}
         />

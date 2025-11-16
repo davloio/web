@@ -1,6 +1,6 @@
 # davlo.io - Software for the Universe
 
-Next-generation interactive space-themed website for davlo.io, featuring blockchain explorers and software.
+Next-generation interactive space-themed website built by David and Loïs, featuring an immersive 3D experience with interactive planets and smooth animations.
 
 ## 🚀 Tech Stack
 
@@ -8,9 +8,9 @@ Next-generation interactive space-themed website for davlo.io, featuring blockch
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **3D Graphics**: Three.js + React Three Fiber
-- **Animations**: GSAP, Framer Motion
-- **Smooth Scroll**: Lenis
-- **Shaders**: Custom GLSL shaders
+- **Animations**: Framer Motion
+- **Build Tools**: Turbopack
+- **3D Rendering**: WebGL with custom shaders
 
 ## 🛠️ Development
 
@@ -34,49 +34,72 @@ Open [http://localhost:3000](http://localhost:3000) to see the result.
 
 ```
 ├── app/                    # Next.js app directory
-│   ├── layout.tsx         # Root layout with smooth scroll
-│   ├── page.tsx           # Homepage
-│   └── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Homepage with 3D scene
+│   └── globals.css        # Global styles & animations
 ├── components/
 │   ├── canvas/            # Three.js/R3F components
-│   │   ├── Scene.tsx      # Canvas wrapper
+│   │   ├── Scene3D.tsx    # Main 3D scene with wheel zoom
+│   │   ├── Planet3D.tsx   # Reusable planet component
 │   │   ├── Stars.tsx      # Star field
 │   │   └── Background.tsx # Gradient background
 │   └── ui/                # UI components
-│       ├── Hero.tsx       # Hero section
-│       ├── PlanetSection.tsx # Planet sections
-│       ├── SmoothScroll.tsx  # Lenis wrapper
-│       └── CustomCursor.tsx  # Custom cursor
-├── lib/
-│   └── shaders/           # GLSL shader files
+│       ├── Hero.tsx       # Hero section with header
+│       ├── DetailModal.tsx # About Us modal
+│       ├── Footer.tsx     # Footer component
+│       └── CustomCursor.tsx # Custom cursor
+├── hooks/
+│   └── useWheelZoom.ts    # Wheel-based zoom control
+├── types/
+│   └── planet.ts          # TypeScript interfaces
 └── public/                # Static assets
+    └── davlo_io_*.svg     # Logos (white & black)
 ```
 
 ## ✨ Features
 
-- **Smooth Scrolling**: Buttery smooth scroll experience with Lenis
+- **Wheel-Based Zoom**: Scroll to zoom into 3D space using mouse wheel
+- **Interactive Planet**: Click to enter detail view with smooth animations
+- **Dynamic Theme System**: Seamless white ↔ black transitions on planet interaction
+- **About Us Modal**: Immersive modal with staggered animations featuring:
+  - Team information (David & Loïs) with social links
+  - Mission and philosophy
+  - Tech stack constellation visualization
+  - Company slogan and branding
 - **Custom Cursor**: Interactive cursor with hover effects
 - **3D Star Field**: Thousands of animated stars
-- **Parallax Scrolling**: Multi-layer depth effects (coming soon)
-- **Planet Exploration**: Interactive zoom into planets (coming soon)
-- **Shader Effects**: Custom WebGL shaders for cosmic visuals
+- **Sprite-Based Glow**: Realistic planet glow effects
+- **Smooth Animations**: Framer Motion powered transitions
 
 ## 🎨 Design Philosophy
 
-- Minimalistic yet immersive
-- Space theme with deep blacks, purples, and blues
-- Desktop-first for tech-savvy audience
-- Parallax scrolling as the main wow factor
+- Minimalistic yet immersive space aesthetic
+- Dynamic theme transitions (white ↔ black)
+- Desktop-first experience for tech-savvy audience
+- 3D interaction as the main wow factor
 - Smooth transitions and micro-interactions
+- Clean typography with Geist Sans font family
+- Staggered animations for engaging content reveals
 
 ## 📝 TODO
 
 See [TODO.md](./TODO.md) for the complete list of planned features and open tasks.
 
-## 🌟 Slogan
+## 👥 Team
 
-**Software for the Universe**
+Built by **David** and **Loïs** - two passionate engineers who believe in building software that pushes boundaries and inspires innovation.
+
+- **David**: [Website](https://www.unterguggenberger.ch/) • [GitHub](https://github.com/JumpiiX)
+- **Loïs**: [Website](https://loiskauffungen.com/) • [GitHub](https://github.com/moinloin)
+
+## 🌟 Mission
+
+Creating tools and experiences that challenge the ordinary and push technical boundaries. We build with passion, precision, and a relentless focus on quality.
+
+## 🔧 Tech Stack Used
+
+Rust • Kubernetes • Go • TypeScript • Next.js • React • PostgreSQL • Docker • GraphQL
 
 ---
 
-Built with 🚀 by the davlo.io team
+**Software for the Universe**

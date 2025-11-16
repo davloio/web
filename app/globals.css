@@ -139,6 +139,21 @@ body::before {
   }
 }
 
+@keyframes planetMaterialize {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 0.8;
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
 @keyframes logoEntrance {
   0% {
     opacity: 0;
