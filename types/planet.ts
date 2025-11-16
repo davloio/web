@@ -1,7 +1,3 @@
-/**
- * Planet type definitions for the 3D space scene
- */
-
 export interface PlanetMetadata {
   title: string;
   description: string;
@@ -35,4 +31,6 @@ export interface Planet3DProps {
   onClick?: () => void;
   onHover?: (isHovered: boolean) => void;
   disableHover?: boolean;
+  showLabel?: boolean;
+  labelText?: string;
 }

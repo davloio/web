@@ -3,8 +3,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-// Register ScrollTrigger
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -30,10 +28,8 @@ export default function PlanetSection({
 
     const section = sectionRef.current;
     const content = contentRef.current;
-
-    // Create ScrollTrigger animation
     const ctx = gsap.context(() => {
-      // Fade in animation
+
       gsap.fromTo(
         content,
         {
@@ -63,7 +59,7 @@ export default function PlanetSection({
       className="relative min-h-screen flex items-center justify-center px-6"
     >
       <div ref={contentRef} className="text-center max-w-4xl">
-        {/* Planet preview circle (placeholder) */}
+        
         <div
           className="w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto mb-12 animate-pulse"
           style={{
@@ -75,7 +71,7 @@ export default function PlanetSection({
         <h2 className="text-5xl md:text-7xl font-bold mb-6">{title}</h2>
         <p className="text-xl md:text-2xl text-white/70">{description}</p>
 
-        {/* Placeholder for more content */}
+        
         <div className="mt-12 space-y-4 text-white/50">
           <p>🚀 Feature One - Coming soon</p>
           <p>⚡ Feature Two - Coming soon</p>

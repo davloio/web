@@ -36,16 +36,14 @@ html.lenis body {
 body {
   background: #000000;
   color: #ffffff;
-  overflow: hidden; /* Prevent all scrolling - camera zoom only */
+  overflow: hidden;
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100vh; /* Fixed height */
-  position: fixed; /* Keep body fixed */
+  height: 100vh;
+  position: fixed;
   width: 100%;
 }
-
-/* Selection colors */
 ::selection {
   background: rgba(139, 92, 246, 0.3);
   color: #ffffff;
@@ -55,14 +53,10 @@ body {
   background: rgba(139, 92, 246, 0.3);
   color: #ffffff;
 }
-
-/* Hide scrollbar but keep functionality */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
 }
-
-/* Noise texture overlay */
 body::before {
   content: '';
   position: fixed;
@@ -193,8 +187,6 @@ body::before {
     transform: translateX(0);
   }
 }
-
-/* Disable all hover effects */
 .no-hover-effect,
 .no-hover-effect:hover,
 .no-hover-effect:focus,
@@ -332,7 +324,7 @@ body::before {
 }
 
 @keyframes spaceshipFlyToPlanet {
-  /* Fly in from far left and draw the line in one smooth movement (0-45%) */
+
   0% {
     left: -30%;
     top: 50%;
@@ -346,14 +338,14 @@ body::before {
     opacity: 1;
     transform: translateY(-50%) rotate(0deg);
   }
-  /* Transition to planet (45-55%) */
+
   55% {
     left: calc(100vw + 60vh);
     top: 50%;
     opacity: 1;
     transform: translateY(-50%) rotate(-45deg);
   }
-  /* Orbit around planet (55-100%) */
+
   65% {
     left: calc(100vw + 60vh);
     top: calc(50% - 80vh);

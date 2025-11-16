@@ -8,22 +8,16 @@ export default function DecorativePlanet() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // Generate asteroids with fixed seed to avoid hydration issues
   const asteroids = useMemo(() => {
     if (!isMounted) return [];
 
     const result = [];
     const asteroidCount = 180;
-
-    // Simple seeded random function for consistent results
     let seed = 12345;
     const seededRandom = () => {
       seed = (seed * 9301 + 49297) % 233280;
       return seed / 233280;
     };
-
-    // Function to calculate y position along the curved path
     const getCurveY = (x: number) => {
       if (x <= 250) {
         const t = x / 250;
@@ -33,18 +27,16 @@ export default function DecorativePlanet() {
         return 35 + (60 - 35) * Math.sin(t * Math.PI / 2);
       }
     };
-
-    // Generate irregular asteroid shape
     const generateAsteroidShape = (size: number) => {
       const points = [];
-      const numPoints = 6 + Math.floor(seededRandom() * 4); // 6-9 points
+      const numPoints = 6 + Math.floor(seededRandom() * 4);
 
       for (let j = 0; j < numPoints; j++) {
         const angle = (j / numPoints) * Math.PI * 2;
-        // Vary the radius for each point to create irregular shape
-        const radiusVariation = 0.6 + seededRandom() * 0.5; // 0.6 to 1.1
+
+        const radiusVariation = 0.6 + seededRandom() * 0.5;
         const radius = size * radiusVariation;
-        const px = Math.cos(angle) * radius * 0.24; // horizontal scaling for aspect ratio
+        const px = Math.cos(angle) * radius * 0.24;
         const py = Math.sin(angle) * radius;
         points.push(`${px},${py}`);
       }
@@ -55,12 +47,8 @@ export default function DecorativePlanet() {
     for (let i = 0; i < asteroidCount; i++) {
       const x = (i / asteroidCount) * 500;
       const baseY = getCurveY(x);
-
-      // Add some vertical spread within the belt height
       const verticalSpread = (seededRandom() - 0.5) * 50;
       const y = baseY + verticalSpread;
-
-      // Random asteroid size - larger for visibility
       const size = 3 + seededRandom() * 4;
 
       result.push({
@@ -72,15 +60,13 @@ export default function DecorativePlanet() {
         shape: generateAsteroidShape(size),
       });
     }
-
-    // Add 6 bigger asteroids at strategic positions
-    const bigAsteroidPositions = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9]; // Positions along the belt (0-1)
+    const bigAsteroidPositions = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9];
     bigAsteroidPositions.forEach((pos, idx) => {
       const x = pos * 500;
       const baseY = getCurveY(x);
       const verticalSpread = (seededRandom() - 0.5) * 40;
       const y = baseY + verticalSpread;
-      const size = 10 + seededRandom() * 6; // Much larger: 10-16
+      const size = 10 + seededRandom() * 6;
 
       result.push({
         id: `big-${idx}`,
@@ -91,15 +77,13 @@ export default function DecorativePlanet() {
         shape: generateAsteroidShape(size),
       });
     });
-
-    // Add many tiny asteroids (almost like dust)
     const tinyAsteroidCount = 700;
     for (let i = 0; i < tinyAsteroidCount; i++) {
       const x = seededRandom() * 500;
       const baseY = getCurveY(x);
       const verticalSpread = (seededRandom() - 0.5) * 55;
       const y = baseY + verticalSpread;
-      const size = 0.8 + seededRandom() * 0.8; // Very small: 0.8-1.6
+      const size = 0.8 + seededRandom() * 0.8;
 
       result.push({
         id: `tiny-${i}`,
@@ -138,7 +122,7 @@ export default function DecorativePlanet() {
         }
       `}</style>
 
-      {/* Planet (background layer) */}
+      
       <div
         className="w-[300vh] h-[300vh] rounded-full relative"
         style={{
@@ -149,7 +133,7 @@ export default function DecorativePlanet() {
         }}
       />
 
-      {/* Small Black Planet - above asteroid belt */}
+      
       <div
         className="absolute w-[8vh] h-[8vh] rounded-full"
         style={{
@@ -161,12 +145,12 @@ export default function DecorativePlanet() {
         }}
       />
 
-      {/* Moon orbiting the black planet */}
+      
       <div
         className="absolute"
         style={{
-          left: '44vh', // Center of black planet (40vh + 4vh)
-          top: 'calc(35% + 4vh)', // Center of black planet
+          left: '44vh',
+          top: 'calc(35% + 4vh)',
           width: 0,
           height: 0,
         }}
@@ -190,7 +174,7 @@ export default function DecorativePlanet() {
         </div>
       </div>
 
-      {/* Asteroid Belt - individual asteroids along curved path */}
+      
       {isMounted && (
         <div
           className="absolute"
@@ -213,7 +197,7 @@ export default function DecorativePlanet() {
                 transform={`translate(${asteroid.x}, ${asteroid.y})`}
               />
             ))}
-            {/* Duplicate asteroids for seamless loop */}
+            
             {asteroids.map((asteroid) => (
               <polygon
                 key={`${asteroid.id}-duplicate`}

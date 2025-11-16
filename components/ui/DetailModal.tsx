@@ -14,14 +14,6 @@ interface DetailModalProps {
   team?: React.ReactNode;
 }
 
-/**
- * Full-screen white page view for planet detail content
- * Features:
- * - Complete white background takeover
- * - Centered content (no scrolling)
- * - ESC key support
- * - Smooth enter/exit animations
- */
 export default function DetailModal({
   isOpen,
   onClose,
@@ -38,7 +30,6 @@ export default function DetailModal({
     setIsMounted(true);
   }, []);
 
-  // Handle ESC key
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -49,8 +40,6 @@ export default function DetailModal({
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, onClose]);
-
-
   if (!isMounted) return null;
 
   return (
@@ -72,7 +61,27 @@ export default function DetailModal({
         >
           <div className="h-screen flex items-center justify-center px-12 py-16 relative">
 
-            {/* Subtitle - "about us" */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                position: 'absolute',
+                top: '140px',
+                left: '120px',
+                fontSize: '56px',
+                fontWeight: 900,
+                letterSpacing: '-0.06em',
+                fontFamily: 'nexa, sans-serif',
+                color: '#000000',
+                lineHeight: '1',
+                margin: 0,
+              }}
+            >
+              who we are
+            </motion.h1>
+
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -94,7 +103,6 @@ export default function DetailModal({
               about us
             </motion.h2>
 
-            {/* Text Block - Below "about us" */}
             {textBlock && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -115,7 +123,6 @@ export default function DetailModal({
               </motion.div>
             )}
 
-            {/* Subtitle - "our mission" */}
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -137,7 +144,6 @@ export default function DetailModal({
               our mission
             </motion.h2>
 
-            {/* Mission Text - Below "our mission" */}
             {missionText && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -158,7 +164,6 @@ export default function DetailModal({
               </motion.div>
             )}
 
-            {/* Tech Stack - Below mission text */}
             {techStack && (
               <>
                 <motion.h3
@@ -198,7 +203,6 @@ export default function DetailModal({
               </>
             )}
 
-            {/* Team - Top right */}
             {team && (
               <>
                 <motion.h3
@@ -238,7 +242,6 @@ export default function DetailModal({
               </>
             )}
 
-            {/* Content container */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -255,7 +258,6 @@ export default function DetailModal({
               {children}
             </motion.div>
 
-            {/* Slogan - Above Title */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -278,7 +280,6 @@ export default function DetailModal({
               software for the universe
             </motion.p>
 
-            {/* Title - Bottom Right */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

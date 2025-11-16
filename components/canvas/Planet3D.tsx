@@ -5,16 +5,6 @@ import { useFrame } from '@react-three/fiber';
 import { Mesh, CanvasTexture } from 'three';
 import { Planet3DProps } from '@/types/planet';
 
-/**
- * Reusable 3D Planet Component
- *
- * Features:
- * - High-quality sphere geometry
- * - CSS box-shadow style glow using sprite
- * - Smooth rotation on Y-axis
- * - Smooth hover glow transitions
- * - Click detection ready
- */
 export default function Planet3D({
   position,
   scale = 1,
@@ -27,6 +17,8 @@ export default function Planet3D({
   onClick,
   onHover,
   disableHover = false,
+  showLabel = false,
+  labelText = '',
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<any>(null);
@@ -36,14 +28,12 @@ export default function Planet3D({
   const [currentGlowScale, setCurrentGlowScale] = useState(1);
   const [currentGlowOpacity, setCurrentGlowOpacity] = useState(0.7);
 
-  // Create radial gradient texture for glow (like CSS box-shadow blur)
   const glowTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 256;
     canvas.height = 256;
     const ctx = canvas.getContext('2d')!;
 
-    // Create radial gradient from center
     const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
     gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.3)');
@@ -57,14 +47,54 @@ export default function Planet3D({
     return new CanvasTexture(canvas);
   }, []);
 
-  // Rotate planet on its axis - faster for visible rotation
-  useFrame(({ camera }) => {
-    if (meshRef.current) {
-      // More visible rotation speed
-      meshRef.current.rotation.y += 0.005;
-    }
+  const [textureReady, setTextureReady] = useState(false);
 
-    // Smooth glow transition - disabled when disableHover is true
+  const surfaceTexture = useMemo(() => {
+    if (!showLabel) return null;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 4096;
+    canvas.height = 2048;
+    const ctx = canvas.getContext('2d')!;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 4096, 2048);
+
+    const centerX = 2048;
+    const centerY = 1024;
+    const logoSize = 400;
+
+    const img = new Image();
+    img.src = '/logo-black.svg';
+
+    img.onload = () => {
+      ctx.drawImage(img, centerX - logoSize / 2, centerY - logoSize / 2, logoSize, logoSize);
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const textY = centerY + logoSize / 2 + 80;
+      ctx.font = '700 100px nexa, sans-serif';
+      ctx.letterSpacing = '-0.06em';
+
+      ctx.strokeStyle = 'rgb(0, 0, 0)';
+      ctx.lineWidth = 6;
+      ctx.lineJoin = 'round';
+      ctx.strokeText('who we are', centerX, textY);
+
+      ctx.fillStyle = 'rgb(0, 0, 0)';
+      ctx.fillText('who we are', centerX, textY);
+
+      texture.needsUpdate = true;
+      setTextureReady(true);
+    };
+
+    const texture = new CanvasTexture(canvas);
+    texture.anisotropy = 16;
+    return texture;
+  }, [showLabel]);
+
+  useFrame(({ camera }) => {
     if (materialRef.current && !disableHover) {
       const targetGlow = hovered ? emissiveIntensity * 2 : emissiveIntensity;
       const newGlow = currentGlow + (targetGlow - currentGlow) * 0.1;
@@ -72,12 +102,9 @@ export default function Planet3D({
       materialRef.current.emissiveIntensity = newGlow;
     }
 
-    // Animate glow sprite on hover
     if (glowSpriteRef.current) {
-      // Make sprite always face camera
       glowSpriteRef.current.quaternion.copy(camera.quaternion);
 
-      // Animate glow size and opacity on hover
       if (!disableHover) {
         const targetGlowScale = hovered ? 1.15 : 1;
         const targetGlowOpacity = hovered ? 1.1 : 0.7;
@@ -98,7 +125,7 @@ export default function Planet3D({
     if (!disableHover) {
       setHovered(true);
       onHover?.(true);
-      document.body.style.cursor = 'pointer'; // Show pointer cursor
+      document.body.style.cursor = 'pointer';
     }
   };
 
@@ -106,7 +133,7 @@ export default function Planet3D({
     if (!disableHover) {
       setHovered(false);
       onHover?.(false);
-      document.body.style.cursor = 'auto'; // Reset cursor
+      document.body.style.cursor = 'auto';
     }
   };
 
@@ -114,7 +141,6 @@ export default function Planet3D({
     onClick?.();
   };
 
-  // Reset cursor when hover is disabled (e.g., when modal opens or zoom level changes)
   useEffect(() => {
     if (disableHover) {
       document.body.style.cursor = 'auto';
@@ -122,38 +148,50 @@ export default function Planet3D({
     }
   }, [disableHover]);
 
+  useEffect(() => {
+    if (meshRef.current && showLabel) {
+      meshRef.current.rotation.y = -Math.PI / 2;
+    }
+  }, [showLabel]);
+
   return (
     <group position={position} scale={scale}>
-      {/* Glow sprite behind planet (CSS box-shadow effect) */}
-      <sprite ref={glowSpriteRef} scale={[4.5, 4.5, 1]} renderOrder={-1}>
-        <spriteMaterial
-          map={glowTexture}
-          transparent={true}
-          opacity={currentGlowOpacity}
-          depthWrite={false}
-          depthTest={false}
-        />
-      </sprite>
+      {!showLabel && (
+        <sprite ref={glowSpriteRef} scale={[4.5, 4.5, 1]} renderOrder={0}>
+          <spriteMaterial
+            map={glowTexture}
+            transparent={true}
+            opacity={currentGlowOpacity}
+            depthWrite={false}
+            depthTest={false}
+          />
+        </sprite>
+      )}
 
-      {/* Main Planet */}
       <mesh
         ref={meshRef}
         onClick={handleClick}
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
+        renderOrder={1}
       >
-        {/* Slightly lower poly for subtle faceted look (32 segments - very subtle low-poly) */}
         <sphereGeometry args={[1, 32, 32]} />
 
-        {/* Standard material */}
-        <meshStandardMaterial
-          ref={materialRef}
-          color={color}
-          emissive={emissive}
-          emissiveIntensity={currentGlow}
-          roughness={roughness}
-          metalness={metalness}
-        />
+        {showLabel ? (
+          <meshBasicMaterial
+            map={surfaceTexture}
+            toneMapped={false}
+          />
+        ) : (
+          <meshStandardMaterial
+            ref={materialRef}
+            color={color}
+            emissive={emissive}
+            emissiveIntensity={currentGlow}
+            roughness={roughness}
+            metalness={metalness}
+          />
+        )}
       </mesh>
     </group>
   );

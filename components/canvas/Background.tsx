@@ -7,7 +7,6 @@ import * as THREE from 'three';
 export default function Background() {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  // Shader material for animated gradient background
   const uniforms = useRef({
     time: { value: 0 },
     color1: { value: new THREE.Color('#000000') },
@@ -43,7 +42,6 @@ export default function Background() {
           void main() {
             vec2 uv = vUv;
 
-            // Create flowing gradient
             float noise = sin(uv.x * 2.0 + time) * cos(uv.y * 2.0 + time * 0.5);
 
             vec3 color = mix(color1, color2, uv.y + noise * 0.1);

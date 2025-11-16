@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
-// Separate Header component that can be rendered outside the zoom wrapper
 export function HeroHeader() {
   const [showAsHeader, setShowAsHeader] = useState(false);
   const [headerText, setHeaderText] = useState('');
@@ -13,12 +12,10 @@ export function HeroHeader() {
   const [inDetailView, setInDetailView] = useState(false);
 
   useEffect(() => {
-    // Listen for header show event
     const handleShowHeader = (e: CustomEvent) => {
       setShowAsHeader(true);
       setShowCursor(true);
 
-      // Type out header text
       const typeHeader = async () => {
         await new Promise(resolve => setTimeout(resolve, 200));
         const headerFullText = 'davlo.io';
@@ -27,7 +24,6 @@ export function HeroHeader() {
           await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 140));
         }
 
-        // Hide cursor after header is complete
         await new Promise(resolve => setTimeout(resolve, 6000));
         setCursorFading(true);
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -41,7 +37,6 @@ export function HeroHeader() {
     return () => window.removeEventListener('showHeader' as any, handleShowHeader);
   }, []);
 
-  // Listen for detail view changes
   useEffect(() => {
     const handleDetailViewChange = (e: CustomEvent) => {
       setInDetailView(e.detail.inDetailView);
@@ -62,9 +57,7 @@ export function HeroHeader() {
 
   return (
     <div className="fixed top-8 left-12 z-[100] flex flex-col gap-4">
-      {/* Logo and Text Row */}
       <div className="flex items-center gap-4">
-        {/* Logo with shimmer wrapper */}
         <div
           style={{
             animation: inDetailView
@@ -89,7 +82,6 @@ export function HeroHeader() {
           />
         </div>
 
-        {/* Text */}
         <h2 style={{
           fontSize: '32px',
           fontWeight: 900,
@@ -118,7 +110,6 @@ export function HeroHeader() {
         </h2>
       </div>
 
-      {/* Back Button - Only visible in detail view */}
       {inDetailView && (
         <button
           onClick={handleBackClick}
@@ -147,7 +138,6 @@ export function HeroHeader() {
             e.currentTarget.style.color = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
           }}
         >
-          {/* Animated arrow icon */}
           <svg
             width="14"
             height="14"
@@ -185,63 +175,47 @@ export default function Hero() {
   const [shuttleOrbiting, setShuttleOrbiting] = useState(false);
 
   useEffect(() => {
-    // Typewriter effect for complete title "davlo.io" (IntelliJ-style autocomplete)
     const typewriterSequence = async () => {
-      // Initial delay - wait for slogan to appear first
       await new Promise(resolve => setTimeout(resolve, 2500));
 
-      // Show cursor
       setShowCursor(true);
       await new Promise(resolve => setTimeout(resolve, 600));
 
-      // Type "d"
       setTypewriterText('d');
       await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Type "a"
       setTypewriterText('da');
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Show autocomplete suggestion "vlo.io"
       setTypewriterText('da{suggestion}vlo.io');
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Accept autocomplete - full text appears
       setTypewriterText('davlo.io');
       await new Promise(resolve => setTimeout(resolve, 400));
 
-      // Mark typing as complete (cursor keeps blinking)
       setTypingComplete(true);
 
-      // Wait 2.5 seconds before deleting
       await new Promise(resolve => setTimeout(resolve, 2500));
 
-      // Start deleting
       setIsDeleting(true);
       const fullText = 'davlo.io';
       for (let i = fullText.length - 1; i >= 0; i--) {
         setTypewriterText(fullText.substring(0, i));
-        // Random delay between 40-120ms for each deletion
         await new Promise(resolve => setTimeout(resolve, 40 + Math.random() * 80));
       }
 
-      // Hide main title elements
       setShowCursor(false);
       setIsDeleting(false);
 
-      // Hide IDE animation
       setShowIDE(false);
 
-      // Small delay before triggering header
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Dispatch event to show header (outside zoom wrapper)
       window.dispatchEvent(new CustomEvent('showHeader'));
     };
 
     typewriterSequence();
 
-    // Animate slogan (appears after zoom-out completes)
     if (sloganRef.current) {
       gsap.fromTo(
         sloganRef.current,
@@ -254,22 +228,19 @@ export default function Hero() {
           opacity: 1,
           duration: 1,
           ease: 'power2.out',
-          delay: 2.0, // Appears 2 seconds after page load
+          delay: 2.0,
         }
       );
     }
 
-    // Trigger shuttle animation once after delay (starts during/after IDE animation)
     const shuttleTimer = setTimeout(() => {
       setShuttleVisible(true);
     }, 4100);
 
-    // Trigger universe glow when shuttle passes by (about 75% through the line drawing)
     const universeGlowTimer = setTimeout(() => {
       setUniverseGlowing(true);
     }, 6100);
 
-    // Start orbiting animation after the initial flight completes
     const orbitTimer = setTimeout(() => {
       setShuttleOrbiting(true);
     }, 8100);
@@ -283,10 +254,8 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex flex-col items-start justify-center px-12">
-      {/* Title with IDE context (initial animation) - will zoom out with page */}
       {showIDE && (
         <div className="text-left">
-          {/* IDE window header */}
           <div style={{
             marginBottom: '16px',
             display: 'flex',
@@ -310,7 +279,6 @@ export default function Hero() {
           </div>
 
           <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-            {/* Line number */}
             <div style={{
               fontFamily: 'var(--font-geist-mono)',
               fontSize: '14px',
@@ -323,7 +291,6 @@ export default function Hero() {
             </div>
 
             <div>
-              {/* Animated title with typewriter */}
               <h1
                 ref={titleRef}
                 className="mb-1 overflow-hidden"
@@ -379,7 +346,6 @@ export default function Hero() {
         </div>
       )}
 
-      {/* Slogan at the bottom */}
       <motion.div
         ref={sloganRef}
         className="absolute bottom-0 text-white text-center w-full"
@@ -391,7 +357,7 @@ export default function Hero() {
           marginBottom: '10vh',
           mixBlendMode: 'difference',
           lineHeight: '0.9',
-          opacity: 0, // Start hidden, GSAP will animate it in
+          opacity: 0,
         }}
       >
         <div style={{ position: 'relative' }}>
@@ -409,7 +375,6 @@ export default function Hero() {
           }}
         >
           universe
-          {/* Spaceship line at the bottom of universe */}
           <span
             style={{
               position: 'absolute',
@@ -422,7 +387,6 @@ export default function Hero() {
               pointerEvents: 'none'
             }}
           >
-            {/* Animated line that gets drawn */}
             <span
               style={{
                 position: 'absolute',
@@ -450,31 +414,26 @@ export default function Hero() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-              {/* Main body */}
               <path
                 d="M20 8L26 16L20 24L18 22V10L20 8Z"
                 fill="white"
               />
-              {/* Nose cone */}
               <path
                 d="M26 16L30 16L28 14L26 16L28 18L30 16Z"
                 fill="white"
                 opacity="0.9"
               />
-              {/* Wings */}
               <path
                 d="M18 12L14 10L16 16L14 22L18 20V12Z"
                 fill="white"
                 opacity="0.7"
               />
-              {/* Window */}
               <circle
                 cx="20"
                 cy="16"
                 r="2"
                 fill="#666666"
               />
-              {/* Thruster flame */}
               <path
                 d="M14 14L10 16L14 18L12 16L14 14Z"
                 fill="#CCCCCC"

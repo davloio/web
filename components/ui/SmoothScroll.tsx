@@ -13,7 +13,7 @@ export default function SmoothScroll({
   const pathname = usePathname();
 
   useEffect(() => {
-    // Initialize Lenis
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -27,23 +27,19 @@ export default function SmoothScroll({
     });
 
     lenisRef.current = lenis;
-
-    // Animation frame loop
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
 
     requestAnimationFrame(raf);
-
-    // Cleanup
     return () => {
       lenis.destroy();
     };
   }, [pathname]);
 
   useEffect(() => {
-    // Expose lenis to GSAP ScrollTrigger
+
     if (lenisRef.current && typeof window !== 'undefined') {
       (window as any).lenis = lenisRef.current;
     }

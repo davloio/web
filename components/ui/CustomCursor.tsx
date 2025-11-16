@@ -28,7 +28,6 @@ export default function CustomCursor() {
     const handleMouseEnter = () => setIsVisible(true);
     const handleMouseLeave = () => setIsVisible(false);
 
-    // Check for interactive elements
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (
@@ -59,7 +58,6 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Main cursor dot */}
       <motion.div
         ref={cursorRef}
         className="pointer-events-none fixed z-[10000] mix-blend-difference"
@@ -81,7 +79,6 @@ export default function CustomCursor() {
         />
       </motion.div>
 
-      {/* Cursor trail/glow */}
       <motion.div
         className="pointer-events-none fixed z-[9999] rounded-full border border-white/20"
         style={{
