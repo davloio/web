@@ -45,3 +45,5 @@ next-env.d.ts
 TODO.md
 *.md.backup
 PARALLAX_PLANETS_PLAN.md
+
+docker-compose.caddy.yml

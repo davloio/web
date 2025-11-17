@@ -19,3 +19,4 @@ dist
 build
 TODO.md
 PARALLAX_PLANETS_PLAN.md
+docker-compose.caddy.yml
