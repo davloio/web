@@ -113,7 +113,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            NODE_VERSION=24.1.0
+            NODE_VERSION=24
 
       - name: Security scan
         uses: aquasecurity/trivy-action@master
