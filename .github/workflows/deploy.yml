@@ -22,10 +22,10 @@ jobs:
     name: Type Check
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run TypeScript type check
+      - name: Type check
         run: npm run type-check
 
   # Security audit
@@ -42,16 +42,16 @@ jobs:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'npm'
 
-      - name: Run npm audit
+      - name: Audit dependencies
         run: npm audit --audit-level=critical || echo "Non-critical vulnerabilities found, continuing..."
 
   # Build verification
@@ -60,10 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [type-check]
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -75,28 +75,21 @@ jobs:
       - name: Build application
         run: npm run build
 
-  # Build and push Docker image
+  # Build, scan, and push Docker image
   docker:
-    name: Build & Push Docker Image
+    name: Build, Scan & Push Image
     runs-on: ubuntu-latest
     needs: [build, security-audit]
     if: github.event_name != 'pull_request'
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
-      image-digest: ${{ steps.build.outputs.digest }}
+      image-digest: ${{ steps.push.outputs.digest }}
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
         id: meta
@@ -108,12 +101,12 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Build image
         id: build
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -121,32 +114,36 @@ jobs:
           build-args: |
             NODE_VERSION=24.1.0
 
-  # Security scan Docker image
-  security-scan:
-    name: Security Scan Image
-    runs-on: ubuntu-latest
-    needs: docker
-    if: github.event_name != 'pull_request'
-    steps:
-      - name: Run Trivy vulnerability scanner
+      - name: Security scan
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
+          exit-code: '1'
 
-      - name: Upload Trivy results to GitHub Security
+      - name: Upload scan results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # Deploy to production
+      - name: Push image
+        id: push
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$REGISTRY_TOKEN" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+          for tag in $(echo "${{ steps.meta.outputs.tags }}" | tr ',' '\n'); do
+            docker push "$tag"
+          done
+          echo "digest=$(docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --format='{{index .RepoDigests 0}}' | cut -d'@' -f2)" >> $GITHUB_OUTPUT
+
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [docker, security-scan]
+    needs: docker
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 15
     concurrency:
@@ -157,10 +154,10 @@ jobs:
       url: https://davlo.io
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to server
+      - name: Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
           IMAGE_TAG: ${{ github.sha }}
@@ -174,36 +171,22 @@ jobs:
           script_stop: true
           script: |
             set -e
-
-            # Navigate to deployment directory
             cd /home/deploy/deployment/web
-
-            # Pull latest docker-compose.yml
             git fetch origin main
             git checkout origin/main -- docker-compose.yml
-
-            # Export variables for docker-compose
             export IMAGE_TAG="${IMAGE_TAG}"
             export GITHUB_REPOSITORY="${GITHUB_REPOSITORY}"
-
-            # Pull new image
             docker compose pull
-
-            # Start new container (with healthcheck)
             docker compose up -d --wait --wait-timeout 60
-
-            # Verify deployment
             if ! docker compose ps | grep -q "healthy\|running"; then
               echo "Deployment failed - container not healthy"
               docker compose logs --tail=50
               docker compose down
               exit 1
             fi
-
-            # Clean up old images
             docker image prune -af --filter "label=org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}"
 
-      - name: Verify deployment health
+      - name: Verify health
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -212,17 +195,10 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd /home/deploy/deployment/web
-
-            # Wait a bit for app to be fully ready
             sleep 10
-
-            # Check container status
             docker compose ps
-
-            # Verify container is healthy
             if ! docker compose ps | grep -q "healthy\|running"; then
               echo "Health check failed!"
               exit 1
             fi
-
             echo "Deployment successful!"
