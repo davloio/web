@@ -253,7 +253,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-start justify-center px-12">
+    <section className="hero-section relative min-h-screen flex flex-col items-start justify-center">
       {showIDE && (
         <div className="text-left">
           <div style={{

@@ -1,12 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
+@import "tailwindcss";
 
 html {
   scroll-behavior: auto;
@@ -439,4 +437,14 @@ body::before {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.footer-container {
+  padding-bottom: 2rem;
+  padding-left: 2rem;
+}
+
+.hero-section {
+  padding-left: 3rem;
+  padding-right: 3rem;
 }

@@ -84,7 +84,7 @@ export default function Home() {
         <Scene3D progress={progress} />
       </Suspense>
 
-      <div className="fixed bottom-0 left-0 z-[100] p-6">
+      <div className="footer-container fixed bottom-0 left-0 z-[100]">
         <Footer />
       </div>
 
