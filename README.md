@@ -28,7 +28,7 @@ npm run build
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the result.
+Open [http://localhost:8000](http://localhost:8000) to see the result.
 
 ## 📁 Project Structure
 
