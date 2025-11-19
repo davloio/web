@@ -6,6 +6,16 @@ services:
     ports:
       - "8000:8000"
 
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=128M
+      - /app/.next/cache:noexec,nosuid,size=256M
+
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:8000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
@@ -32,3 +42,11 @@ services:
       - NODE_ENV=production
       - PORT=8000
       - HOSTNAME=0.0.0.0
+
+    networks:
+      - web-network
+
+networks:
+  web-network:
+    name: web-network
+    driver: bridge
