@@ -175,7 +175,7 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.3
         env:
-          IMAGE_TAG: main-${{ github.sha }}
+          IMAGE_TAG: latest
           GITHUB_REPOSITORY: ${{ github.repository }}
         with:
           host: ${{ secrets.SERVER_HOST }}
