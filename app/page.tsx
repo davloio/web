@@ -20,12 +20,12 @@ export default function Home() {
     const handleWhitePageOpen = () => setWhitePageOpen(true);
     const handleWhitePageClose = () => setWhitePageOpen(false);
 
-    window.addEventListener('whitePageOpen' as any, handleWhitePageOpen);
-    window.addEventListener('whitePageClose' as any, handleWhitePageClose);
+    window.addEventListener('whitePageOpen', handleWhitePageOpen);
+    window.addEventListener('whitePageClose', handleWhitePageClose);
 
     return () => {
-      window.removeEventListener('whitePageOpen' as any, handleWhitePageOpen);
-      window.removeEventListener('whitePageClose' as any, handleWhitePageClose);
+      window.removeEventListener('whitePageOpen', handleWhitePageOpen);
+      window.removeEventListener('whitePageClose', handleWhitePageClose);
     };
   }, []);
   useEffect(() => {
@@ -34,8 +34,8 @@ export default function Home() {
       window.dispatchEvent(new CustomEvent('zoomToPlanetAndOpen'));
     };
 
-    window.addEventListener('navigateToAbout' as any, handleNavigateToAbout);
-    return () => window.removeEventListener('navigateToAbout' as any, handleNavigateToAbout);
+    window.addEventListener('navigateToAbout', handleNavigateToAbout);
+    return () => window.removeEventListener('navigateToAbout', handleNavigateToAbout);
   }, []);
 
   const normalizedProgress = progress / 100;

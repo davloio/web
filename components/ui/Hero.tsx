@@ -12,7 +12,7 @@ export function HeroHeader() {
   const [inDetailView, setInDetailView] = useState(false);
 
   useEffect(() => {
-    const handleShowHeader = (e: CustomEvent) => {
+    const handleShowHeader = () => {
       setShowAsHeader(true);
       setShowCursor(true);
 
@@ -33,17 +33,17 @@ export function HeroHeader() {
       typeHeader();
     };
 
-    window.addEventListener('showHeader' as any, handleShowHeader);
-    return () => window.removeEventListener('showHeader' as any, handleShowHeader);
+    window.addEventListener('showHeader', handleShowHeader);
+    return () => window.removeEventListener('showHeader', handleShowHeader);
   }, []);
 
   useEffect(() => {
-    const handleDetailViewChange = (e: CustomEvent) => {
-      setInDetailView(e.detail.inDetailView);
+    const handleDetailViewChange = (e: Event) => {
+      setInDetailView((e as CustomEvent).detail.inDetailView);
     };
 
-    window.addEventListener('detailViewChange' as any, handleDetailViewChange);
-    return () => window.removeEventListener('detailViewChange' as any, handleDetailViewChange);
+    window.addEventListener('detailViewChange', handleDetailViewChange);
+    return () => window.removeEventListener('detailViewChange', handleDetailViewChange);
   }, []);
 
   if (!showAsHeader) return null;
@@ -166,13 +166,11 @@ export default function Hero() {
   const typewriterRef = useRef<HTMLSpanElement>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
-  const [cursorFading, setCursorFading] = useState(false);
+  const cursorFading = false;
   const [typingComplete, setTypingComplete] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [showIDE, setShowIDE] = useState(true);
   const [shuttleVisible, setShuttleVisible] = useState(false);
   const [universeGlowing, setUniverseGlowing] = useState(false);
-  const [shuttleOrbiting, setShuttleOrbiting] = useState(false);
 
   useEffect(() => {
     const typewriterSequence = async () => {
@@ -197,7 +195,6 @@ export default function Hero() {
 
       await new Promise(resolve => setTimeout(resolve, 2500));
 
-      setIsDeleting(true);
       const fullText = 'davlo.io';
       for (let i = fullText.length - 1; i >= 0; i--) {
         setTypewriterText(fullText.substring(0, i));
@@ -205,7 +202,6 @@ export default function Hero() {
       }
 
       setShowCursor(false);
-      setIsDeleting(false);
 
       setShowIDE(false);
 
@@ -241,14 +237,9 @@ export default function Hero() {
       setUniverseGlowing(true);
     }, 6100);
 
-    const orbitTimer = setTimeout(() => {
-      setShuttleOrbiting(true);
-    }, 8100);
-
     return () => {
       clearTimeout(shuttleTimer);
       clearTimeout(universeGlowTimer);
-      clearTimeout(orbitTimer);
     };
   }, []);
 

@@ -2,7 +2,6 @@
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useState, useRef } from 'react';
-import { getScrollZone } from '@/utils/scrollZones';
 import * as THREE from 'three';
 import Planet3D from './Planet3D';
 import DetailModal from '@/components/ui/DetailModal';
@@ -18,7 +17,6 @@ function CameraController({
   progress: number;
 }) {
   const { camera } = useThree();
-  const currentZone = getScrollZone(progress);
 
   const currentLookAtRef = useRef(new THREE.Vector3(0, 0, 0));
 
@@ -71,11 +69,6 @@ function CameraController({
     const lerpFactor = inDetailView ? 0.08 : 0.15;
     const newZ = currentZ + (targetZ - currentZ) * lerpFactor;
 
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-    const easedProgress = easeOutCubic(normalizedProgress);
-
-    const offsetProgress = Math.max(0, 1 - (normalizedProgress / 0.2));
-
     const planetX = -15;
     const planetY = 15;
     const planetZ = 0;
@@ -123,7 +116,6 @@ export default function Scene3D({ progress }: Scene3DProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [inDetailView, setInDetailView] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [isZooming, setIsZooming] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -158,8 +150,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
       handleModalClose();
     };
 
-    window.addEventListener('exitDetailView' as any, handleExitDetailView);
-    return () => window.removeEventListener('exitDetailView' as any, handleExitDetailView);
+    window.addEventListener('exitDetailView', handleExitDetailView);
+    return () => window.removeEventListener('exitDetailView', handleExitDetailView);
   }, [showModal]);
 
   useEffect(() => {
@@ -177,8 +169,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
       }
     };
 
-    window.addEventListener('zoomToPlanetAndOpen' as any, handleZoomToPlanetAndOpen);
-    return () => window.removeEventListener('zoomToPlanetAndOpen' as any, handleZoomToPlanetAndOpen);
+    window.addEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
+    return () => window.removeEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
   }, [progress]);
 
   const handlePlanetClick = () => {
@@ -187,12 +179,10 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
       window.dispatchEvent(new CustomEvent('whitePageOpen'));
 
-      setIsZooming(true);
       setInDetailView(true);
 
       setTimeout(() => {
         setShowModal(true);
-        setIsZooming(false);
       }, 200);
     }
   };

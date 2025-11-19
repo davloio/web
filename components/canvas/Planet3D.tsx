@@ -2,7 +2,7 @@
 
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, CanvasTexture } from 'three';
+import { Mesh, CanvasTexture, MeshStandardMaterial, SpriteMaterial } from 'three';
 import { Planet3DProps } from '@/types/planet';
 
 export default function Planet3D({
@@ -11,18 +11,16 @@ export default function Planet3D({
   color,
   emissive = color,
   emissiveIntensity = 0.3,
-  name,
   roughness = 0.9,
   metalness = 0.1,
   onClick,
   onHover,
   disableHover = false,
   showLabel = false,
-  labelText = '',
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
-  const materialRef = useRef<any>(null);
-  const glowSpriteRef = useRef<any>(null);
+  const materialRef = useRef<MeshStandardMaterial>(null);
+  const glowSpriteRef = useRef<Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const [currentGlow, setCurrentGlow] = useState(emissiveIntensity);
   const [currentGlowScale, setCurrentGlowScale] = useState(1);
@@ -46,8 +44,6 @@ export default function Planet3D({
 
     return new CanvasTexture(canvas);
   }, []);
-
-  const [textureReady, setTextureReady] = useState(false);
 
   const surfaceTexture = useMemo(() => {
     if (!showLabel) return null;
@@ -86,7 +82,6 @@ export default function Planet3D({
       ctx.fillText('who we are', centerX, textY);
 
       texture.needsUpdate = true;
-      setTextureReady(true);
     };
 
     const texture = new CanvasTexture(canvas);
@@ -116,7 +111,7 @@ export default function Planet3D({
         setCurrentGlowOpacity(newGlowOpacity);
 
         glowSpriteRef.current.scale.set(4.5 * newGlowScale, 4.5 * newGlowScale, 1);
-        glowSpriteRef.current.material.opacity = newGlowOpacity;
+        (glowSpriteRef.current.material as SpriteMaterial).opacity = newGlowOpacity;
       }
     }
   });

@@ -6,7 +6,7 @@
     "dev": "next dev -p 8000",
     "build": "next build",
     "start": "next start -p 8000",
-    "lint": "echo 'Linting skipped - Next.js 16 ESLint 9 compatibility issue' && exit 0",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

@@ -22,6 +22,25 @@ permissions:
   security-events: write
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run ESLint
+        run: npm run lint
+
   type-check:
     name: Type Check
     runs-on: ubuntu-latest
@@ -75,7 +94,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [type-check]
+    needs: [lint, type-check, security-audit]
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout
@@ -96,7 +115,7 @@ jobs:
   docker:
     name: Build, Scan & Push Image
     runs-on: ubuntu-latest
-    needs: [type-check, security-audit]
+    needs: [lint, type-check, security-audit]
     if: github.event_name != 'pull_request'
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}

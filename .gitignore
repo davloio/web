@@ -47,3 +47,10 @@ TODO.md
 PARALLAX_PLANETS_PLAN.md
 
 docker-compose.caddy.yml
+
+# linting
+.eslintcache
+
+# IDE
+.vscode/
+.idea/

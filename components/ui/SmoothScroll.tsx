@@ -40,7 +40,7 @@ export default function SmoothScroll({
   useEffect(() => {
 
     if (lenisRef.current && typeof window !== 'undefined') {
-      (window as any).lenis = lenisRef.current;
+      (window as typeof window & { lenis: Lenis }).lenis = lenisRef.current;
     }
   }, []);
 

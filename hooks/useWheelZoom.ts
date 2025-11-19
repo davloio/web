@@ -31,11 +31,11 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
   }, [disabled]);
 
   useEffect(() => {
-    const handleSetZoomProgress = (e: CustomEvent) => {
-      setProgress(e.detail.progress);
+    const handleSetZoomProgress = (e: Event) => {
+      setProgress((e as CustomEvent).detail.progress);
     };
-    window.addEventListener('setZoomProgress' as any, handleSetZoomProgress);
-    return () => window.removeEventListener('setZoomProgress' as any, handleSetZoomProgress);
+    window.addEventListener('setZoomProgress', handleSetZoomProgress);
+    return () => window.removeEventListener('setZoomProgress', handleSetZoomProgress);
   }, []);
 
   const disabledRef = useRef(disabled);
@@ -65,17 +65,20 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
       });
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
+    const handleTouchMove = (e: Event) => {
       if (disabledRef.current) return;
       e.preventDefault();
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    const wheelOptions: AddEventListenerOptions = { passive: false, capture: true };
+    const touchOptions: AddEventListenerOptions = { passive: false };
+
+    window.addEventListener('wheel', handleWheel, wheelOptions);
+    window.addEventListener('touchmove', handleTouchMove, touchOptions);
 
     return () => {
-      window.removeEventListener('wheel', handleWheel, { passive: false, capture: true } as any);
-      window.removeEventListener('touchmove', handleTouchMove, { passive: false } as any);
+      window.removeEventListener('wheel', handleWheel, wheelOptions);
+      window.removeEventListener('touchmove', handleTouchMove, touchOptions);
     };
   }, []);
 

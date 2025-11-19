@@ -13,12 +13,12 @@ export default function Footer() {
     setIsMounted(true);
   }, []);
   useEffect(() => {
-    const handleDetailViewChange = (e: CustomEvent) => {
-      setInDetailView(e.detail.inDetailView);
+    const handleDetailViewChange = (e: Event) => {
+      setInDetailView((e as CustomEvent).detail.inDetailView);
     };
 
-    window.addEventListener('detailViewChange' as any, handleDetailViewChange);
-    return () => window.removeEventListener('detailViewChange' as any, handleDetailViewChange);
+    window.addEventListener('detailViewChange', handleDetailViewChange);
+    return () => window.removeEventListener('detailViewChange', handleDetailViewChange);
   }, []);
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -69,7 +69,6 @@ export default function Footer() {
     { name: 'contact', href: 'mailto:hello@davlo.io', hoverIcon: 'spaceship' },
   ];
 
-  const textColor = inDetailView ? 'black' : 'white';
   const linkIdleColor = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
   const linkHoverColor = inDetailView ? 'black' : 'white';
   const tooltipColor = inDetailView ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';
@@ -91,9 +90,11 @@ export default function Footer() {
                 color: linkIdleColor,
                 transition: 'color 0.5s ease'
               }}
-              onClick={(link as any).onClick}
+              onClick={'onClick' in link ? link.onClick : undefined}
               onMouseEnter={(e) => {
-                (link.hoverText || link.hoverIcon) && setHoveredLink(link.name);
+                if (link.hoverText || link.hoverIcon) {
+                  setHoveredLink(link.name);
+                }
                 e.currentTarget.style.color = linkHoverColor;
               }}
               onMouseLeave={(e) => {
