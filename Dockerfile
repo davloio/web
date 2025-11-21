@@ -3,6 +3,8 @@ FROM node:${NODE_VERSION}-alpine AS base
 
 RUN apk update && apk upgrade --no-cache && apk add --no-cache libc6-compat
 
+RUN npm install -g npm@latest
+
 FROM base AS deps
 WORKDIR /app
 
