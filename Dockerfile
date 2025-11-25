@@ -1,7 +1,9 @@
 ARG NODE_VERSION=24
 FROM node:${NODE_VERSION}-alpine AS base
 
-RUN apk update && apk upgrade --no-cache && apk add --no-cache libc6-compat
+RUN apk update && apk upgrade --no-cache && \
+    apk add --no-cache libc6-compat && \
+    apk add --no-cache --upgrade busybox>=1.37.0-r20 ssl_client>=1.37.0-r20
 
 RUN npm install -g npm@latest
 
