@@ -33,4 +33,5 @@ export interface Planet3DProps {
   disableHover?: boolean;
   showLabel?: boolean;
   labelText?: string;
+  zoomProgress?: number;
 }

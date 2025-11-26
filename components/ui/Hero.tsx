@@ -247,28 +247,50 @@ export default function Hero() {
     <section className="hero-section relative min-h-screen flex flex-col items-start justify-center">
       {showIDE && (
         <div className="text-left">
+          {/* Minimal IDE Header */}
           <div style={{
-            marginBottom: '16px',
+            marginBottom: '20px',
             display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            opacity: 0.6
+            flexDirection: 'column',
+            gap: '8px',
           }}>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FF5F56' }}></div>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FFBD2E' }}></div>
-              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27C93F' }}></div>
+            {/* Window Controls + Filename */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              opacity: 0.5
+            }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FF5F56' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FFBD2E' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#27C93F' }}></div>
+              </div>
+              <span style={{
+                fontFamily: 'var(--font-geist-mono)',
+                fontSize: '13px',
+                color: '#888',
+                fontWeight: 500
+              }}>
+                index.tsx
+              </span>
             </div>
-            <span style={{
+
+            {/* Simple syntax-highlighted code context */}
+            <div style={{
               fontFamily: 'var(--font-geist-mono)',
               fontSize: '13px',
-              color: '#888',
-              fontWeight: 500
+              opacity: 0.4,
+              marginBottom: '8px',
             }}>
-              index.tsx
-            </span>
+              <span style={{ color: '#C586C0' }}>const</span>
+              <span style={{ color: '#9CDCFE' }}> title </span>
+              <span style={{ color: '#D4D4D4' }}>= </span>
+              <span style={{ color: '#CE9178' }}>"</span>
+            </div>
           </div>
 
+          {/* Main typewriter content */}
           <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
             <div style={{
               fontFamily: 'var(--font-geist-mono)',
@@ -276,7 +298,8 @@ export default function Hero() {
               color: '#444',
               paddingTop: '8px',
               userSelect: 'none',
-              fontWeight: 600
+              fontWeight: 600,
+              opacity: 0.3,
             }}>
               1
             </div>
@@ -306,8 +329,22 @@ export default function Hero() {
                     padding: '4px 8px',
                     borderRadius: '6px',
                     border: '1px solid rgba(139, 92, 246, 0.3)',
+                    position: 'relative',
                   }}
                 >
+                  {/* Small "Tab to accept" hint */}
+                  <span style={{
+                    position: 'absolute',
+                    top: '-20px',
+                    right: '0',
+                    fontSize: '10px',
+                    color: '#8B5CF6',
+                    fontFamily: 'var(--font-geist-mono)',
+                    opacity: 0.6,
+                    whiteSpace: 'nowrap',
+                  }}>
+                    Tab
+                  </span>
                   {typewriterText.split('{suggestion}')[1]}
                 </span>
               </>

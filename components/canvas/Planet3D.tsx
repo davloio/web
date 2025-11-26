@@ -17,6 +17,7 @@ export default function Planet3D({
   onHover,
   disableHover = false,
   showLabel = false,
+  zoomProgress = 0,
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -76,10 +77,10 @@ export default function Planet3D({
       ctx.strokeStyle = 'rgb(0, 0, 0)';
       ctx.lineWidth = 6;
       ctx.lineJoin = 'round';
-      ctx.strokeText('who we are', centerX, textY);
+      ctx.strokeText('about', centerX, textY);
 
       ctx.fillStyle = 'rgb(0, 0, 0)';
-      ctx.fillText('who we are', centerX, textY);
+      ctx.fillText('about', centerX, textY);
 
       texture.needsUpdate = true;
     };
@@ -173,10 +174,15 @@ export default function Planet3D({
         <sphereGeometry args={[1, 32, 32]} />
 
         {showLabel ? (
-          <meshBasicMaterial
-            map={surfaceTexture}
-            toneMapped={false}
-          />
+          <>
+            <meshStandardMaterial
+              color={color}
+              emissive={emissive}
+              emissiveIntensity={emissiveIntensity}
+              roughness={roughness}
+              metalness={metalness}
+            />
+          </>
         ) : (
           <meshStandardMaterial
             ref={materialRef}
@@ -188,6 +194,22 @@ export default function Planet3D({
           />
         )}
       </mesh>
+
+      {showLabel && (
+        <mesh
+          position={[0, 0, 0]}
+          rotation={[0, -Math.PI / 2, 0]}
+          renderOrder={2}
+        >
+          <sphereGeometry args={[1.001, 32, 32]} />
+          <meshBasicMaterial
+            map={surfaceTexture}
+            toneMapped={false}
+            opacity={zoomProgress <= 75 ? 0 : Math.min(1, (zoomProgress - 75) / 25)}
+            transparent={true}
+          />
+        </mesh>
+      )}
     </group>
   );
 }

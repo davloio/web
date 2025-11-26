@@ -252,6 +252,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
               disableHover={inDetailView || progress < 95}
               showLabel={true}
               labelText="davlo.io"
+              zoomProgress={progress}
             />
           </group>
         </Suspense>
