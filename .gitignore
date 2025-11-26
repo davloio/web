@@ -40,11 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Claude Code context and project files
+# Claude Code context
 .claude/
-TODO.md
-*.md.backup
-PARALLAX_PLANETS_PLAN.md
+CLAUDE.md
 
 docker-compose.caddy.yml
 
