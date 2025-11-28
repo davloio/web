@@ -12,7 +12,7 @@ function CameraController({
   modalOpen,
   progress
 }: {
-  inDetailView: boolean;
+  inDetailView: 'about' | 'projects' | null;
   modalOpen: boolean;
   progress: number;
 }) {
@@ -56,35 +56,96 @@ function CameraController({
 
     const normalizedProgress = progress / 100;
 
+    const aboutPlanetX = -15;
+    const aboutPlanetY = 15;
+    const aboutPlanetZ = 0;
+    const projectsPlanetX = -90;
+    const projectsPlanetY = 8;
+    const projectsPlanetZ = -40;
+
     const startZ = 50;
-    const endZ = 8;
+    const zoomZ = 8;
     const detailZ = 4.2;
-
-    let targetZ = startZ - (startZ - endZ) * normalizedProgress;
-    if (inDetailView) {
-      targetZ = detailZ;
-    }
-
-    const currentZ = camera.position.z;
-    const lerpFactor = inDetailView ? 0.08 : 0.15;
-    const newZ = currentZ + (targetZ - currentZ) * lerpFactor;
-
-    const planetX = -15;
-    const planetY = 15;
-    const planetZ = 0;
+    const transitionZ = 30;
 
     const startCameraX = 15;
     const startCameraY = -15;
-    const endCameraX = -15;
-    const endCameraY = 15;
 
-    const targetPosX = inDetailView
-      ? planetX
-      : startCameraX + (endCameraX - startCameraX) * normalizedProgress;
+    let targetZ: number;
+    let targetPosX: number;
+    let targetPosY: number;
+    let targetLookAtX: number;
+    let targetLookAtY: number;
+    let targetLookAtZ: number;
 
-    const targetPosY = inDetailView
-      ? planetY
-      : startCameraY + (endCameraY - startCameraY) * normalizedProgress;
+    const lerpFactor = inDetailView !== null ? 0.08 : 0.15;
+
+    if (inDetailView === 'about') {
+      targetZ = detailZ;
+      targetPosX = aboutPlanetX;
+      targetPosY = aboutPlanetY;
+      targetLookAtX = aboutPlanetX;
+      targetLookAtY = aboutPlanetY;
+      targetLookAtZ = aboutPlanetZ;
+    } else if (inDetailView === 'projects') {
+      targetZ = detailZ;
+      targetPosX = projectsPlanetX;
+      targetPosY = projectsPlanetY;
+      targetLookAtX = projectsPlanetX;
+      targetLookAtY = projectsPlanetY;
+      targetLookAtZ = projectsPlanetZ;
+    } else if (normalizedProgress < 1.0) {
+      const zoneProgress = normalizedProgress;
+      targetZ = startZ - (startZ - zoomZ) * zoneProgress;
+      targetPosX = startCameraX + (aboutPlanetX - startCameraX) * zoneProgress;
+      targetPosY = startCameraY + (aboutPlanetY - startCameraY) * zoneProgress;
+      targetLookAtX = aboutPlanetX * zoneProgress;
+      targetLookAtY = aboutPlanetY * zoneProgress;
+      targetLookAtZ = aboutPlanetZ;
+    } else if (normalizedProgress < 1.1) {
+      targetZ = zoomZ;
+      targetPosX = aboutPlanetX;
+      targetPosY = aboutPlanetY;
+      targetLookAtX = aboutPlanetX;
+      targetLookAtY = aboutPlanetY;
+      targetLookAtZ = aboutPlanetZ;
+    } else if (normalizedProgress < 1.3) {
+      if (normalizedProgress < 1.17) {
+        const subProgress = (normalizedProgress - 1.1) / 0.07;
+        targetZ = zoomZ + (transitionZ - zoomZ) * subProgress;
+        targetPosX = aboutPlanetX;
+        targetPosY = aboutPlanetY;
+        targetLookAtX = aboutPlanetX;
+        targetLookAtY = aboutPlanetY;
+        targetLookAtZ = aboutPlanetZ;
+      } else if (normalizedProgress < 1.23) {
+        const subProgress = (normalizedProgress - 1.17) / 0.06;
+        targetZ = transitionZ;
+        targetPosX = aboutPlanetX + (projectsPlanetX - aboutPlanetX) * subProgress;
+        targetPosY = aboutPlanetY + (projectsPlanetY - aboutPlanetY) * subProgress;
+        targetLookAtX = aboutPlanetX + (projectsPlanetX - aboutPlanetX) * subProgress;
+        targetLookAtY = aboutPlanetY + (projectsPlanetY - aboutPlanetY) * subProgress;
+        targetLookAtZ = aboutPlanetZ;
+      } else {
+        const subProgress = (normalizedProgress - 1.23) / 0.07;
+        targetZ = transitionZ - (transitionZ - zoomZ) * subProgress;
+        targetPosX = projectsPlanetX;
+        targetPosY = projectsPlanetY;
+        targetLookAtX = projectsPlanetX;
+        targetLookAtY = projectsPlanetY;
+        targetLookAtZ = projectsPlanetZ;
+      }
+    } else {
+      targetZ = zoomZ;
+      targetPosX = projectsPlanetX;
+      targetPosY = projectsPlanetY;
+      targetLookAtX = projectsPlanetX;
+      targetLookAtY = projectsPlanetY;
+      targetLookAtZ = projectsPlanetZ;
+    }
+
+    const currentZ = camera.position.z;
+    const newZ = currentZ + (targetZ - currentZ) * lerpFactor;
 
     const currentX = camera.position.x;
     const currentY = camera.position.y;
@@ -92,10 +153,6 @@ function CameraController({
     const newY = currentY + (targetPosY - currentY) * lerpFactor;
 
     camera.position.set(newX, newY, newZ);
-
-    const targetLookAtX = inDetailView ? planetX : planetX * normalizedProgress;
-    const targetLookAtY = inDetailView ? planetY : planetY * normalizedProgress;
-    const targetLookAtZ = planetZ;
 
     const currentLookAt = currentLookAtRef.current;
     currentLookAt.x += (targetLookAtX - currentLookAt.x) * lerpFactor;
@@ -114,8 +171,8 @@ interface Scene3DProps {
 
 export default function Scene3D({ progress }: Scene3DProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [inDetailView, setInDetailView] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [inDetailView, setInDetailView] = useState<'about' | 'projects' | null>(null);
+  const [showModal, setShowModal] = useState<'about' | 'projects' | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -124,15 +181,21 @@ export default function Scene3D({ progress }: Scene3DProps) {
   const handleModalClose = () => {
     setGlobalWheelDisabled(false);
 
-    setShowModal(false);
+    const wasShowingProjects = showModal === 'projects';
 
-    setInDetailView(false);
+    setShowModal(null);
 
-    window.dispatchEvent(new CustomEvent('whitePageClose'));
+    setInDetailView(null);
+
+    if (wasShowingProjects) {
+      window.dispatchEvent(new CustomEvent('pinkPageClose'));
+    } else {
+      window.dispatchEvent(new CustomEvent('whitePageClose'));
+    }
   };
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && inDetailView) {
+      if (e.key === 'Escape' && inDetailView !== null) {
         handleModalClose();
       }
     };
@@ -156,15 +219,15 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
   useEffect(() => {
     const handleZoomToPlanetAndOpen = () => {
-      if (progress >= 95) {
-        handlePlanetClick();
-      } else {
+      if (progress >= 100 && progress < 110) {
+        handleAboutClick();
+      } else if (progress < 100) {
         setGlobalWheelDisabled(true);
 
         window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 100 } }));
 
         setTimeout(() => {
-          handlePlanetClick();
+          handleAboutClick();
         }, 1000);
       }
     };
@@ -173,16 +236,30 @@ export default function Scene3D({ progress }: Scene3DProps) {
     return () => window.removeEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
   }, [progress]);
 
-  const handlePlanetClick = () => {
-    if (progress >= 95) {
+  const handleAboutClick = () => {
+    if (progress >= 100 && progress < 110) {
       setGlobalWheelDisabled(true);
 
       window.dispatchEvent(new CustomEvent('whitePageOpen'));
 
-      setInDetailView(true);
+      setInDetailView('about');
 
       setTimeout(() => {
-        setShowModal(true);
+        setShowModal('about');
+      }, 200);
+    }
+  };
+
+  const handleProjectsClick = () => {
+    if (progress >= 245) {
+      setGlobalWheelDisabled(true);
+
+      window.dispatchEvent(new CustomEvent('pinkPageOpen'));
+
+      setInDetailView('projects');
+
+      setTimeout(() => {
+        setShowModal('projects');
       }, 200);
     }
   };
@@ -195,9 +272,9 @@ export default function Scene3D({ progress }: Scene3DProps) {
         className="fixed inset-0 pointer-events-auto"
         style={{
           zIndex: 2,
-          opacity: showModal ? 0 : 1,
-          transform: inDetailView ? 'scale(1.5)' : 'scale(1)',
-          pointerEvents: showModal ? 'none' : 'auto',
+          opacity: showModal !== null ? 0 : 1,
+          transform: inDetailView !== null ? 'scale(1.5)' : 'scale(1)',
+          pointerEvents: showModal !== null ? 'none' : 'auto',
           transition: 'opacity 0.35s ease-in-out, transform 0.35s ease-in-out',
           transformOrigin: 'center center',
           animation: 'planetMaterialize 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
@@ -217,7 +294,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
-          <CameraController inDetailView={inDetailView} modalOpen={showModal} progress={progress} />
+          <CameraController inDetailView={inDetailView} modalOpen={showModal !== null} progress={progress} />
 
           <ambientLight intensity={0.3} />
 
@@ -248,11 +325,32 @@ export default function Scene3D({ progress }: Scene3DProps) {
               name="davlo.io"
               roughness={0.7}
               metalness={0.1}
-              onClick={handlePlanetClick}
-              disableHover={inDetailView || progress < 95}
+              onClick={handleAboutClick}
+              disableHover={inDetailView !== null || progress < 100 || progress >= 110}
               showLabel={true}
-              labelText="davlo.io"
+              labelText="about"
               zoomProgress={progress}
+              textFadeStart={75}
+              textFadeRange={25}
+              glowColor="#ffffff"
+            />
+            <Planet3D
+              position={[-90, 8, -40]}
+              scale={4}
+              color="#FFC0CB"
+              emissive="#FFC0CB"
+              emissiveIntensity={0.5}
+              name="projects"
+              roughness={0.7}
+              metalness={0.1}
+              onClick={handleProjectsClick}
+              disableHover={inDetailView !== null || progress < 245}
+              showLabel={true}
+              labelText="projects"
+              zoomProgress={progress}
+              textFadeStart={220}
+              textFadeRange={25}
+              glowColor="#FFC0CB"
             />
           </group>
         </Suspense>
@@ -260,38 +358,53 @@ export default function Scene3D({ progress }: Scene3DProps) {
     </div>
 
     <DetailModal
-      isOpen={showModal}
+      isOpen={showModal !== null}
       onClose={handleModalClose}
+      backgroundColor={showModal === 'projects' ? '#FFC0CB' : '#ffffff'}
       textBlock={
-        <p style={{
-          fontSize: '18px',
-          lineHeight: '1.7',
-          fontWeight: 400,
-          color: '#000000',
-          margin: 0,
-        }}>
-          We are two colleagues with a shared obsession: building software that actually matters.
-          We spend our free time creating what doesn't exist yet not following trends, but setting them.
-          Anyone can copy what's already been done. We build what hasn't, bringing real innovation and value to every project.
-          We're always at the forefront of new technologies, turning cutting-edge ideas into working products.
-          Everything here is built in our free time. This shows that great engineering comes from passion.
-        </p>
+        showModal === 'projects' ? (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
+            color: '#000000',
+            margin: 0,
+          }}>
+            Our projects showcase innovative blockchain software. More coming soon.
+          </p>
+        ) : (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
+            color: '#000000',
+            margin: 0,
+          }}>
+            We are two colleagues with a shared obsession: building software that actually matters.
+            We spend our free time creating what doesn't exist yet not following trends, but setting them.
+            Anyone can copy what's already been done. We build what hasn't, bringing real innovation and value to every project.
+            We're always at the forefront of new technologies, turning cutting-edge ideas into working products.
+            Everything here is built in our free time. This shows that great engineering comes from passion.
+          </p>
+        )
       }
       missionText={
-        <p style={{
-          fontSize: '18px',
-          lineHeight: '1.7',
-          fontWeight: 400,
-          color: '#000000',
-          margin: 0,
-        }}>
-          Software for the universe means thinking bigger. We don't build basic tools that anyone can create.
-          We develop solutions that solve real problems, improve systems, and expand what's possible.
-          Every project pushes boundaries. Every line of code serves a purpose.
-          We're not here to add to the noise we're here to build what actually matters and makes the universe a better place.
-        </p>
+        showModal === 'about' ? (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
+            color: '#000000',
+            margin: 0,
+          }}>
+            Software for the universe means thinking bigger. We don't build basic tools that anyone can create.
+            We develop solutions that solve real problems, improve systems, and expand what's possible.
+            Every project pushes boundaries. Every line of code serves a purpose.
+            We're not here to add to the noise we're here to build what actually matters and makes the universe a better place.
+          </p>
+        ) : undefined
       }
-      team={
+      team={showModal === 'about' ? (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -359,8 +472,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
             </div>
           ))}
         </div>
-      }
-      techStack={
+      ) : undefined}
+      techStack={showModal === 'about' ? (
         <div style={{
           position: 'relative',
           width: 'calc(96px * 7)',
@@ -429,7 +542,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
             </div>
           ))}
         </div>
-      }
+      ) : undefined}
     >
     </DetailModal>
     </>

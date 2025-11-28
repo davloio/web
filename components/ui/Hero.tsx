@@ -9,7 +9,7 @@ export function HeroHeader() {
   const [headerText, setHeaderText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const [cursorFading, setCursorFading] = useState(false);
-  const [inDetailView, setInDetailView] = useState(false);
+  const [inDetailView, setInDetailView] = useState<'about' | 'projects' | null>(null);
 
   useEffect(() => {
     const handleShowHeader = () => {
@@ -48,8 +48,8 @@ export function HeroHeader() {
 
   if (!showAsHeader) return null;
 
-  const textColor = inDetailView ? 'black' : 'white';
-  const logoSrc = inDetailView ? '/logo-black.svg' : '/logo-white.svg';
+  const textColor = inDetailView !== null ? 'black' : 'white';
+  const logoSrc = inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
 
   const handleBackClick = () => {
     window.dispatchEvent(new CustomEvent('exitDetailView'));
@@ -60,7 +60,7 @@ export function HeroHeader() {
       <div className="flex items-center gap-4">
         <div
           style={{
-            animation: inDetailView
+            animation: inDetailView !== null
               ? 'logoShimmerBlack 3s ease-in-out 1.2s infinite'
               : 'logoShimmer 3s ease-in-out 1.2s infinite',
             transition: 'filter 0.5s ease'
@@ -110,7 +110,7 @@ export function HeroHeader() {
         </h2>
       </div>
 
-      {inDetailView && (
+      {inDetailView !== null && (
         <button
           onClick={handleBackClick}
           style={{
@@ -121,7 +121,7 @@ export function HeroHeader() {
             fontWeight: 400,
             letterSpacing: '0.03em',
             fontFamily: 'var(--font-geist-sans)',
-            color: inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+            color: inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
             background: 'none',
             border: 'none',
             padding: '0',
@@ -132,10 +132,10 @@ export function HeroHeader() {
             transition: 'color 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = inDetailView ? 'black' : 'white';
+            e.currentTarget.style.color = inDetailView !== null ? 'black' : 'white';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+            e.currentTarget.style.color = inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
           }}
         >
           <svg

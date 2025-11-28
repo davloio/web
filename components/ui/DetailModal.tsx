@@ -12,6 +12,7 @@ interface DetailModalProps {
   missionText?: React.ReactNode;
   techStack?: React.ReactNode;
   team?: React.ReactNode;
+  backgroundColor?: string;
 }
 
 const fadeSlideUp = {
@@ -63,6 +64,7 @@ export default function DetailModal({
   missionText,
   techStack,
   team,
+  backgroundColor = '#ffffff',
 }: DetailModalProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -92,7 +94,7 @@ export default function DetailModal({
           className="fixed inset-0 overflow-hidden"
           style={{
             zIndex: 50,
-            backgroundColor: '#ffffff',
+            backgroundColor: backgroundColor,
           }}
         >
           <div className="h-screen flex items-center justify-center px-12 py-16 relative">

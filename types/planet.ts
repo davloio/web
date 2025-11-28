@@ -34,4 +34,7 @@ export interface Planet3DProps {
   showLabel?: boolean;
   labelText?: string;
   zoomProgress?: number;
+  textFadeStart?: number;
+  textFadeRange?: number;
+  glowColor?: string;
 }

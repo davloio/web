@@ -174,7 +174,7 @@ export default function DecorativePlanet() {
         </div>
       </div>
 
-      
+
       {isMounted && (
         <div
           className="absolute"
@@ -197,7 +197,7 @@ export default function DecorativePlanet() {
                 transform={`translate(${asteroid.x}, ${asteroid.y})`}
               />
             ))}
-            
+
             {asteroids.map((asteroid) => (
               <polygon
                 key={`${asteroid.id}-duplicate`}

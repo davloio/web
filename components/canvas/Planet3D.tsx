@@ -18,6 +18,9 @@ export default function Planet3D({
   disableHover = false,
   showLabel = false,
   zoomProgress = 0,
+  textFadeStart = 75,
+  textFadeRange = 25,
+  glowColor = '#ffffff',
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -33,18 +36,22 @@ export default function Planet3D({
     canvas.height = 256;
     const ctx = canvas.getContext('2d')!;
 
+    const r = parseInt(glowColor.slice(1, 3), 16);
+    const g = parseInt(glowColor.slice(3, 5), 16);
+    const b = parseInt(glowColor.slice(5, 7), 16);
+
     const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.3)');
-    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.15)');
-    gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.05)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+    gradient.addColorStop(0.2, `rgba(${r}, ${g}, ${b}, 0.3)`);
+    gradient.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, 0.15)`);
+    gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, 0.05)`);
+    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 256, 256);
 
     return new CanvasTexture(canvas);
-  }, []);
+  }, [glowColor]);
 
   const surfaceTexture = useMemo(() => {
     if (!showLabel) return null;
@@ -205,7 +212,7 @@ export default function Planet3D({
           <meshBasicMaterial
             map={surfaceTexture}
             toneMapped={false}
-            opacity={zoomProgress <= 75 ? 0 : Math.min(1, (zoomProgress - 75) / 25)}
+            opacity={zoomProgress <= textFadeStart ? 0 : Math.min(1, (zoomProgress - textFadeStart) / textFadeRange)}
             transparent={true}
           />
         </mesh>
