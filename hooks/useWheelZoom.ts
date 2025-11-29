@@ -61,7 +61,7 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
       const sensitivity = 0.08;
       setProgress((prev) => {
         const newProgress = prev + (e.deltaY * sensitivity);
-        return Math.max(0, Math.min(250, newProgress));
+        return Math.max(0, Math.min(350, newProgress));
       });
     };
 

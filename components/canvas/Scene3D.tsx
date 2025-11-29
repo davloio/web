@@ -6,15 +6,28 @@ import * as THREE from 'three';
 import Planet3D from './Planet3D';
 import DetailModal from '@/components/ui/DetailModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
+import {
+  PROJECT_PLANETS,
+  PLACEHOLDER_PLANETS,
+  SOLAR_SYSTEM_CENTER,
+  SOLAR_SYSTEM_RADIUS,
+  OVERVIEW_DISTANCE,
+  DETAIL_ZOOM_DISTANCE,
+  ProjectPlanetConfig,
+} from '@/types/planet';
+
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 
 function CameraController({
   inDetailView,
   modalOpen,
-  progress
+  progress,
+  activePlanetPosition,
 }: {
-  inDetailView: 'about' | 'projects' | null;
+  inDetailView: DetailViewType;
   modalOpen: boolean;
   progress: number;
+  activePlanetPosition: [number, number, number] | null;
 }) {
   const { camera } = useThree();
 
@@ -59,14 +72,14 @@ function CameraController({
     const aboutPlanetX = -15;
     const aboutPlanetY = 15;
     const aboutPlanetZ = 0;
-    const projectsPlanetX = -90;
-    const projectsPlanetY = 8;
-    const projectsPlanetZ = -40;
+    const solarSystemCenterX = SOLAR_SYSTEM_CENTER[0];
+    const solarSystemCenterY = SOLAR_SYSTEM_CENTER[1];
+    const solarSystemCenterZ = SOLAR_SYSTEM_CENTER[2];
+    const overviewZ = OVERVIEW_DISTANCE;
 
     const startZ = 50;
     const zoomZ = 8;
-    const detailZ = 4.2;
-    const transitionZ = 30;
+    const transitionZ = 12;
 
     const startCameraX = 15;
     const startCameraY = -15;
@@ -78,22 +91,31 @@ function CameraController({
     let targetLookAtY: number;
     let targetLookAtZ: number;
 
-    const lerpFactor = inDetailView !== null ? 0.08 : 0.15;
+    const lerpFactor = inDetailView !== null ? 0.08 : 0.12;
 
     if (inDetailView === 'about') {
-      targetZ = detailZ;
+      targetZ = DETAIL_ZOOM_DISTANCE;
       targetPosX = aboutPlanetX;
       targetPosY = aboutPlanetY;
       targetLookAtX = aboutPlanetX;
       targetLookAtY = aboutPlanetY;
       targetLookAtZ = aboutPlanetZ;
-    } else if (inDetailView === 'projects') {
-      targetZ = detailZ;
-      targetPosX = projectsPlanetX;
-      targetPosY = projectsPlanetY;
-      targetLookAtX = projectsPlanetX;
-      targetLookAtY = projectsPlanetY;
-      targetLookAtZ = projectsPlanetZ;
+    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark') {
+      if (activePlanetPosition) {
+        targetPosX = activePlanetPosition[0];
+        targetPosY = activePlanetPosition[1];
+        targetZ = DETAIL_ZOOM_DISTANCE + activePlanetPosition[2];
+        targetLookAtX = activePlanetPosition[0];
+        targetLookAtY = activePlanetPosition[1];
+        targetLookAtZ = activePlanetPosition[2];
+      } else {
+        targetPosX = solarSystemCenterX;
+        targetPosY = solarSystemCenterY;
+        targetZ = overviewZ + solarSystemCenterZ;
+        targetLookAtX = solarSystemCenterX;
+        targetLookAtY = solarSystemCenterY;
+        targetLookAtZ = solarSystemCenterZ;
+      }
     } else if (normalizedProgress < 1.0) {
       const zoneProgress = normalizedProgress;
       targetZ = startZ - (startZ - zoomZ) * zoneProgress;
@@ -109,39 +131,76 @@ function CameraController({
       targetLookAtX = aboutPlanetX;
       targetLookAtY = aboutPlanetY;
       targetLookAtZ = aboutPlanetZ;
-    } else if (normalizedProgress < 1.3) {
-      if (normalizedProgress < 1.17) {
-        const subProgress = (normalizedProgress - 1.1) / 0.07;
+    } else if (normalizedProgress < 2.2) {
+      if (normalizedProgress < 1.4) {
+        const subProgress = (normalizedProgress - 1.1) / 0.3;
         targetZ = zoomZ + (transitionZ - zoomZ) * subProgress;
         targetPosX = aboutPlanetX;
         targetPosY = aboutPlanetY;
         targetLookAtX = aboutPlanetX;
         targetLookAtY = aboutPlanetY;
         targetLookAtZ = aboutPlanetZ;
-      } else if (normalizedProgress < 1.23) {
-        const subProgress = (normalizedProgress - 1.17) / 0.06;
-        targetZ = transitionZ;
-        targetPosX = aboutPlanetX + (projectsPlanetX - aboutPlanetX) * subProgress;
-        targetPosY = aboutPlanetY + (projectsPlanetY - aboutPlanetY) * subProgress;
-        targetLookAtX = aboutPlanetX + (projectsPlanetX - aboutPlanetX) * subProgress;
-        targetLookAtY = aboutPlanetY + (projectsPlanetY - aboutPlanetY) * subProgress;
-        targetLookAtZ = aboutPlanetZ;
+      } else if (normalizedProgress < 1.8) {
+        const subProgress = (normalizedProgress - 1.4) / 0.4;
+        const pivotX = aboutPlanetX;
+        const pivotY = aboutPlanetY;
+        const pivotZ = transitionZ;
+
+        targetZ = pivotZ;
+        targetPosX = pivotX;
+        targetPosY = pivotY;
+        targetLookAtX = aboutPlanetX + (solarSystemCenterX - aboutPlanetX) * subProgress;
+        targetLookAtY = aboutPlanetY + (solarSystemCenterY - aboutPlanetY) * subProgress;
+        targetLookAtZ = aboutPlanetZ + (solarSystemCenterZ - aboutPlanetZ) * subProgress;
       } else {
-        const subProgress = (normalizedProgress - 1.23) / 0.07;
-        targetZ = transitionZ - (transitionZ - zoomZ) * subProgress;
-        targetPosX = projectsPlanetX;
-        targetPosY = projectsPlanetY;
-        targetLookAtX = projectsPlanetX;
-        targetLookAtY = projectsPlanetY;
-        targetLookAtZ = projectsPlanetZ;
+        const subProgress = (normalizedProgress - 1.8) / 0.4;
+        const startPosX = aboutPlanetX;
+        const startPosY = aboutPlanetY;
+        const startPosZ = transitionZ;
+        const elevationHeight = 15;
+
+        targetPosX = startPosX + (solarSystemCenterX - startPosX) * subProgress;
+        targetPosY = startPosY + ((solarSystemCenterY + elevationHeight) - startPosY) * subProgress;
+        targetZ = startPosZ + (overviewZ + solarSystemCenterZ - startPosZ) * subProgress;
+        targetLookAtX = solarSystemCenterX;
+        targetLookAtY = solarSystemCenterY;
+        targetLookAtZ = solarSystemCenterZ;
       }
     } else {
-      targetZ = zoomZ;
-      targetPosX = projectsPlanetX;
-      targetPosY = projectsPlanetY;
-      targetLookAtX = projectsPlanetX;
-      targetLookAtY = projectsPlanetY;
-      targetLookAtZ = projectsPlanetZ;
+      const rotationProgress = Math.max(0, normalizedProgress - 2.2);
+      const maxRotationProgress = 3.5 - 2.2;
+      const rotationRatio = Math.min(1, rotationProgress / maxRotationProgress);
+      const initialAngle = 90;
+      const rotationAngle = initialAngle + (rotationRatio * 200);
+
+      const angleInRadians = (rotationAngle * Math.PI) / 180;
+
+      const allPlanets = [
+        ...PROJECT_PLANETS.map(p => ({ angle: p.angle })),
+        ...PLACEHOLDER_PLANETS.map(p => ({ angle: p.angle }))
+      ];
+
+      let minAngleDiff = 360;
+      for (const planet of allPlanets) {
+        let angleDiff = Math.abs(rotationAngle - planet.angle);
+        if (angleDiff > 180) angleDiff = 360 - angleDiff;
+        if (angleDiff < minAngleDiff) {
+          minAngleDiff = angleDiff;
+        }
+      }
+
+      const zoomFactor = 1 - (minAngleDiff / 180) * 0.3;
+      const dynamicDistance = overviewZ * zoomFactor;
+
+      const elevationHeight = 15;
+
+      targetPosX = solarSystemCenterX + Math.cos(angleInRadians) * dynamicDistance;
+      targetPosY = solarSystemCenterY + elevationHeight;
+      targetZ = solarSystemCenterZ + Math.sin(angleInRadians) * dynamicDistance;
+
+      targetLookAtX = solarSystemCenterX;
+      targetLookAtY = solarSystemCenterY;
+      targetLookAtZ = solarSystemCenterZ;
     }
 
     const currentZ = camera.position.z;
@@ -171,8 +230,9 @@ interface Scene3DProps {
 
 export default function Scene3D({ progress }: Scene3DProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [inDetailView, setInDetailView] = useState<'about' | 'projects' | null>(null);
-  const [showModal, setShowModal] = useState<'about' | 'projects' | null>(null);
+  const [inDetailView, setInDetailView] = useState<DetailViewType>(null);
+  const [showModal, setShowModal] = useState<DetailViewType>(null);
+  const [activePlanetPosition, setActivePlanetPosition] = useState<[number, number, number] | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -180,15 +240,16 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
   const handleModalClose = () => {
     setGlobalWheelDisabled(false);
+    setActivePlanetPosition(null);
 
-    const wasShowingProjects = showModal === 'projects';
+    const wasShowingProject = showModal?.startsWith('project-');
+    const planetId = showModal?.replace('project-', '');
 
     setShowModal(null);
-
     setInDetailView(null);
 
-    if (wasShowingProjects) {
-      window.dispatchEvent(new CustomEvent('pinkPageClose'));
+    if (wasShowingProject) {
+      window.dispatchEvent(new CustomEvent('projectPageClose', { detail: { planetId } }));
     } else {
       window.dispatchEvent(new CustomEvent('whitePageClose'));
     }
@@ -218,23 +279,13 @@ export default function Scene3D({ progress }: Scene3DProps) {
   }, [showModal]);
 
   useEffect(() => {
-    const handleZoomToPlanetAndOpen = () => {
-      if (progress >= 100 && progress < 110) {
-        handleAboutClick();
-      } else if (progress < 100) {
-        setGlobalWheelDisabled(true);
-
-        window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 100 } }));
-
-        setTimeout(() => {
-          handleAboutClick();
-        }, 1000);
-      }
+    const handleNavigateToAbout = () => {
+      window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 105 } }));
     };
 
-    window.addEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
-    return () => window.removeEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
-  }, [progress]);
+    window.addEventListener('navigateToAbout', handleNavigateToAbout);
+    return () => window.removeEventListener('navigateToAbout', handleNavigateToAbout);
+  }, []);
 
   const handleAboutClick = () => {
     if (progress >= 100 && progress < 110) {
@@ -250,17 +301,17 @@ export default function Scene3D({ progress }: Scene3DProps) {
     }
   };
 
-  const handleProjectsClick = () => {
-    if (progress >= 245) {
+  const handleProjectPlanetClick = (planetId: 'pink' | 'dark', config: ProjectPlanetConfig) => {
+    if (progress >= 220) {
       setGlobalWheelDisabled(true);
+      setActivePlanetPosition(config.position);
 
-      window.dispatchEvent(new CustomEvent('pinkPageOpen'));
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId, backgroundColor: config.modalBackgroundColor }
+      }));
 
-      setInDetailView('projects');
-
-      setTimeout(() => {
-        setShowModal('projects');
-      }, 200);
+      setInDetailView(`project-${planetId}` as DetailViewType);
+      setTimeout(() => setShowModal(`project-${planetId}` as DetailViewType), 200);
     }
   };
 
@@ -294,7 +345,12 @@ export default function Scene3D({ progress }: Scene3DProps) {
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
-          <CameraController inDetailView={inDetailView} modalOpen={showModal !== null} progress={progress} />
+          <CameraController
+            inDetailView={inDetailView}
+            modalOpen={showModal !== null}
+            progress={progress}
+            activePlanetPosition={activePlanetPosition}
+          />
 
           <ambientLight intensity={0.3} />
 
@@ -327,31 +383,41 @@ export default function Scene3D({ progress }: Scene3DProps) {
               metalness={0.1}
               onClick={handleAboutClick}
               disableHover={inDetailView !== null || progress < 100 || progress >= 110}
-              showLabel={true}
-              labelText="about"
-              zoomProgress={progress}
-              textFadeStart={75}
-              textFadeRange={25}
               glowColor="#ffffff"
             />
-            <Planet3D
-              position={[-90, 8, -40]}
-              scale={4}
-              color="#FFC0CB"
-              emissive="#FFC0CB"
-              emissiveIntensity={0.5}
-              name="projects"
-              roughness={0.7}
-              metalness={0.1}
-              onClick={handleProjectsClick}
-              disableHover={inDetailView !== null || progress < 245}
-              showLabel={true}
-              labelText="projects"
-              zoomProgress={progress}
-              textFadeStart={220}
-              textFadeRange={25}
-              glowColor="#FFC0CB"
-            />
+
+            {PROJECT_PLANETS.map((config) => (
+              <Planet3D
+                key={config.id}
+                position={config.position}
+                scale={config.scale}
+                color={config.color}
+                emissive={config.emissive}
+                emissiveIntensity={config.emissiveIntensity}
+                name={config.name}
+                roughness={0.7}
+                metalness={0.1}
+                onClick={() => handleProjectPlanetClick(config.id, config)}
+                disableHover={inDetailView !== null || progress < 220}
+                glowColor={config.glowColor}
+              />
+            ))}
+
+            {PLACEHOLDER_PLANETS.map((config, index) => (
+              <Planet3D
+                key={`placeholder-${index}`}
+                position={config.position}
+                scale={config.scale}
+                color={config.color}
+                emissive={config.color}
+                emissiveIntensity={0.2}
+                name={`placeholder-${index}`}
+                roughness={0.9}
+                metalness={0.05}
+                disableHover={true}
+                glowColor={config.color}
+              />
+            ))}
           </group>
         </Suspense>
       </Canvas>
@@ -360,14 +426,29 @@ export default function Scene3D({ progress }: Scene3DProps) {
     <DetailModal
       isOpen={showModal !== null}
       onClose={handleModalClose}
-      backgroundColor={showModal === 'projects' ? '#FFC0CB' : '#ffffff'}
+      backgroundColor={
+        showModal === 'project-pink' ? '#DB7093' :
+        showModal === 'project-dark' ? '#333333' :
+        '#ffffff'
+      }
+      textColor={
+        showModal === 'project-dark' ? '#ffffff' : '#000000'
+      }
       textBlock={
-        showModal === 'projects' ? (
+        showModal === 'project-pink' ? (
           <p style={{
             fontSize: '18px',
             lineHeight: '1.7',
             fontWeight: 400,
-            color: '#000000',
+            margin: 0,
+          }}>
+            Our projects showcase innovative blockchain software. More coming soon.
+          </p>
+        ) : showModal === 'project-dark' ? (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
             margin: 0,
           }}>
             Our projects showcase innovative blockchain software. More coming soon.

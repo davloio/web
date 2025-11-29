@@ -31,6 +31,8 @@ export default function Planet3D({
   const [currentGlowOpacity, setCurrentGlowOpacity] = useState(0.7);
 
   const glowTexture = useMemo(() => {
+    if (!glowColor) return null;
+
     const canvas = document.createElement('canvas');
     canvas.width = 256;
     canvas.height = 256;
@@ -159,7 +161,7 @@ export default function Planet3D({
 
   return (
     <group position={position} scale={scale}>
-      {!showLabel && (
+      {!showLabel && glowTexture && (
         <sprite ref={glowSpriteRef} scale={[4.5, 4.5, 1]} renderOrder={0}>
           <spriteMaterial
             map={glowTexture}

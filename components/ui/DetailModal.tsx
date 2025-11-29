@@ -13,6 +13,7 @@ interface DetailModalProps {
   techStack?: React.ReactNode;
   team?: React.ReactNode;
   backgroundColor?: string;
+  textColor?: string;
 }
 
 const fadeSlideUp = {
@@ -65,6 +66,7 @@ export default function DetailModal({
   techStack,
   team,
   backgroundColor = '#ffffff',
+  textColor = '#000000',
 }: DetailModalProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -114,6 +116,7 @@ export default function DetailModal({
                   position: 'absolute',
                   top: 'clamp(60px, 7.5%, 100px)',
                   left: '120px',
+                  color: textColor,
                 }}
               >
                 who we are
@@ -127,6 +130,7 @@ export default function DetailModal({
                   position: 'absolute',
                   top: 'clamp(160px, 20%, 200px)',
                   left: '120px',
+                  color: textColor,
                 }}
               >
                 our mission
@@ -158,6 +162,7 @@ export default function DetailModal({
                       position: 'absolute',
                       top: 'clamp(380px, 47.5%, 480px)',
                       left: '120px',
+                      color: textColor,
                     }}
                   >
                     tech stack
@@ -187,6 +192,7 @@ export default function DetailModal({
                       position: 'absolute',
                       top: 'clamp(60px, 7.5%, 100px)',
                       right: '120px',
+                      color: textColor,
                     }}
                   >
                     team
@@ -214,6 +220,7 @@ export default function DetailModal({
                   position: 'absolute',
                   top: 'clamp(260px, 32.5%, 320px)',
                   right: '120px',
+                  color: textColor,
                 }}
               >
                 about us
@@ -243,7 +250,7 @@ export default function DetailModal({
                   fontFamily: 'var(--font-geist-sans)',
                   fontSize: '28px',
                   lineHeight: '1.6',
-                  color: '#000000',
+                  color: textColor,
                   display: 'none',
                 }}
               >
@@ -261,7 +268,7 @@ export default function DetailModal({
                   fontWeight: 900,
                   letterSpacing: '-0.02em',
                   fontFamily: 'var(--font-geist-sans)',
-                  color: '#000000',
+                  color: textColor,
                   lineHeight: '1',
                   margin: 0,
                   textShadow: '0 0 8px rgba(0, 0, 0, 0.15), 0 0 15px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.05)',
@@ -279,6 +286,7 @@ export default function DetailModal({
                   bottom: 'clamp(20px, 2.5%, 80px)',
                   right: '120px',
                   fontSize: '96px',
+                  color: textColor,
                 }}
               >
                 {title}

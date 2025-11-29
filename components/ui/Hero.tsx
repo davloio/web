@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
+
 export function HeroHeader() {
   const [showAsHeader, setShowAsHeader] = useState(false);
   const [headerText, setHeaderText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const [cursorFading, setCursorFading] = useState(false);
-  const [inDetailView, setInDetailView] = useState<'about' | 'projects' | null>(null);
+  const [inDetailView, setInDetailView] = useState<DetailViewType>(null);
 
   useEffect(() => {
     const handleShowHeader = () => {
@@ -48,11 +50,15 @@ export function HeroHeader() {
 
   if (!showAsHeader) return null;
 
-  const textColor = inDetailView !== null ? 'black' : 'white';
-  const logoSrc = inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
+  const textColor = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
+  const logoSrc = inDetailView === 'project-dark' ? '/logo-white.svg' : inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
 
   const handleBackClick = () => {
     window.dispatchEvent(new CustomEvent('exitDetailView'));
+  };
+
+  const handleLogoClick = () => {
+    window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 0 } }));
   };
 
   return (
@@ -69,6 +75,7 @@ export function HeroHeader() {
           <img
             src={logoSrc}
             alt="davlo.io"
+            onClick={handleLogoClick}
             style={{
               width: '28px',
               height: '28px',
@@ -77,7 +84,14 @@ export function HeroHeader() {
               animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               animationDelay: '0.2s',
               display: 'block',
-              transition: 'opacity 0.5s ease'
+              transition: 'opacity 0.5s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.7';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
             }}
           />
         </div>
@@ -88,7 +102,8 @@ export function HeroHeader() {
           letterSpacing: '-0.06em',
           fontFamily: 'nexa, sans-serif',
           color: textColor,
-          transition: 'color 0.5s ease'
+          transition: 'color 0.5s ease',
+          cursor: 'default'
         }}>
           {headerText}
           {showCursor && (

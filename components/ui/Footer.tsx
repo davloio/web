@@ -63,8 +63,14 @@ export default function Footer() {
     window.dispatchEvent(new CustomEvent('navigateToAbout'));
   };
 
+  const handleProjectsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 220 } }));
+  };
+
   const links = [
-    { name: 'projects', href: '#projects', hoverText: 'ready for time travel?' },
+    { name: 'projects', href: '#projects', hoverText: 'ready for time travel?', onClick: handleProjectsClick },
     { name: 'about', href: '#about', hoverText: 'well, thats a shorter trip', onClick: handleAboutClick },
     { name: 'contact', href: 'mailto:hello@davlo.io', hoverIcon: 'spaceship' },
   ];
@@ -290,12 +296,13 @@ export default function Footer() {
         </a>
       </nav>
 
-      
+
       <div
         className="text-xs font-light tracking-wider flex flex-col gap-1"
         style={{
           color: watermarkColor,
-          transition: 'color 0.5s ease'
+          transition: 'color 0.5s ease',
+          cursor: 'default'
         }}
       >
         <span>© 2025</span>
