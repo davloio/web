@@ -20,6 +20,8 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
   const [isZooming, setIsZooming] = useState(false);
 
   const savedProgressRef = useRef<number | null>(null);
+  const targetProgressRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (disabled && savedProgressRef.current === null) {
@@ -32,10 +34,42 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
 
   useEffect(() => {
     const handleSetZoomProgress = (e: Event) => {
-      setProgress((e as CustomEvent).detail.progress);
+      const targetProgress = (e as CustomEvent).detail.progress;
+      targetProgressRef.current = targetProgress;
+
+      const animate = () => {
+        setProgress((currentProgress) => {
+          if (targetProgressRef.current === null) return currentProgress;
+
+          const diff = targetProgressRef.current - currentProgress;
+          const distance = Math.abs(diff);
+
+          const baseSpeed = distance > 100 ? 0.02 : 0.05;
+
+          if (Math.abs(diff) < 0.5) {
+            targetProgressRef.current = null;
+            return targetProgressRef.current !== null ? targetProgressRef.current : currentProgress;
+          }
+
+          const newProgress = currentProgress + diff * baseSpeed;
+          animationFrameRef.current = requestAnimationFrame(animate);
+          return newProgress;
+        });
+      };
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      animate();
     };
+
     window.addEventListener('setZoomProgress', handleSetZoomProgress);
-    return () => window.removeEventListener('setZoomProgress', handleSetZoomProgress);
+    return () => {
+      window.removeEventListener('setZoomProgress', handleSetZoomProgress);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, []);
 
   const disabledRef = useRef(disabled);

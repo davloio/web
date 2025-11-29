@@ -62,7 +62,7 @@ export default function Home() {
         style={{
           transform: isMounted ? `scale(${scale})` : 'scale(1)',
           transition: 'opacity 0.8s ease',
-          pointerEvents: (opacity > 0 && !whitePageOpen) ? 'auto' : 'none',
+          pointerEvents: 'none',
           zIndex: 1,
           opacity: whitePageOpen ? 0 : 1,
         }}
@@ -75,7 +75,26 @@ export default function Home() {
           }}
         >
           <DecorativePlanet />
+        </main>
+      </div>
 
+      <div
+        className="fixed inset-0 origin-center transition-opacity duration-800"
+        style={{
+          transform: isMounted ? `scale(${scale})` : 'scale(1)',
+          transition: 'opacity 0.8s ease',
+          pointerEvents: (opacity > 0 && !whitePageOpen) ? 'auto' : 'none',
+          zIndex: 3,
+          opacity: whitePageOpen ? 0 : 1,
+        }}
+      >
+        <main
+          className="relative h-screen w-screen"
+          style={{
+            animation: 'pageZoomOut 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            opacity,
+          }}
+        >
           <Hero />
         </main>
       </div>
