@@ -29,6 +29,7 @@ export default function Planet3D({
   const [currentGlow, setCurrentGlow] = useState(emissiveIntensity);
   const [currentGlowScale, setCurrentGlowScale] = useState(1);
   const [currentGlowOpacity, setCurrentGlowOpacity] = useState(0.7);
+  const [currentMeshScale, setCurrentMeshScale] = useState(1);
 
   const glowTexture = useMemo(() => {
     if (!glowColor) return null;
@@ -113,14 +114,17 @@ export default function Planet3D({
       if (!disableHover) {
         const targetGlowScale = hovered ? 1.15 : 1;
         const targetGlowOpacity = hovered ? 1.1 : 0.7;
+        const targetMeshScale = hovered ? 1.2 : 1;
 
         const newGlowScale = currentGlowScale + (targetGlowScale - currentGlowScale) * 0.1;
         const newGlowOpacity = currentGlowOpacity + (targetGlowOpacity - currentGlowOpacity) * 0.1;
+        const newMeshScale = currentMeshScale + (targetMeshScale - currentMeshScale) * 0.1;
 
         setCurrentGlowScale(newGlowScale);
         setCurrentGlowOpacity(newGlowOpacity);
+        setCurrentMeshScale(newMeshScale);
 
-        glowSpriteRef.current.scale.set(4.5 * newGlowScale, 4.5 * newGlowScale, 1);
+        glowSpriteRef.current.scale.set(4.5 * newGlowScale * newMeshScale, 4.5 * newGlowScale * newMeshScale, 1);
         (glowSpriteRef.current.material as SpriteMaterial).opacity = newGlowOpacity;
       }
     }
@@ -150,6 +154,7 @@ export default function Planet3D({
     if (disableHover) {
       document.body.style.cursor = 'auto';
       setHovered(false);
+      setCurrentMeshScale(1);
     }
   }, [disableHover]);
 
@@ -179,6 +184,7 @@ export default function Planet3D({
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
         renderOrder={1}
+        scale={currentMeshScale}
       >
         <sphereGeometry args={[1, 32, 32]} />
 

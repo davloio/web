@@ -414,7 +414,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 name={`placeholder-${index}`}
                 roughness={0.9}
                 metalness={0.05}
-                disableHover={true}
+                disableHover={false}
                 glowColor={config.color}
               />
             ))}

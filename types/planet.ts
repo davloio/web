@@ -63,8 +63,8 @@ export interface PlaceholderPlanetConfig {
 export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
   {
     id: 'pink',
-    position: [-95, 18, -70],
-    angle: 0,
+    position: [-156.8, 12, -92.5],
+    angle: 220,
     scale: 4,
     color: '#DB7093',
     emissive: '#DB7093',
@@ -76,8 +76,8 @@ export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
   },
   {
     id: 'dark',
-    position: [-103.2, 13, -47.5],
-    angle: 40,
+    position: [-113.5, 17, -91.3],
+    angle: 300,
     scale: 4,
     color: '#333333',
     emissive: '#333333',
@@ -91,8 +91,8 @@ export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
 
 export const PLACEHOLDER_PLANETS: PlaceholderPlanetConfig[] = [
   { position: [-156.8, 19, -47.5], angle: 140, scale: 3.5, color: '#999999' },
-  { position: [-156.8, 12, -92.5], angle: 220, scale: 3, color: '#999999' },
-  { position: [-113.5, 17, -91.3], angle: 300, scale: 3.5, color: '#999999' },
+  { position: [-103.2, 13, -47.5], angle: 40, scale: 3, color: '#999999' },
+  { position: [-95, 18, -70], angle: 0, scale: 3.5, color: '#999999' },
 ];
 
 export const SOLAR_SYSTEM_CENTER = [-130, 15, -70] as const;
