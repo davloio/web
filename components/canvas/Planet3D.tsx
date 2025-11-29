@@ -4,6 +4,8 @@ import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, CanvasTexture, MeshStandardMaterial, SpriteMaterial } from 'three';
 import { Planet3DProps } from '@/types/planet';
+import CloudLayer from './CloudLayer';
+import Logo3DSatellite from './Logo3DSatellite';
 
 export default function Planet3D({
   position,
@@ -21,6 +23,10 @@ export default function Planet3D({
   textFadeStart = 75,
   textFadeRange = 25,
   glowColor = '#ffffff',
+  showClouds = false,
+  show3DLogo = false,
+  cloudConfig,
+  logoConfig,
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -178,6 +184,15 @@ export default function Planet3D({
         </sprite>
       )}
 
+      {showClouds && (
+        <CloudLayer
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          hovered={hovered}
+          {...cloudConfig}
+        />
+      )}
+
       <mesh
         ref={meshRef}
         onClick={handleClick}
@@ -209,6 +224,14 @@ export default function Planet3D({
           />
         )}
       </mesh>
+
+      {show3DLogo && (
+        <Logo3DSatellite
+          position={logoConfig?.position || [0, 2.5, 0]}
+          hovered={hovered}
+          {...logoConfig}
+        />
+      )}
 
       {showLabel && (
         <mesh

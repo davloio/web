@@ -384,6 +384,19 @@ export default function Scene3D({ progress }: Scene3DProps) {
               onClick={handleAboutClick}
               disableHover={inDetailView !== null || progress < 100 || progress >= 110}
               glowColor="#ffffff"
+              showClouds={true}
+              show3DLogo={false}
+              cloudConfig={{
+                cloudCount: 20,
+                rotationSpeed: 0.0008,
+                cloudOpacity: 0.85,
+                layerHeight: 1.03,
+              }}
+              logoConfig={{
+                scale: 0.2,
+                glowColor: "#ffffff",
+                glowIntensity: 0.3,
+              }}
             />
 
             {PROJECT_PLANETS.map((config) => (
@@ -400,6 +413,14 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 onClick={() => handleProjectPlanetClick(config.id, config)}
                 disableHover={inDetailView !== null || progress < 220}
                 glowColor={config.glowColor}
+                showClouds={config.id === 'pink'}
+                cloudConfig={config.id === 'pink' ? {
+                  cloudCount: 20,
+                  rotationSpeed: 0.0008,
+                  cloudOpacity: 0.85,
+                  layerHeight: 1.03,
+                  cloudColor: '#DB7093',
+                } : undefined}
               />
             ))}
 
@@ -416,6 +437,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 metalness={0.05}
                 disableHover={false}
                 glowColor={config.color}
+                showClouds={false}
               />
             ))}
           </group>

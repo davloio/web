@@ -19,6 +19,21 @@ export interface PlanetConfig {
   project?: PlanetMetadata;
 }
 
+export interface CloudConfig {
+  cloudCount?: number;
+  rotationSpeed?: number;
+  cloudOpacity?: number;
+  layerHeight?: number;
+}
+
+export interface LogoConfig {
+  scale?: number;
+  svgPath?: string;
+  glowColor?: string;
+  glowIntensity?: number;
+  position?: [number, number, number];
+}
+
 export interface Planet3DProps {
   position: [number, number, number];
   scale?: number;
@@ -37,6 +52,10 @@ export interface Planet3DProps {
   textFadeStart?: number;
   textFadeRange?: number;
   glowColor?: string;
+  showClouds?: boolean;
+  show3DLogo?: boolean;
+  cloudConfig?: CloudConfig;
+  logoConfig?: LogoConfig;
 }
 
 export interface ProjectPlanetConfig {
