@@ -24,6 +24,16 @@ export interface CloudConfig {
   rotationSpeed?: number;
   cloudOpacity?: number;
   layerHeight?: number;
+  cloudColor?: string;
+}
+
+export interface NetworkConfig {
+  particleCount?: number;
+  layerHeight?: number;
+  connectionDistance?: number;
+  rotationSpeed?: number;
+  particleSize?: number;
+  opacity?: number;
 }
 
 export interface LogoConfig {
@@ -56,6 +66,11 @@ export interface Planet3DProps {
   show3DLogo?: boolean;
   cloudConfig?: CloudConfig;
   logoConfig?: LogoConfig;
+  textureType?: 'rocky-dark' | 'rocky-gray';
+  showParticleNetwork?: boolean;
+  networkConfig?: NetworkConfig;
+  showScanner?: boolean;
+  showComingSoonOnHover?: boolean;
 }
 
 export interface ProjectPlanetConfig {
@@ -85,12 +100,12 @@ export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
     position: [-156.8, 12, -92.5],
     angle: 220,
     scale: 4,
-    color: '#DB7093',
-    emissive: '#DB7093',
+    color: '#C55A7D',
+    emissive: '#C55A7D',
     emissiveIntensity: 0.5,
     name: 'projects-pink',
-    glowColor: '#DB7093',
-    modalBackgroundColor: '#DB7093',
+    glowColor: '#C55A7D',
+    modalBackgroundColor: '#C55A7D',
     modalTextColor: '#000000',
   },
   {

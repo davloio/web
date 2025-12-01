@@ -6,6 +6,9 @@ import { Mesh, CanvasTexture, MeshStandardMaterial, SpriteMaterial } from 'three
 import { Planet3DProps } from '@/types/planet';
 import CloudLayer from './CloudLayer';
 import Logo3DSatellite from './Logo3DSatellite';
+import ParticleNetwork from './ParticleNetwork';
+import ScannerEffect from './ScannerEffect';
+import ComingSoonOverlay from './ComingSoonOverlay';
 
 export default function Planet3D({
   position,
@@ -27,6 +30,11 @@ export default function Planet3D({
   show3DLogo = false,
   cloudConfig,
   logoConfig,
+  textureType,
+  showParticleNetwork = false,
+  networkConfig,
+  showScanner = false,
+  showComingSoonOnHover = false,
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -105,6 +113,77 @@ export default function Planet3D({
     texture.anisotropy = 16;
     return texture;
   }, [showLabel]);
+
+  const craterTexture = useMemo(() => {
+    if (!textureType) return null;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 2048;
+    canvas.height = 2048;
+    const ctx = canvas.getContext('2d')!;
+
+    const baseColor = textureType === 'rocky-dark' ? '#404040' : '#aaaaaa';
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, 2048, 2048);
+
+    const seededRandom = (seed: number) => {
+      const x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    };
+
+    if (textureType === 'rocky-dark') {
+      const craterCount = 15;
+      for (let i = 0; i < craterCount; i++) {
+        const x = seededRandom(i * 2.5) * 2048;
+        const y = seededRandom(i * 3.7) * 2048;
+        const radius = 150 + seededRandom(i * 5.3) * 250;
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, '#0a0a0a');
+        gradient.addColorStop(0.3, '#1a1a1a');
+        gradient.addColorStop(0.5, '#2a2a2a');
+        gradient.addColorStop(0.7, '#404040');
+        gradient.addColorStop(0.85, '#606060');
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 2048, 2048);
+      }
+    } else {
+      const craterCount = 28;
+      for (let i = 0; i < craterCount; i++) {
+        const x = seededRandom(i * 1.8) * 2048;
+        const y = seededRandom(i * 2.3) * 2048;
+        const radius = 70 + seededRandom(i * 4.1) * 100;
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, '#8a8a8a');
+        gradient.addColorStop(0.3, '#939393');
+        gradient.addColorStop(0.5, '#9c9c9c');
+        gradient.addColorStop(0.7, '#aaaaaa');
+        gradient.addColorStop(0.85, '#b8b8b8');
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 2048, 2048);
+      }
+    }
+
+    const noiseImageData = ctx.getImageData(0, 0, 2048, 2048);
+    const data = noiseImageData.data;
+    const noiseStrength = textureType === 'rocky-dark' ? 30 : 25;
+    for (let i = 0; i < data.length; i += 4) {
+      const noise = (seededRandom(i / 4) - 0.5) * noiseStrength;
+      data[i] = Math.max(0, Math.min(255, data[i] + noise));
+      data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+      data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+    }
+    ctx.putImageData(noiseImageData, 0, 0);
+
+    const texture = new CanvasTexture(canvas);
+    texture.anisotropy = 16;
+    return texture;
+  }, [textureType]);
 
   useFrame(({ camera }) => {
     if (materialRef.current && !disableHover) {
@@ -193,6 +272,32 @@ export default function Planet3D({
         />
       )}
 
+      {showParticleNetwork && (
+        <ParticleNetwork
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          particleColor="#aaaaaa"
+          lineColor="#6b8fb8"
+          {...networkConfig}
+        />
+      )}
+
+      {showScanner && (
+        <ScannerEffect
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          color={color}
+        />
+      )}
+
+      {showComingSoonOnHover && (
+        <ComingSoonOverlay
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          show={hovered}
+        />
+      )}
+
       <mesh
         ref={meshRef}
         onClick={handleClick}
@@ -211,6 +316,7 @@ export default function Planet3D({
               emissiveIntensity={emissiveIntensity}
               roughness={roughness}
               metalness={metalness}
+              map={craterTexture}
             />
           </>
         ) : (
@@ -221,6 +327,7 @@ export default function Planet3D({
             emissiveIntensity={currentGlow}
             roughness={roughness}
             metalness={metalness}
+            map={craterTexture}
           />
         )}
       </mesh>

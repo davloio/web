@@ -288,7 +288,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
   }, []);
 
   const handleAboutClick = () => {
-    if (progress >= 100 && progress < 110) {
+    if (progress >= 80 && progress < 130) {
       setGlobalWheelDisabled(true);
 
       window.dispatchEvent(new CustomEvent('whitePageOpen'));
@@ -382,7 +382,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
               roughness={0.7}
               metalness={0.1}
               onClick={handleAboutClick}
-              disableHover={inDetailView !== null || progress < 100 || progress >= 110}
+              disableHover={inDetailView !== null || progress < 80 || progress >= 130}
               glowColor="#ffffff"
               showClouds={true}
               show3DLogo={false}
@@ -413,13 +413,17 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 onClick={() => handleProjectPlanetClick(config.id, config)}
                 disableHover={inDetailView !== null || progress < 220}
                 glowColor={config.glowColor}
-                showClouds={config.id === 'pink'}
-                cloudConfig={config.id === 'pink' ? {
-                  cloudCount: 20,
-                  rotationSpeed: 0.0008,
-                  cloudOpacity: 0.85,
-                  layerHeight: 1.03,
-                  cloudColor: '#DB7093',
+                showClouds={false}
+                textureType={config.id === 'dark' ? 'rocky-dark' : undefined}
+                showParticleNetwork={config.id === 'dark'}
+                showScanner={config.id === 'pink'}
+                networkConfig={config.id === 'dark' ? {
+                  particleCount: 250,
+                  layerHeight: 1.08,
+                  connectionDistance: 0.3,
+                  rotationSpeed: 0.0003,
+                  particleSize: 0.18,
+                  opacity: 0.8,
                 } : undefined}
               />
             ))}
@@ -438,6 +442,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 disableHover={false}
                 glowColor={config.color}
                 showClouds={false}
+                textureType="rocky-gray"
+                showComingSoonOnHover={true}
               />
             ))}
           </group>
@@ -449,7 +455,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
       isOpen={showModal !== null}
       onClose={handleModalClose}
       backgroundColor={
-        showModal === 'project-pink' ? '#DB7093' :
+        showModal === 'project-pink' ? '#C55A7D' :
         showModal === 'project-dark' ? '#333333' :
         '#ffffff'
       }
