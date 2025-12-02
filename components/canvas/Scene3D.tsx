@@ -397,6 +397,21 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 glowColor: "#ffffff",
                 glowIntensity: 0.3,
               }}
+              showHolographicLogo={true}
+              holographicConfig={{
+                streamCount: 6,
+                streamHeight: 1.65,
+                particleSpeed: 0.008,
+                particleSize: 0.12,
+                particleColor: '#ffffff',
+                logoScale: 0.8,
+                logoOpacity: 0.6,
+                pulseSpeed: 1.2,
+                distortionAmount: 0.1,
+                svgPath: '/logo-white.svg',
+                text: 'about',
+                textSize: 0.3,
+              }}
             />
 
             {PROJECT_PLANETS.map((config) => (
@@ -425,6 +440,31 @@ export default function Scene3D({ progress }: Scene3DProps) {
                   particleSize: 0.18,
                   opacity: 0.8,
                 } : undefined}
+                showHolographicLogo={true}
+                holographicConfig={config.id === 'pink' ? {
+                  streamCount: 4,
+                  streamHeight: 1.6,
+                  particleSpeed: 0.015,
+                  particleSize: 0.15,
+                  particleColor: '#ff69b4',
+                  logoScale: 0.9,
+                  logoOpacity: 0.65,
+                  pulseSpeed: 2.0,
+                  distortionAmount: 0.2,
+                  svgPath: '/logo-taiko.webp',
+                  disableHoverEffect: true,
+                } : {
+                  streamCount: 8,
+                  streamHeight: 2.0,
+                  particleSpeed: 0.01,
+                  particleSize: 0.13,
+                  particleColor: '#6b8fb8',
+                  logoScale: 1.0,
+                  logoOpacity: 0.7,
+                  distortionAmount: 0.15,
+                  svgPath: '/logo-intuition.svg',
+                  disableHoverEffect: true,
+                }}
               />
             ))}
 

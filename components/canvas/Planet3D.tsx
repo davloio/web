@@ -9,6 +9,7 @@ import Logo3DSatellite from './Logo3DSatellite';
 import ParticleNetwork from './ParticleNetwork';
 import ScannerEffect from './ScannerEffect';
 import ComingSoonOverlay from './ComingSoonOverlay';
+import HolographicLogo from './HolographicLogo';
 
 export default function Planet3D({
   position,
@@ -35,6 +36,8 @@ export default function Planet3D({
   networkConfig,
   showScanner = false,
   showComingSoonOnHover = false,
+  showHolographicLogo = false,
+  holographicConfig,
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -295,6 +298,15 @@ export default function Planet3D({
           planetRadius={1}
           planetScale={currentMeshScale}
           show={hovered}
+        />
+      )}
+
+      {showHolographicLogo && (
+        <HolographicLogo
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          hovered={hovered}
+          {...holographicConfig}
         />
       )}
 

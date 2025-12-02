@@ -44,6 +44,22 @@ export interface LogoConfig {
   position?: [number, number, number];
 }
 
+export interface HolographicLogoConfig {
+  streamCount?: number;
+  streamHeight?: number;
+  particleSpeed?: number;
+  particleSize?: number;
+  particleColor?: string;
+  logoScale?: number;
+  logoOpacity?: number;
+  pulseSpeed?: number;
+  distortionAmount?: number;
+  svgPath?: string;
+  text?: string;
+  textSize?: number;
+  disableHoverEffect?: boolean;
+}
+
 export interface Planet3DProps {
   position: [number, number, number];
   scale?: number;
@@ -71,6 +87,8 @@ export interface Planet3DProps {
   networkConfig?: NetworkConfig;
   showScanner?: boolean;
   showComingSoonOnHover?: boolean;
+  showHolographicLogo?: boolean;
+  holographicConfig?: HolographicLogoConfig;
 }
 
 export interface ProjectPlanetConfig {
