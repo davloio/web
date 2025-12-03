@@ -15,6 +15,8 @@ import {
   DETAIL_ZOOM_DISTANCE,
   ProjectPlanetConfig,
 } from '@/types/planet';
+import OrbitalRing from './OrbitalRing';
+import ProjectsTitle from './ProjectsTitle';
 
 type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 
@@ -371,6 +373,51 @@ export default function Scene3D({ progress }: Scene3DProps) {
             color="#ffffff"
           />
 
+          {/* Orbital ring for each planet at its specific radius and height */}
+          {PROJECT_PLANETS.map((planet) => {
+            const dx = planet.position[0] - SOLAR_SYSTEM_CENTER[0];
+            const dz = planet.position[2] - SOLAR_SYSTEM_CENTER[2];
+            const radius = Math.sqrt(dx * dx + dz * dz);
+            const ringCenter: [number, number, number] = [
+              SOLAR_SYSTEM_CENTER[0],
+              planet.position[1],
+              SOLAR_SYSTEM_CENTER[2]
+            ];
+
+            return (
+              <OrbitalRing
+                key={`ring-${planet.id}`}
+                radius={radius}
+                color="#ffffff"
+                center={ringCenter}
+                opacity={0.15}
+                progress={progress}
+              />
+            );
+          })}
+
+          {PLACEHOLDER_PLANETS.map((planet, index) => {
+            const dx = planet.position[0] - SOLAR_SYSTEM_CENTER[0];
+            const dz = planet.position[2] - SOLAR_SYSTEM_CENTER[2];
+            const radius = Math.sqrt(dx * dx + dz * dz);
+            const ringCenter: [number, number, number] = [
+              SOLAR_SYSTEM_CENTER[0],
+              planet.position[1],
+              SOLAR_SYSTEM_CENTER[2]
+            ];
+
+            return (
+              <OrbitalRing
+                key={`ring-placeholder-${index}`}
+                radius={radius}
+                color="#ffffff"
+                center={ringCenter}
+                opacity={0.15}
+                progress={progress}
+              />
+            );
+          })}
+
           <group>
             <Planet3D
               position={[-15, 15, 0]}
@@ -487,6 +534,17 @@ export default function Scene3D({ progress }: Scene3DProps) {
               />
             ))}
           </group>
+
+          <ProjectsTitle
+            position={SOLAR_SYSTEM_CENTER}
+            progress={progress}
+            scale={3.5}
+            color="#ffffff"
+            opacity={0.6}
+            radius={18}
+            startAngle={245}
+            arcLength={35}
+          />
         </Suspense>
       </Canvas>
     </div>
