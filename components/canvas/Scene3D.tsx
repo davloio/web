@@ -334,6 +334,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
         }}
       >
       <Canvas
+        shadows
         camera={{
           position: [25, -15, 50],
           fov: 75,
@@ -354,23 +355,20 @@ export default function Scene3D({ progress }: Scene3DProps) {
             activePlanetPosition={activePlanetPosition}
           />
 
-          <ambientLight intensity={0.3} />
+          <ambientLight intensity={0.03} />
 
           <directionalLight
-            position={[10, 10, 5]}
-            intensity={1}
+            position={[90, 15, 0]}
+            intensity={6.0}
             castShadow
-          />
-
-          <directionalLight
-            position={[-10, -10, -5]}
-            intensity={0.3}
-          />
-
-          <pointLight
-            position={[0, 5, 10]}
-            intensity={0.5}
-            color="#ffffff"
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+            shadow-camera-left={-200}
+            shadow-camera-right={200}
+            shadow-camera-top={200}
+            shadow-camera-bottom={-200}
+            shadow-camera-near={0.5}
+            shadow-camera-far={500}
           />
 
           {/* Orbital ring for each planet at its specific radius and height */}

@@ -317,6 +317,8 @@ export default function Planet3D({
         onPointerOut={handlePointerOut}
         renderOrder={1}
         scale={currentMeshScale}
+        castShadow
+        receiveShadow
       >
         <sphereGeometry args={[1, 32, 32]} />
 
