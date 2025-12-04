@@ -17,6 +17,7 @@ import {
 } from '@/types/planet';
 import OrbitalRing from './OrbitalRing';
 import ProjectsTitle from './ProjectsTitle';
+import SpaceDust from './SpaceDust';
 
 type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 
@@ -371,6 +372,15 @@ export default function Scene3D({ progress }: Scene3DProps) {
             shadow-camera-bottom={-200}
             shadow-camera-near={0.5}
             shadow-camera-far={500}
+          />
+
+          <SpaceDust
+            count={1800}
+            size={0.2}
+            opacity={0.3}
+            color="#ffffff"
+            spread={150}
+            driftSpeed={0.02}
           />
 
           {/* Orbital ring for each planet at its specific radius and height */}
