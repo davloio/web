@@ -10,6 +10,7 @@ import ParticleNetwork from './ParticleNetwork';
 import ScannerEffect from './ScannerEffect';
 import ComingSoonOverlay from './ComingSoonOverlay';
 import HolographicLogo from './HolographicLogo';
+import AtmosphereLayer from './AtmosphereLayer';
 
 export default function Planet3D({
   position,
@@ -345,6 +346,15 @@ export default function Planet3D({
           />
         )}
       </mesh>
+
+      <AtmosphereLayer
+        planetRadius={1}
+        planetScale={currentMeshScale}
+        atmosphereColor="#88ccff"
+        atmosphereIntensity={0.15}
+        fresnelPower={2.5}
+        enabled={true}
+      />
 
       {show3DLogo && (
         <Logo3DSatellite
