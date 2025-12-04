@@ -24,6 +24,25 @@ const SpaceDust = ({
   const pointsRef = useRef<THREE.Points>(null)
   const { camera } = useThree()
 
+  const particleTexture = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 32
+    canvas.height = 32
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+
+    const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16)
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
+    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.8)')
+    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.3)')
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, 32, 32)
+
+    return new THREE.CanvasTexture(canvas)
+  }, [])
+
   const [positions, velocities, layers] = useMemo(() => {
     const positions = new Float32Array(count * 3)
     const velocities = new Float32Array(count * 3)
@@ -101,6 +120,8 @@ const SpaceDust = ({
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         sizeAttenuation={true}
+        map={particleTexture}
+        alphaTest={0.01}
       />
     </points>
   )

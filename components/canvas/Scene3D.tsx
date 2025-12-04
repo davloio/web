@@ -405,9 +405,9 @@ export default function Scene3D({ progress }: Scene3DProps) {
           />
 
           <SpaceDust
-            count={1800}
-            size={0.2}
-            opacity={0.3}
+            count={2200}
+            size={0.25}
+            opacity={0.4}
             color="#ffffff"
             spread={150}
             driftSpeed={0.02}
