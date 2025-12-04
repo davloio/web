@@ -183,6 +183,7 @@ export default function Hero() {
   const cursorFading = false;
   const [typingComplete, setTypingComplete] = useState(false);
   const [showIDE, setShowIDE] = useState(true);
+  const [ideOpacity, setIdeOpacity] = useState(1);
 
   useEffect(() => {
     const typewriterSequence = async () => {
@@ -215,6 +216,9 @@ export default function Hero() {
 
       setShowCursor(false);
 
+      setIdeOpacity(0);
+      await new Promise(resolve => setTimeout(resolve, 400));
+
       setShowIDE(false);
 
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -239,15 +243,39 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero-section relative min-h-screen flex flex-col items-start justify-center">
+    <section className="hero-section relative min-h-screen flex flex-col items-start justify-center" style={{ paddingLeft: '0px' }}>
       {showIDE && (
-        <div className="text-left">
+        <>
           <div style={{
-            marginBottom: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
+            position: 'fixed',
+            top: '50%',
+            left: '10%',
+            transform: 'translate(-50%, -50%)',
+            width: '1400px',
+            height: '800px',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            background: 'radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 40%, transparent 70%)',
+            zIndex: 2.5,
+            pointerEvents: 'none',
+            borderRadius: '8px',
+            opacity: ideOpacity,
+            transition: 'opacity 0.4s ease-out'
+          }} />
+          <div className="text-left" style={{
+            position: 'relative',
+            zIndex: 3,
+            padding: '40px 60px',
+            marginLeft: '0px',
+            opacity: ideOpacity,
+            transition: 'opacity 0.4s ease-out'
           }}>
+            <div style={{
+              marginBottom: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+            }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -362,6 +390,7 @@ export default function Hero() {
             </div>
           </div>
         </div>
+        </>
       )}
     </section>
   );
