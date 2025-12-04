@@ -344,6 +344,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
         gl={{
           antialias: true,
           alpha: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.4,
         }}
         dpr={[1, 2]}
       >
