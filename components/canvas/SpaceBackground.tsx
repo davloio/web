@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 export default function SpaceBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const animationFrameRef = useRef<number>();
+  const timeRef = useRef(0);
 
   useEffect(() => {
     setIsMounted(true);
@@ -19,10 +21,14 @@ export default function SpaceBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      drawSpace();
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
     };
 
     let seed = 12345;
@@ -31,140 +37,184 @@ export default function SpaceBackground() {
       return seed / 233280;
     };
 
-    const drawSpace = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    interface Star {
+      x: number;
+      y: number;
+      baseX: number;
+      baseY: number;
+      size: number;
+      opacity: number;
+      baseOpacity: number;
+      color: string;
+      layer: number;
+      twinkleSpeed: number;
+      twinklePhase: number;
+    }
 
-      const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      bgGradient.addColorStop(0, '#000000');
-      bgGradient.addColorStop(0.3, '#000205');
-      bgGradient.addColorStop(0.7, '#000308');
-      bgGradient.addColorStop(1, '#000000');
-      ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const stars: Star[] = [];
 
-      const addNebula = (x: number, y: number, radius: number, color1: string, color2: string, depth: number = 0) => {
-        const nebula = ctx.createRadialGradient(x, y, 0, x, y, radius);
-        nebula.addColorStop(0, color1);
-        nebula.addColorStop(0.3, color2);
-        nebula.addColorStop(0.6, `rgba(0, 0, 0, ${0.05 - depth * 0.01})`);
-        nebula.addColorStop(1, 'transparent');
-        ctx.fillStyle = nebula;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      };
-
-      addNebula(canvas.width * 0.4, canvas.height * 0.5, canvas.width * 0.6, 'rgba(20, 10, 40, 0.03)', 'rgba(10, 5, 20, 0.01)', 3);
-      addNebula(canvas.width * 0.6, canvas.height * 0.3, canvas.width * 0.5, 'rgba(15, 15, 30, 0.025)', 'rgba(8, 8, 15, 0.01)', 3);
-
-      addNebula(canvas.width * 0.2, canvas.height * 0.3, canvas.width * 0.4, 'rgba(40, 15, 70, 0.04)', 'rgba(20, 8, 35, 0.015)', 2);
-      addNebula(canvas.width * 0.7, canvas.height * 0.6, canvas.width * 0.5, 'rgba(15, 30, 80, 0.035)', 'rgba(8, 15, 40, 0.01)', 2);
-      addNebula(canvas.width * 0.5, canvas.height * 0.8, canvas.width * 0.35, 'rgba(50, 30, 100, 0.03)', 'rgba(25, 15, 50, 0.008)', 2);
-
-      addNebula(canvas.width * 0.85, canvas.height * 0.2, canvas.width * 0.25, 'rgba(60, 20, 100, 0.045)', 'rgba(30, 10, 50, 0.015)', 1);
-      addNebula(canvas.width * 0.15, canvas.height * 0.75, canvas.width * 0.2, 'rgba(25, 45, 110, 0.04)', 'rgba(12, 22, 55, 0.012)', 1);
-
+    const initStars = () => {
+      stars.length = 0;
       seed = 54321;
 
-      for (let i = 0; i < 1200; i++) {
-        const x = seededRandom() * canvas.width;
-        const y = seededRandom() * canvas.height;
-        const size = seededRandom() * 0.3 + 0.2;
-        const opacity = seededRandom() * 0.15 + 0.1;
+      for (let layer = 0; layer < 4; layer++) {
+        const starCount = [1200, 600, 150, 30][layer];
+        const layerDepth = layer / 3;
 
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-        ctx.fill();
-      }
+        for (let i = 0; i < starCount; i++) {
+          const baseX = seededRandom() * width;
+          const baseY = seededRandom() * height;
+          const size = seededRandom() * [0.3, 0.5, 1.0, 1.5][layer] + [0.2, 0.4, 0.6, 1.2][layer];
+          const baseOpacity = seededRandom() * [0.15, 0.25, 0.35, 0.4][layer] + [0.1, 0.2, 0.4, 0.6][layer];
 
-      for (let i = 0; i < 600; i++) {
-        const x = seededRandom() * canvas.width;
-        const y = seededRandom() * canvas.height;
-        const size = seededRandom() * 0.4 + 0.4;
-        const opacity = seededRandom() * 0.2 + 0.2;
+          const colorChoice = seededRandom();
+          let color;
+          if (colorChoice < 0.7) {
+            color = 'rgb(255, 255, 255)';
+          } else if (colorChoice < 0.85) {
+            color = 'rgb(200, 220, 255)';
+          } else if (colorChoice < 0.95) {
+            color = 'rgb(255, 240, 220)';
+          } else {
+            color = 'rgb(255, 200, 255)';
+          }
 
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-        ctx.fill();
-      }
-
-      for (let i = 0; i < 150; i++) {
-        const x = seededRandom() * canvas.width;
-        const y = seededRandom() * canvas.height;
-        const size = seededRandom() * 0.8 + 0.6;
-        const opacity = seededRandom() * 0.3 + 0.4;
-
-        const colorChoice = seededRandom();
-        let color;
-        if (colorChoice < 0.75) {
-          color = `rgba(255, 255, 255, ${opacity})`;
-        } else if (colorChoice < 0.9) {
-          color = `rgba(200, 220, 255, ${opacity})`;
-        } else {
-          color = `rgba(255, 240, 220, ${opacity})`;
-        }
-
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-
-        if (opacity > 0.6) {
-          ctx.shadowBlur = 1.5;
-          ctx.shadowColor = color;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        }
-      }
-
-      for (let i = 0; i < 20; i++) {
-        const x = seededRandom() * canvas.width;
-        const y = seededRandom() * canvas.height;
-        const size = seededRandom() * 1.2 + 1.2;
-        const opacity = seededRandom() * 0.2 + 0.7;
-
-        const colorChoice = seededRandom();
-        let color;
-        if (colorChoice < 0.6) {
-          color = `rgba(255, 255, 255, ${opacity})`;
-        } else if (colorChoice < 0.8) {
-          color = `rgba(180, 210, 255, ${opacity})`;
-        } else if (colorChoice < 0.93) {
-          color = `rgba(255, 245, 220, ${opacity})`;
-        } else {
-          color = `rgba(255, 200, 180, ${opacity})`;
-        }
-
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = color;
-        ctx.beginPath();
-        ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        if (seededRandom() > 0.7) {
-          ctx.strokeStyle = color.replace(/[\d.]+\)$/g, `${opacity * 0.3})`);
-          ctx.lineWidth = 0.4;
-
-          ctx.beginPath();
-          ctx.moveTo(x - size * 2.5, y);
-          ctx.lineTo(x + size * 2.5, y);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(x, y - size * 2.5);
-          ctx.lineTo(x, y + size * 2.5);
-          ctx.stroke();
+          stars.push({
+            x: baseX,
+            y: baseY,
+            baseX,
+            baseY,
+            size,
+            opacity: baseOpacity,
+            baseOpacity,
+            color,
+            layer,
+            twinkleSpeed: seededRandom() * 0.5 + 0.5,
+            twinklePhase: seededRandom() * Math.PI * 2,
+          });
         }
       }
     };
 
+    const drawNebula = (time: number) => {
+      const nebulas = [
+        { x: 0.4, y: 0.5, radius: 0.6, color1: 'rgba(100, 40, 180, 0.08)', color2: 'rgba(50, 20, 90, 0.03)', rotation: 0.1 },
+        { x: 0.6, y: 0.3, radius: 0.5, color1: 'rgba(40, 80, 160, 0.07)', color2: 'rgba(20, 40, 80, 0.025)', rotation: -0.15 },
+        { x: 0.2, y: 0.3, radius: 0.4, color1: 'rgba(140, 60, 200, 0.09)', color2: 'rgba(70, 30, 100, 0.035)', rotation: 0.08 },
+        { x: 0.7, y: 0.6, radius: 0.5, color1: 'rgba(40, 120, 180, 0.08)', color2: 'rgba(20, 60, 90, 0.03)', rotation: -0.12 },
+        { x: 0.5, y: 0.8, radius: 0.35, color1: 'rgba(180, 80, 220, 0.075)', color2: 'rgba(90, 40, 110, 0.025)', rotation: 0.2 },
+        { x: 0.85, y: 0.2, radius: 0.25, color1: 'rgba(200, 60, 200, 0.1)', color2: 'rgba(100, 30, 100, 0.04)', rotation: -0.18 },
+        { x: 0.15, y: 0.75, radius: 0.2, color1: 'rgba(60, 150, 220, 0.09)', color2: 'rgba(30, 75, 110, 0.035)', rotation: 0.25 },
+      ];
+
+      nebulas.forEach((nebula) => {
+        const centerX = width * nebula.x;
+        const centerY = height * nebula.y;
+        const radius = width * nebula.radius;
+        const rotation = time * nebula.rotation * 0.0001;
+
+        const offsetX = Math.cos(rotation) * radius * 0.1;
+        const offsetY = Math.sin(rotation) * radius * 0.1;
+
+        const gradient = ctx.createRadialGradient(
+          centerX + offsetX, centerY + offsetY, 0,
+          centerX, centerY, radius
+        );
+        gradient.addColorStop(0, nebula.color1);
+        gradient.addColorStop(0.3, nebula.color2);
+        gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.02)');
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      });
+    };
+
+    const drawStars = (time: number, mouseX: number, mouseY: number) => {
+      stars.forEach((star) => {
+        const parallaxAmount = (1 - star.layer / 3) * 0.05;
+        const offsetX = (mouseX - width / 2) * parallaxAmount;
+        const offsetY = (mouseY - height / 2) * parallaxAmount;
+
+        star.x = star.baseX + offsetX;
+        star.y = star.baseY + offsetY;
+
+        if (star.layer >= 2) {
+          const twinkle = Math.sin(time * 0.001 * star.twinkleSpeed + star.twinklePhase) * 0.3 + 0.7;
+          star.opacity = star.baseOpacity * twinkle;
+        }
+
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fillStyle = star.color.replace('rgb', 'rgba').replace(')', `, ${star.opacity})`);
+        ctx.fill();
+
+        if (star.layer === 3 && star.baseOpacity > 0.7) {
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = star.color;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          if (seededRandom() > 0.7) {
+            ctx.strokeStyle = star.color.replace('rgb', 'rgba').replace(')', `, ${star.opacity * 0.3})`);
+            ctx.lineWidth = 0.4;
+
+            ctx.beginPath();
+            ctx.moveTo(star.x - star.size * 2.5, star.y);
+            ctx.lineTo(star.x + star.size * 2.5, star.y);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y - star.size * 2.5);
+            ctx.lineTo(star.x, star.y + star.size * 2.5);
+            ctx.stroke();
+          }
+        }
+      });
+    };
+
+    let mouseX = width / 2;
+    let mouseY = height / 2;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+
+    const animate = () => {
+      timeRef.current += 16;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+      bgGradient.addColorStop(0, '#000000');
+      bgGradient.addColorStop(0.3, '#000308');
+      bgGradient.addColorStop(0.7, '#00040a');
+      bgGradient.addColorStop(1, '#000000');
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, width, height);
+
+      drawNebula(timeRef.current);
+      drawStars(timeRef.current, mouseX, mouseY);
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
     resize();
-    window.addEventListener('resize', resize);
+    initStars();
+    window.addEventListener('resize', () => {
+      resize();
+      initStars();
+    });
+    window.addEventListener('mousemove', handleMouseMove);
+
+    animate();
 
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, [isMounted]);
 
