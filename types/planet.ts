@@ -112,6 +112,35 @@ export interface PlaceholderPlanetConfig {
   color: string;
 }
 
+export interface AsteroidBeltConfig {
+  orbitRadius: number;
+  beltThickness: number;
+  beltHeight: number;
+  smallCount: number;
+  mediumCount: number;
+  largeCount: number;
+  baseColor: string;
+  emissiveColor?: string;
+  roughness: number;
+  metalness: number;
+  orbitSpeed: number;
+  tumbleSpeed: number;
+  wobbleAmount: number;
+  renderOrder?: number;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
+}
+
+export interface DecorativePlanet3DConfig {
+  position: [number, number, number];
+  scale: number;
+  showMoon?: boolean;
+  showCrater?: boolean;
+  asteroidBelt?: AsteroidBeltConfig;
+  fadeStartDistance?: number;
+  fadeRange?: number;
+}
+
 export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
   {
     id: 'pink',

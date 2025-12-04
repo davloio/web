@@ -186,7 +186,7 @@ export default function Hero() {
 
   useEffect(() => {
     const typewriterSequence = async () => {
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise(resolve => setTimeout(resolve, 4500));
 
       setShowCursor(true);
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -226,11 +226,11 @@ export default function Hero() {
 
     const shuttleTimer = setTimeout(() => {
       window.dispatchEvent(new CustomEvent('showShuttle'));
-    }, 4100);
+    }, 6100);
 
     const universeGlowTimer = setTimeout(() => {
       window.dispatchEvent(new CustomEvent('activateUniverseGlow'));
-    }, 6100);
+    }, 8100);
 
     return () => {
       clearTimeout(shuttleTimer);
@@ -242,14 +242,12 @@ export default function Hero() {
     <section className="hero-section relative min-h-screen flex flex-col items-start justify-center">
       {showIDE && (
         <div className="text-left">
-          {/* Minimal IDE Header */}
           <div style={{
             marginBottom: '20px',
             display: 'flex',
             flexDirection: 'column',
             gap: '8px',
           }}>
-            {/* Window Controls + Filename */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -271,7 +269,6 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* Simple syntax-highlighted code context */}
             <div style={{
               fontFamily: 'var(--font-geist-mono)',
               fontSize: '13px',
@@ -285,7 +282,6 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Main typewriter content */}
           <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
             <div style={{
               fontFamily: 'var(--font-geist-mono)',
@@ -327,7 +323,6 @@ export default function Hero() {
                     position: 'relative',
                   }}
                 >
-                  {/* Small "Tab to accept" hint */}
                   <span style={{
                     position: 'absolute',
                     top: '-20px',

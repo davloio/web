@@ -7,9 +7,31 @@ export default function SpaceBackground() {
   const [isMounted, setIsMounted] = useState(false);
   const animationFrameRef = useRef<number>();
   const timeRef = useRef(0);
+  const [telescopeZoom, setTelescopeZoom] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
+
+    const startDelay = setTimeout(() => {
+      const duration = 1800;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        setTelescopeZoom(easedProgress);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      animate();
+    }, 2000);
+
+    return () => clearTimeout(startDelay);
   }, []);
 
   useEffect(() => {
@@ -21,12 +43,12 @@ export default function SpaceBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
+    let width = window.innerWidth * 1.4;
+    let height = window.innerHeight * 1.4;
 
     const resize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
+      width = window.innerWidth * 1.4;
+      height = window.innerHeight * 1.4;
       canvas.width = width;
       canvas.height = height;
     };
@@ -220,12 +242,23 @@ export default function SpaceBackground() {
 
   if (!isMounted) return null;
 
+  const startScale = 0.6;
+  const endScale = 1;
+  const currentScale = startScale + (endScale - startScale) * telescopeZoom;
+
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
+      className="fixed pointer-events-none"
       style={{
         zIndex: 0,
+        left: '-20%',
+        top: '-20%',
+        width: '140%',
+        height: '140%',
+        transform: `scale(${currentScale})`,
+        transformOrigin: '60% center',
+        transition: telescopeZoom === 0 ? 'none' : 'transform 0.05s linear',
       }}
     />
   );

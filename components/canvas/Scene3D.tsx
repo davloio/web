@@ -18,6 +18,7 @@ import {
 import OrbitalRing from './OrbitalRing';
 import ProjectsTitle from './ProjectsTitle';
 import SpaceDust from './SpaceDust';
+import DecorativePlanet3D from './DecorativePlanet3D';
 
 type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 
@@ -26,11 +27,13 @@ function CameraController({
   modalOpen,
   progress,
   activePlanetPosition,
+  telescopeZoomProgress,
 }: {
   inDetailView: DetailViewType;
   modalOpen: boolean;
   progress: number;
   activePlanetPosition: [number, number, number] | null;
+  telescopeZoomProgress: number;
 }) {
   const { camera } = useThree();
 
@@ -80,7 +83,11 @@ function CameraController({
     const solarSystemCenterZ = SOLAR_SYSTEM_CENTER[2];
     const overviewZ = OVERVIEW_DISTANCE;
 
-    const startZ = 50;
+    const telescopeStartZ = 100;
+    const normalStartZ = 50;
+    const effectiveStartZ = telescopeStartZ - (telescopeStartZ - normalStartZ) * telescopeZoomProgress;
+
+    const startZ = effectiveStartZ;
     const zoomZ = 8;
     const transitionZ = 12;
 
@@ -236,9 +243,31 @@ export default function Scene3D({ progress }: Scene3DProps) {
   const [inDetailView, setInDetailView] = useState<DetailViewType>(null);
   const [showModal, setShowModal] = useState<DetailViewType>(null);
   const [activePlanetPosition, setActivePlanetPosition] = useState<[number, number, number] | null>(null);
+  const [telescopeZoomProgress, setTelescopeZoomProgress] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
+
+    const startDelay = setTimeout(() => {
+      const duration = 1800;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        setTelescopeZoomProgress(easedProgress);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      animate();
+    }, 2000);
+
+    return () => clearTimeout(startDelay);
   }, []);
 
   const handleModalClose = () => {
@@ -331,13 +360,13 @@ export default function Scene3D({ progress }: Scene3DProps) {
           pointerEvents: showModal !== null ? 'none' : 'auto',
           transition: 'opacity 0.35s ease-in-out, transform 0.35s ease-in-out',
           transformOrigin: 'center center',
-          animation: 'planetMaterialize 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          animation: 'planetMaterialize 2.2s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards',
         }}
       >
       <Canvas
         shadows
         camera={{
-          position: [25, -15, 50],
+          position: [15, -15, 100],
           fov: 75,
           near: 0.1,
           far: 1000,
@@ -356,6 +385,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
             modalOpen={showModal !== null}
             progress={progress}
             activePlanetPosition={activePlanetPosition}
+            telescopeZoomProgress={telescopeZoomProgress}
           />
 
           <ambientLight intensity={0.03} />
@@ -383,7 +413,32 @@ export default function Scene3D({ progress }: Scene3DProps) {
             driftSpeed={0.02}
           />
 
-          {/* Orbital ring for each planet at its specific radius and height */}
+          <DecorativePlanet3D
+            position={[42, -10, 30]}
+            scale={50}
+            showMoon={true}
+            showCrater={true}
+            fadeStartDistance={50}
+            fadeRange={20}
+            asteroidBelt={{
+              orbitRadius: 1.1,
+              beltThickness: 1.0,
+              beltHeight: 2.0,
+              smallCount: 3500,
+              mediumCount: 800,
+              largeCount: 250,
+              baseColor: '#1a1a1a',
+              roughness: 0.95,
+              metalness: 0.05,
+              orbitSpeed: 0.0001,
+              tumbleSpeed: 0.0003,
+              wobbleAmount: 0.0,
+              renderOrder: 0.4,
+              castShadow: true,
+              receiveShadow: true,
+            }}
+          />
+
           {PROJECT_PLANETS.map((planet) => {
             const dx = planet.position[0] - SOLAR_SYSTEM_CENTER[0];
             const dz = planet.position[2] - SOLAR_SYSTEM_CENTER[2];
@@ -696,7 +751,6 @@ export default function Scene3D({ progress }: Scene3DProps) {
           width: 'calc(96px * 7)',
           height: '280px',
         }}>
-          
           <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
             <line x1="80" y1="60" x2="180" y2="60" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
             <line x1="180" y1="60" x2="280" y2="100" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
@@ -709,7 +763,6 @@ export default function Scene3D({ progress }: Scene3DProps) {
             <line x1="330" y1="180" x2="430" y2="180" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
           </svg>
 
-          
           {[
             { name: 'Rust', icon: 'rust', x: 80, y: 60 },
             { name: 'Kubernetes', icon: 'kubernetes', x: 180, y: 60 },
