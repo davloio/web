@@ -4,6 +4,8 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import Planet3D from './Planet3D';
+import ProceduralPlanet3D from './ProceduralPlanet3D';
+import { aboutPlanet } from '@/lib/planets/aboutPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import {
@@ -483,46 +485,11 @@ export default function Scene3D({ progress }: Scene3DProps) {
           })}
 
           <group>
-            <Planet3D
-              position={[-15, 0, 0]}
-              scale={4}
-              color="#ffffff"
-              emissive="#ffffff"
-              emissiveIntensity={0.5}
-              name="davlo.io"
-              roughness={0.7}
-              metalness={0.1}
+            {/* About Planet - Now using procedural generation */}
+            <ProceduralPlanet3D
+              config={aboutPlanet}
               onClick={handleAboutClick}
               disableHover={inDetailView !== null || progress < 80 || progress >= 130}
-              glowColor="#ffffff"
-              showClouds={true}
-              show3DLogo={false}
-              cloudConfig={{
-                cloudCount: 20,
-                rotationSpeed: 0.0008,
-                cloudOpacity: 0.85,
-                layerHeight: 1.03,
-              }}
-              logoConfig={{
-                scale: 0.2,
-                glowColor: "#ffffff",
-                glowIntensity: 0.3,
-              }}
-              showHolographicLogo={true}
-              holographicConfig={{
-                streamCount: 6,
-                streamHeight: 1.65,
-                particleSpeed: 0.008,
-                particleSize: 0.12,
-                particleColor: '#ffffff',
-                logoScale: 0.8,
-                logoOpacity: 0.6,
-                pulseSpeed: 1.2,
-                distortionAmount: 0.1,
-                svgPath: '/logo-white.svg',
-                text: 'about',
-                textSize: 0.3,
-              }}
             />
 
             {PROJECT_PLANETS.map((config) => (
