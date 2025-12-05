@@ -8,9 +8,11 @@ export default function SpaceBackground() {
   const animationFrameRef = useRef<number | undefined>(undefined);
   const timeRef = useRef(0);
   const [telescopeZoom, setTelescopeZoom] = useState(0);
+  const [isFirefox, setIsFirefox] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    setIsFirefox(navigator.userAgent.toLowerCase().includes('firefox'));
 
     const startDelay = setTimeout(() => {
       const duration = 1800;
@@ -42,6 +44,80 @@ export default function SpaceBackground() {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    if (isFirefox) {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+
+      let seed = 54321;
+      const seededRandom = () => {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      };
+
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+      bgGradient.addColorStop(0, '#000000');
+      bgGradient.addColorStop(0.3, '#000308');
+      bgGradient.addColorStop(0.7, '#00040a');
+      bgGradient.addColorStop(1, '#000000');
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, width, height);
+
+      const nebulas = [
+        { x: 0.4, y: 0.5, radius: 0.6, color1: 'rgba(120, 40, 200, 0.12)', color2: 'rgba(60, 20, 100, 0.045)' },
+        { x: 0.6, y: 0.3, radius: 0.5, color1: 'rgba(80, 60, 180, 0.10)', color2: 'rgba(40, 30, 90, 0.035)' },
+        { x: 0.2, y: 0.3, radius: 0.4, color1: 'rgba(160, 50, 220, 0.13)', color2: 'rgba(80, 25, 110, 0.05)' },
+        { x: 0.7, y: 0.6, radius: 0.5, color1: 'rgba(70, 80, 200, 0.11)', color2: 'rgba(35, 40, 100, 0.04)' },
+        { x: 0.5, y: 0.8, radius: 0.35, color1: 'rgba(200, 70, 230, 0.11)', color2: 'rgba(100, 35, 115, 0.038)' },
+        { x: 0.85, y: 0.2, radius: 0.25, color1: 'rgba(220, 50, 210, 0.14)', color2: 'rgba(110, 25, 105, 0.055)' },
+        { x: 0.15, y: 0.75, radius: 0.2, color1: 'rgba(100, 100, 230, 0.12)', color2: 'rgba(50, 50, 115, 0.045)' },
+      ];
+
+      nebulas.forEach((nebula) => {
+        const gradient = ctx.createRadialGradient(
+          width * nebula.x, height * nebula.y, 0,
+          width * nebula.x, height * nebula.y, width * nebula.radius
+        );
+        gradient.addColorStop(0, nebula.color1);
+        gradient.addColorStop(0.3, nebula.color2);
+        gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.02)');
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      });
+
+      for (let layer = 0; layer < 4; layer++) {
+        const starCount = [800, 400, 100, 20][layer];
+
+        for (let i = 0; i < starCount; i++) {
+          const x = seededRandom() * width;
+          const y = seededRandom() * height;
+          const size = seededRandom() * [0.3, 0.5, 1.0, 1.5][layer] + [0.2, 0.4, 0.6, 1.2][layer];
+          const opacity = seededRandom() * [0.15, 0.25, 0.35, 0.4][layer] + [0.1, 0.2, 0.4, 0.6][layer];
+
+          const colorChoice = seededRandom();
+          let r, g, b;
+          if (colorChoice < 0.7) {
+            r = 255; g = 255; b = 255;
+          } else if (colorChoice < 0.85) {
+            r = 200; g = 220; b = 255;
+          } else if (colorChoice < 0.95) {
+            r = 255; g = 240; b = 220;
+          } else {
+            r = 255; g = 200; b = 255;
+          }
+
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+          ctx.fill();
+        }
+      }
+
+      return;
+    }
 
     let width = window.innerWidth * 1.4;
     let height = window.innerHeight * 1.4;
@@ -237,7 +313,7 @@ export default function SpaceBackground() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isMounted]);
+  }, [isMounted, isFirefox]);
 
   if (!isMounted) return null;
 
@@ -245,20 +321,31 @@ export default function SpaceBackground() {
   const endScale = 1;
   const currentScale = startScale + (endScale - startScale) * telescopeZoom;
 
+  const canvasStyles = isFirefox ? {
+    zIndex: 0,
+    left: '0',
+    top: '0',
+    width: '100%',
+    height: '100%',
+    transform: `scale(${currentScale})`,
+    transformOrigin: '50% center',
+    transition: telescopeZoom === 0 ? 'none' : 'transform 0.05s linear',
+  } : {
+    zIndex: 0,
+    left: '-20%',
+    top: '-20%',
+    width: '140%',
+    height: '140%',
+    transform: `scale(${currentScale})`,
+    transformOrigin: '60% center',
+    transition: telescopeZoom === 0 ? 'none' : 'transform 0.05s linear',
+  };
+
   return (
     <canvas
       ref={canvasRef}
       className="fixed pointer-events-none"
-      style={{
-        zIndex: 0,
-        left: '-20%',
-        top: '-20%',
-        width: '140%',
-        height: '140%',
-        transform: `scale(${currentScale})`,
-        transformOrigin: '60% center',
-        transition: telescopeZoom === 0 ? 'none' : 'transform 0.05s linear',
-      }}
+      style={canvasStyles}
     />
   );
 }
