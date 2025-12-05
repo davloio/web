@@ -246,22 +246,6 @@ export default function Hero() {
     <section className="hero-section relative min-h-screen flex flex-col items-start justify-center" style={{ paddingLeft: '0px' }}>
       {showIDE && (
         <>
-          <div style={{
-            position: 'fixed',
-            top: '50%',
-            left: '10%',
-            transform: 'translate(-50%, -50%)',
-            width: '1400px',
-            height: '800px',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            background: 'radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 40%, transparent 70%)',
-            zIndex: 2.5,
-            pointerEvents: 'none',
-            borderRadius: '8px',
-            opacity: ideOpacity,
-            transition: 'opacity 0.4s ease-out'
-          }} />
           <div className="text-left" style={{
             position: 'relative',
             zIndex: 3,

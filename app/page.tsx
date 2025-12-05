@@ -81,6 +81,10 @@ export default function Home() {
         </main>
       </div>
 
+      <Suspense fallback={null}>
+        <Scene3D progress={progress} />
+      </Suspense>
+
       <div
         className="fixed inset-0 origin-center transition-opacity duration-800"
         style={{
@@ -101,10 +105,6 @@ export default function Home() {
           <Hero />
         </main>
       </div>
-
-      <Suspense fallback={null}>
-        <Scene3D progress={progress} />
-      </Suspense>
 
       <div className="footer-container fixed bottom-0 left-0 z-[100]">
         <Footer />

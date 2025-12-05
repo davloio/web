@@ -76,7 +76,7 @@ export default function DecorativePlanet3D({
   });
 
   return (
-    <group ref={groupRef} position={position} rotation={[Math.PI * 0.15, Math.PI * 0.25, 0]}>
+    <group ref={groupRef} position={position} rotation={[Math.PI * 0.04, Math.PI * 0.09, 0]}>
       <sprite scale={[planetRadius * 2.3, planetRadius * 4.0, 1]} renderOrder={0.8}>
         <spriteMaterial
           map={glowTexture}

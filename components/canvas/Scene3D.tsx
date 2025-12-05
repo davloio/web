@@ -76,7 +76,7 @@ function CameraController({
     const normalizedProgress = progress / 100;
 
     const aboutPlanetX = -15;
-    const aboutPlanetY = 15;
+    const aboutPlanetY = 0;
     const aboutPlanetZ = 0;
     const solarSystemCenterX = SOLAR_SYSTEM_CENTER[0];
     const solarSystemCenterY = SOLAR_SYSTEM_CENTER[1];
@@ -92,7 +92,7 @@ function CameraController({
     const transitionZ = 12;
 
     const startCameraX = 15;
-    const startCameraY = -15;
+    const startCameraY = 0;
 
     let targetZ: number;
     let targetPosX: number;
@@ -366,7 +366,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
       <Canvas
         shadows
         camera={{
-          position: [15, -15, 100],
+          position: [15, 0, 100],
           fov: 75,
           near: 0.1,
           far: 1000,
@@ -414,7 +414,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
           />
 
           <DecorativePlanet3D
-            position={[42, -10, 30]}
+            position={[42, 0, 30]}
             scale={50}
             showMoon={true}
             showCrater={true}
@@ -485,7 +485,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
           <group>
             <Planet3D
-              position={[-15, 15, 0]}
+              position={[-15, 0, 0]}
               scale={4}
               color="#ffffff"
               emissive="#ffffff"
