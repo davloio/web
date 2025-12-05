@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import gsap from 'gsap';
 
 type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 

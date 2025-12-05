@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AsteroidBeltConfig } from '@/types/planet';
 
@@ -16,15 +16,11 @@ interface AsteroidBeltProps {
 export default function AsteroidBelt({
   config,
   planetRadius,
-  fadeStartDistance = 50,
-  fadeRange = 20,
-  planetPosition = [0, 0, 0]
 }: AsteroidBeltProps) {
   const groupRef = useRef<THREE.Group>(null);
   const mediumMeshesRef = useRef<(THREE.InstancedMesh | null)[]>([]);
   const largeMeshesRef = useRef<(THREE.InstancedMesh | null)[]>([]);
   const pointsRef = useRef<THREE.Points>(null);
-  const { camera } = useThree();
 
   const {
     orbitRadius,
@@ -231,14 +227,6 @@ export default function AsteroidBelt({
     return geoArray;
   }, []);
 
-  const mediumGeometry = useMemo(() => {
-    return geometries;
-  }, [geometries]);
-
-  const largeGeometry = useMemo(() => {
-    return geometries;
-  }, [geometries]);
-
   let frameCount = 0;
 
   useFrame(({ clock }) => {
@@ -330,8 +318,8 @@ export default function AsteroidBelt({
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
+            args={[smallAsteroidsData.positions, 3]}
             count={smallCount}
-            array={smallAsteroidsData.positions}
             itemSize={3}
           />
         </bufferGeometry>

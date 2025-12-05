@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useMemo } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import AsteroidBelt from './AsteroidBelt';
 import { DecorativePlanet3DConfig } from '@/types/planet';
@@ -10,7 +10,6 @@ export default function DecorativePlanet3D({
   position,
   scale,
   showMoon = false,
-  showCrater = false,
   asteroidBelt,
   fadeStartDistance = 50,
   fadeRange = 20,
@@ -18,7 +17,6 @@ export default function DecorativePlanet3D({
   const groupRef = useRef<THREE.Group>(null);
   const planetMeshRef = useRef<THREE.Mesh>(null);
   const moonMeshRef = useRef<THREE.Mesh>(null);
-  const { camera } = useThree();
 
   const planetRadius = scale / 2;
 

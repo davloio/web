@@ -20,9 +20,6 @@ export default function ProjectsTitle({
   scale = 2,
   color = '#ffffff',
   opacity = 0.8,
-  radius = 30,
-  startAngle = 240,
-  arcLength = 40,
 }: ProjectsTitleProps) {
   const text = 'PROJECTS';
 

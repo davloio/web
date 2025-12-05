@@ -120,7 +120,7 @@ const CloudLayer = ({
   }, [planetRadius, cloudCount, layerHeight, cloudColor])
 
 
-  useFrame((state) => {
+  useFrame(() => {
     if (!groupRef.current || !enabled) return
 
     const targetSpeed = hovered ? rotationSpeed * 3 : rotationSpeed

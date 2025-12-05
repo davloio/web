@@ -5,13 +5,11 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
 export default function DecorativePlanet() {
-  const [isMounted, setIsMounted] = useState(false);
   const [shuttleVisible, setShuttleVisible] = useState(false);
   const [universeGlowing, setUniverseGlowing] = useState(false);
   const sloganRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsMounted(true);
 
     if (sloganRef.current) {
       gsap.fromTo(

@@ -70,11 +70,10 @@ const SpaceDust = ({
     return [positions, velocities, layers]
   }, [count, spread, driftSpeed])
 
-  useFrame((state) => {
+  useFrame(() => {
     if (!pointsRef.current) return
 
     const positionAttribute = pointsRef.current.geometry.attributes.position
-    const time = state.clock.elapsedTime
 
     for (let i = 0; i < count; i++) {
       positionAttribute.array[i * 3] += velocities[i * 3]
@@ -107,8 +106,8 @@ const SpaceDust = ({
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
+          args={[positions, 3]}
           count={count}
-          array={positions}
           itemSize={3}
         />
       </bufferGeometry>

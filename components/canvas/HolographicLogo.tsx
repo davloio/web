@@ -13,7 +13,6 @@ export interface HolographicLogoProps extends HolographicLogoConfig {
 
 const HolographicLogo = ({
   planetRadius,
-  planetScale,
   hovered,
   streamCount = 6,
   streamHeight = 1.8,
@@ -23,7 +22,6 @@ const HolographicLogo = ({
   logoScale = 0.6,
   logoOpacity = 0.25,
   pulseSpeed = 1.5,
-  distortionAmount = 0.15,
   svgPath = '/logo-white.svg',
   text,
   textSize = 0.15,
@@ -147,7 +145,7 @@ const HolographicLogo = ({
     setTextTexture(texture)
   }, [text, particleColor])
 
-  const { geometry, particlesPerStream, minHeight, maxHeight } = useMemo(() => {
+  const { geometry, minHeight, maxHeight } = useMemo(() => {
     const particlesPerStream = 18
     const totalParticles = streamCount * particlesPerStream
 
@@ -188,7 +186,7 @@ const HolographicLogo = ({
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     geometry.setAttribute('alpha', new THREE.BufferAttribute(opacities, 1))
 
-    return { geometry, particlesPerStream, minHeight, maxHeight }
+    return { geometry, minHeight, maxHeight }
   }, [streamCount, planetRadius, streamHeight])
 
   useFrame(({ clock }) => {
@@ -226,9 +224,9 @@ const HolographicLogo = ({
 
     if (logoSpriteRef.current && logoTexture) {
       const basePulse = Math.sin(time * pulseSpeed) * 0.1 + 0.9
-      let targetOpacity = logoOpacity * basePulse
       let targetScale = logoScale
 
+      let targetOpacity = logoOpacity * basePulse
       if (hovered && !disableHoverEffect) {
         targetOpacity *= 1.3
         targetScale *= 1.1
@@ -242,13 +240,6 @@ const HolographicLogo = ({
     }
 
     if (textSpriteRef.current && textTexture) {
-      const basePulse = Math.sin(time * pulseSpeed) * 0.1 + 0.9
-      let targetOpacity = logoOpacity * basePulse
-
-      if (hovered && !disableHoverEffect) {
-        targetOpacity *= 1.3
-      }
-
       const textOpacity = currentOpacity.current
       textSpriteRef.current.material.opacity = textOpacity
     }

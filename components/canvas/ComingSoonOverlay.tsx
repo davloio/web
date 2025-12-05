@@ -11,7 +11,6 @@ interface ComingSoonOverlayProps {
 }
 
 export default function ComingSoonOverlay({
-  planetRadius,
   planetScale = 1,
   show,
 }: ComingSoonOverlayProps) {
@@ -24,40 +23,6 @@ export default function ComingSoonOverlay({
       billboardGroupRef.current.quaternion.copy(camera.quaternion);
     }
   });
-
-  const blurSphereGeometry = useMemo(() => {
-    return new THREE.SphereGeometry(planetRadius * 2, 32, 32);
-  }, [planetRadius]);
-
-  const blurTexture = useMemo(() => {
-    const canvas = document.createElement('canvas');
-    const size = 512;
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d')!;
-
-    const centerX = size / 2;
-    const centerY = size / 2;
-    const radius = size / 2;
-
-    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-    gradient.addColorStop(0, 'rgba(200, 200, 200, 0.3)');
-    gradient.addColorStop(0.2, 'rgba(180, 180, 180, 0.5)');
-    gradient.addColorStop(0.4, 'rgba(160, 160, 160, 0.6)');
-    gradient.addColorStop(0.6, 'rgba(140, 140, 140, 0.5)');
-    gradient.addColorStop(0.8, 'rgba(120, 120, 120, 0.3)');
-    gradient.addColorStop(1, 'rgba(100, 100, 100, 0)');
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, size, size);
-
-    ctx.filter = 'blur(60px)';
-    ctx.drawImage(canvas, 0, 0);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.needsUpdate = true;
-    return texture;
-  }, []);
 
   const lockIconTexture = useMemo(() => {
     const canvas = document.createElement('canvas');

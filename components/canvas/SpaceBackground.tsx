@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function SpaceBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const timeRef = useRef(0);
   const [telescopeZoom, setTelescopeZoom] = useState(0);
 
@@ -81,7 +81,6 @@ export default function SpaceBackground() {
 
       for (let layer = 0; layer < 4; layer++) {
         const starCount = [1200, 600, 150, 30][layer];
-        const layerDepth = layer / 3;
 
         for (let i = 0; i < starCount; i++) {
           const baseX = seededRandom() * width;
