@@ -236,6 +236,9 @@ export default function DetailModal({
                     top: 'clamp(300px, 37.5%, 360px)',
                     right: '120px',
                     width: 'calc(96px * 5)',
+                    maxHeight: 'calc(100% - clamp(300px, 37.5%, 360px) - clamp(200px, 25%, 300px))',
+                    overflowY: 'auto',
+                    paddingRight: '12px',
                   }}
                 >
                   {textBlock}

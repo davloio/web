@@ -5,6 +5,7 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import Planet3D from './Planet3D';
 import DetailModal from '@/components/ui/DetailModal';
+import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import {
   PROJECT_PLANETS,
@@ -613,28 +614,22 @@ export default function Scene3D({ progress }: Scene3DProps) {
       </Canvas>
     </div>
 
+    <TaikoExplorerModal
+      isOpen={showModal === 'project-pink'}
+      onClose={handleModalClose}
+    />
+
     <DetailModal
-      isOpen={showModal !== null}
+      isOpen={showModal === 'about' || showModal === 'project-dark'}
       onClose={handleModalClose}
       backgroundColor={
-        showModal === 'project-pink' ? '#C55A7D' :
-        showModal === 'project-dark' ? '#333333' :
-        '#ffffff'
+        showModal === 'project-dark' ? '#333333' : '#ffffff'
       }
       textColor={
         showModal === 'project-dark' ? '#ffffff' : '#000000'
       }
       textBlock={
-        showModal === 'project-pink' ? (
-          <p style={{
-            fontSize: '18px',
-            lineHeight: '1.7',
-            fontWeight: 400,
-            margin: 0,
-          }}>
-            Our projects showcase innovative blockchain software. More coming soon.
-          </p>
-        ) : showModal === 'project-dark' ? (
+        showModal === 'project-dark' ? (
           <p style={{
             fontSize: '18px',
             lineHeight: '1.7',
