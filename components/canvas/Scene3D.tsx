@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import Planet3D from './Planet3D';
 import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
+import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import {
   PROJECT_PLANETS,
@@ -619,8 +620,13 @@ export default function Scene3D({ progress }: Scene3DProps) {
       onClose={handleModalClose}
     />
 
+    <IntuitionExplorerModal
+      isOpen={showModal === 'project-dark'}
+      onClose={handleModalClose}
+    />
+
     <DetailModal
-      isOpen={showModal === 'about' || showModal === 'project-dark'}
+      isOpen={showModal === 'about'}
       onClose={handleModalClose}
       backgroundColor={
         showModal === 'project-dark' ? '#333333' : '#ffffff'

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SpaceshipLink from './SpaceshipLink';
 
-interface TaikoExplorerModalProps {
+interface IntuitionExplorerModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
@@ -23,7 +23,7 @@ const fadeSlideUp = {
 
 const smoothEase = [0.16, 1, 0.3, 1] as const;
 
-export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerModalProps) {
+export default function IntuitionExplorerModal({ isOpen, onClose }: IntuitionExplorerModalProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
           className="fixed inset-0 overflow-hidden"
           style={{
             zIndex: 50,
-            backgroundColor: '#C55A7D',
+            backgroundColor: '#0a0a0a',
           }}
         >
           <div className="h-screen flex items-center justify-center px-12 py-16 relative">
@@ -72,7 +72,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontWeight: 900,
                   letterSpacing: '-0.06em',
                   fontFamily: 'nexa, sans-serif',
-                  color: '#000000',
+                  color: '#cccccc',
                   lineHeight: '1',
                   margin: 0,
                   position: 'absolute',
@@ -95,15 +95,15 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontSize: '18px',
                   lineHeight: '1.7',
                   fontWeight: 400,
-                  color: '#000000',
+                  color: '#cccccc',
                   textAlign: 'left',
                 }}
               >
                 <p style={{ margin: '0 0 24px 0' }}>
-                  A next-generation blockchain explorer designed to deliver an exceptional user experience for exploring the Taiko network. Built with cutting-edge technology and a focus on speed.
+                  Blockchain explorer for Intuition, a new Layer 2 network built for the future of decentralized systems. First-class tooling from day one, providing real-time insights as the network grows.
                 </p>
                 <p style={{ margin: '0' }}>
-                  Experience instant search results and real-time updates. Our advanced ingestion system processes blockchain data at unprecedented speeds, ensuring you're always viewing the latest information.
+                  Track every transaction, block, and address on this emerging blockchain. Built to scale alongside the network, delivering accurate data from genesis to the present moment.
                 </p>
               </motion.div>
 
@@ -115,7 +115,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontWeight: 900,
                   letterSpacing: '-0.06em',
                   fontFamily: 'nexa, sans-serif',
-                  color: '#000000',
+                  color: '#cccccc',
                   lineHeight: '1',
                   margin: 0,
                   position: 'absolute',
@@ -138,20 +138,20 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontSize: '18px',
                   lineHeight: '1.7',
                   fontWeight: 400,
-                  color: '#000000',
+                  color: '#cccccc',
                 }}
               >
                 <p style={{ margin: '0 0 12px 0' }}>
-                  instant search with real-time blockchain data
+                  live tracking from genesis block onwards
                 </p>
                 <p style={{ margin: '0 0 12px 0' }}>
-                  clean interface for developers and traders
+                  built for a new generation blockchain
                 </p>
                 <p style={{ margin: '0 0 12px 0' }}>
-                  complete transparency for all transactions
+                  comprehensive data as the network evolves
                 </p>
                 <p style={{ margin: '0' }}>
-                  open source under MIT license
+                  open source infrastructure for developers
                 </p>
               </motion.div>
 
@@ -163,7 +163,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontWeight: 900,
                   letterSpacing: '-0.06em',
                   fontFamily: 'nexa, sans-serif',
-                  color: '#000000',
+                  color: '#cccccc',
                   lineHeight: '1',
                   margin: 0,
                   position: 'absolute',
@@ -185,7 +185,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontSize: '16px',
                   lineHeight: '1.7',
                   fontWeight: 400,
-                  color: '#000000',
+                  color: '#cccccc',
                   textAlign: 'right',
                 }}
               >
@@ -206,7 +206,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontWeight: 900,
                   letterSpacing: '-0.06em',
                   fontFamily: 'nexa, sans-serif',
-                  color: '#000000',
+                  color: '#cccccc',
                   lineHeight: '1',
                   margin: 0,
                 }}
@@ -224,8 +224,8 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontFamily: 'var(--font-geist-sans)',
                 }}
               >
-                <SpaceshipLink href="https://taiko.davlo.io/" textColor="#000000">
-                  <span style={{ fontSize: '18px', fontWeight: 400 }}>taiko.davlo.io</span>
+                <SpaceshipLink href="https://intuition.davlo.io/" textColor="#cccccc">
+                  <span style={{ fontSize: '18px', fontWeight: 400 }}>intuition.davlo.io</span>
                 </SpaceshipLink>
               </motion.div>
 
@@ -239,7 +239,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontFamily: 'var(--font-geist-sans)',
                 }}
               >
-                <SpaceshipLink href="https://github.com/davloio" textColor="#000000">
+                <SpaceshipLink href="https://github.com/davloio" textColor="#cccccc">
                   <span style={{ fontSize: '18px', fontWeight: 400 }}>github.com/davloio</span>
                 </SpaceshipLink>
               </motion.div>
@@ -255,13 +255,13 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontWeight: 900,
                   letterSpacing: '-0.02em',
                   fontFamily: 'var(--font-geist-sans)',
-                  color: '#000000',
+                  color: '#cccccc',
                   lineHeight: '1',
                   margin: 0,
-                  textShadow: '0 0 8px rgba(0, 0, 0, 0.15), 0 0 15px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.05)',
+                  textShadow: '0 0 8px rgba(204, 204, 204, 0.15), 0 0 15px rgba(204, 204, 204, 0.1), 0 0 20px rgba(204, 204, 204, 0.05)',
                 }}
               >
-                built for the taiko community
+                exploring a new blockchain from day one
               </motion.p>
 
               <motion.h1
@@ -272,7 +272,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   fontWeight: 900,
                   letterSpacing: '-0.06em',
                   fontFamily: 'nexa, sans-serif',
-                  color: '#000000',
+                  color: '#cccccc',
                   lineHeight: '1',
                   margin: 0,
                   position: 'absolute',
@@ -280,7 +280,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   right: '120px',
                 }}
               >
-                Taiko Explorer
+                Intuition Explorer
               </motion.h1>
             </div>
           </div>

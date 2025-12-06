@@ -134,7 +134,7 @@ export function HeroHeader() {
             fontWeight: 400,
             letterSpacing: '0.03em',
             fontFamily: 'var(--font-geist-sans)',
-            color: inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+            color: inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
             background: 'none',
             border: 'none',
             padding: '0',
@@ -145,10 +145,10 @@ export function HeroHeader() {
             transition: 'color 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = inDetailView !== null ? 'black' : 'white';
+            e.currentTarget.style.color = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+            e.currentTarget.style.color = inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
           }}
         >
           <svg
