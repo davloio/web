@@ -91,7 +91,7 @@ export default function ProceduralAtmosphere({
   if (!params.enabled) return null;
 
   return (
-    <points ref={pointsRef} geometry={geometry}>
+    <points ref={pointsRef} geometry={geometry} raycast={() => null}>
       <shaderMaterial
         ref={materialRef}
         uniforms={uniforms}

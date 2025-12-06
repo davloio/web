@@ -46,11 +46,11 @@ export const aboutPlanet: ProceduralPlanetConfig = {
 
   // Lighting (matching scene directional light at [90, 15, 0] with intensity 6.0)
   lighting: {
-    ambientIntensity: 0.2, // Increased for visibility in scene
-    diffuseIntensity: 3.0, // Increased to account for scene light intensity 6.0
+    ambientIntensity: 0.5,
+    diffuseIntensity: 6.0,
     specularIntensity: 2.0,
     shininess: 10,
-    lightDirection: [90, 15, 0], // Match scene directional light position
+    lightDirection: [0.820, 0, 0.586],
     lightColor: '#ffffff',
     bumpStrength: 1.0,
     bumpOffset: 0.001,
@@ -65,7 +65,7 @@ export const aboutPlanet: ProceduralPlanetConfig = {
     radius: 4.2, // (planetRadius + 1) * scale = 21.0 * 0.2
     thickness: 0.3, // 1.5 * 0.2 to match scale
     density: 0.0,
-    opacity: 0.35,
+    opacity: 0.25,
     scale: 8,
     color: '#ffffff', // Original uses white atmosphere
     speed: 0.03,

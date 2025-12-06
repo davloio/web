@@ -43,7 +43,6 @@ uniform float specularIntensity;
 uniform float shininess;
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
-uniform vec3 cameraPosition;
 
 varying vec3 fragPosition;
 varying vec3 fragNormal;

@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useMemo, forwardRef } from 'react';
-import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ProceduralTerrainParams, ProceduralColorParams, ProceduralLightingParams } from '@/types/proceduralPlanet';
 import { noiseFunctions } from '@/lib/shaders/noise.glsl';
@@ -21,7 +20,6 @@ interface ProceduralPlanetMeshProps {
 const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
   ({ terrain, colors, lighting, scale, onPointerOver, onPointerOut, onClick }, ref) => {
     const materialRef = useRef<THREE.ShaderMaterial>(null);
-    const { camera } = useThree();
 
     // Convert TerrainType to integer for shader
     const terrainTypeMap: Record<string, number> = { simplex: 1, fractal: 2, ridged: 3 };
@@ -63,17 +61,16 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
       lightColor: { value: new THREE.Color(lighting.lightColor) },
       bumpStrength: { value: lighting.bumpStrength },
       bumpOffset: { value: lighting.bumpOffset },
-
-      // Camera position for specular calculations (updated each frame below)
-      cameraPosition: { value: camera.position },
-    }), [terrain, colors, lighting, camera]);
+    }), [terrain, colors, lighting]);
 
     // Create geometry with tangents for bump mapping
     const geometry = useMemo(() => {
-      const geo = new THREE.SphereGeometry(1, 128, 128);
+      const geo = new THREE.SphereGeometry(1, 64, 64);
       geo.computeTangents();
+      const maxDisplacement = terrain.radius + terrain.amplitude;
+      geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), maxDisplacement);
       return geo;
-    }, []);
+    }, [terrain.radius, terrain.amplitude, scale]);
 
     // Inject noise functions into shaders
     const vertexShader = useMemo(() =>
@@ -89,13 +86,6 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
         `${noiseFunctions}\nvoid main() {`
       ), []
     );
-
-    // Update camera position uniform every frame for lighting calculations
-    useFrame(({ camera }) => {
-      if (materialRef.current) {
-        materialRef.current.uniforms.cameraPosition.value.copy(camera.position);
-      }
-    });
 
     return (
       <mesh

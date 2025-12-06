@@ -68,7 +68,7 @@ const AtmosphereLayer = ({
   const effectiveRadius = planetRadius * planetScale * 1.02
 
   return (
-    <mesh ref={meshRef} scale={effectiveRadius} renderOrder={0.8}>
+    <mesh ref={meshRef} scale={effectiveRadius} renderOrder={0.8} raycast={() => null}>
       <sphereGeometry args={[1, 64, 64]} />
       <shaderMaterial
         uniforms={uniforms}

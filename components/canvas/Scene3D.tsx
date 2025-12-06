@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import Planet3D from './Planet3D';
 import ProceduralPlanet3D from './ProceduralPlanet3D';
 import { aboutPlanet } from '@/lib/planets/aboutPlanet';
+import { pinkPlanet } from '@/lib/planets/pinkPlanet';
+import { darkPlanet } from '@/lib/planets/darkPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import {
@@ -492,59 +494,17 @@ export default function Scene3D({ progress }: Scene3DProps) {
               disableHover={inDetailView !== null || progress < 80 || progress >= 130}
             />
 
-            {PROJECT_PLANETS.map((config) => (
-              <Planet3D
-                key={config.id}
-                position={config.position}
-                scale={config.scale}
-                color={config.color}
-                emissive={config.emissive}
-                emissiveIntensity={config.emissiveIntensity}
-                name={config.name}
-                roughness={0.7}
-                metalness={0.1}
-                onClick={() => handleProjectPlanetClick(config.id, config)}
-                disableHover={inDetailView !== null || progress < 220}
-                glowColor={config.glowColor}
-                showClouds={false}
-                textureType={config.id === 'dark' ? 'rocky-dark' : undefined}
-                showParticleNetwork={config.id === 'dark'}
-                showScanner={config.id === 'pink'}
-                networkConfig={config.id === 'dark' ? {
-                  particleCount: 250,
-                  layerHeight: 1.08,
-                  connectionDistance: 0.3,
-                  rotationSpeed: 0.0003,
-                  particleSize: 0.18,
-                  opacity: 0.8,
-                } : undefined}
-                showHolographicLogo={true}
-                holographicConfig={config.id === 'pink' ? {
-                  streamCount: 4,
-                  streamHeight: 1.6,
-                  particleSpeed: 0.015,
-                  particleSize: 0.15,
-                  particleColor: '#ff69b4',
-                  logoScale: 0.9,
-                  logoOpacity: 0.65,
-                  pulseSpeed: 2.0,
-                  distortionAmount: 0.2,
-                  svgPath: '/logo-taiko.webp',
-                  disableHoverEffect: true,
-                } : {
-                  streamCount: 8,
-                  streamHeight: 2.0,
-                  particleSpeed: 0.01,
-                  particleSize: 0.13,
-                  particleColor: '#6b8fb8',
-                  logoScale: 1.0,
-                  logoOpacity: 0.7,
-                  distortionAmount: 0.15,
-                  svgPath: '/logo-intuition.svg',
-                  disableHoverEffect: true,
-                }}
-              />
-            ))}
+            <ProceduralPlanet3D
+              config={pinkPlanet}
+              onClick={() => handleProjectPlanetClick('pink', PROJECT_PLANETS[0])}
+              disableHover={inDetailView !== null || progress < 220}
+            />
+
+            <ProceduralPlanet3D
+              config={darkPlanet}
+              onClick={() => handleProjectPlanetClick('dark', PROJECT_PLANETS[1])}
+              disableHover={inDetailView !== null || progress < 220}
+            />
 
             {PLACEHOLDER_PLANETS.map((config, index) => (
               <Planet3D

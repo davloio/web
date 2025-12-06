@@ -40,6 +40,7 @@ export default function ProceduralPlanet3D({
   });
 
   const handlePointerOver = () => {
+    console.log('ProceduralPlanet3D handlePointerOver called', config.id, 'disableHover:', disableHover);
     if (!disableHover) {
       setHovered(true);
       onHover?.(true);
@@ -55,7 +56,9 @@ export default function ProceduralPlanet3D({
     }
   };
 
-  const handleClick = () => {
+  const handleClick = (e: any) => {
+    console.log('ProceduralPlanet3D handleClick called', config.id);
+    e.stopPropagation();
     onClick?.();
   };
 
