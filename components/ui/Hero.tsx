@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import gsap from 'gsap';
+
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 
 export function HeroHeader() {
   const [showAsHeader, setShowAsHeader] = useState(false);
   const [headerText, setHeaderText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const [cursorFading, setCursorFading] = useState(false);
-  const [inDetailView, setInDetailView] = useState(false);
+  const [inDetailView, setInDetailView] = useState<DetailViewType>(null);
 
   useEffect(() => {
     const handleShowHeader = () => {
@@ -48,11 +48,15 @@ export function HeroHeader() {
 
   if (!showAsHeader) return null;
 
-  const textColor = inDetailView ? 'black' : 'white';
-  const logoSrc = inDetailView ? '/logo-black.svg' : '/logo-white.svg';
+  const textColor = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
+  const logoSrc = inDetailView === 'project-dark' ? '/logo-white.svg' : inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
 
   const handleBackClick = () => {
     window.dispatchEvent(new CustomEvent('exitDetailView'));
+  };
+
+  const handleLogoClick = () => {
+    window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 0 } }));
   };
 
   return (
@@ -60,7 +64,7 @@ export function HeroHeader() {
       <div className="flex items-center gap-4">
         <div
           style={{
-            animation: inDetailView
+            animation: inDetailView !== null
               ? 'logoShimmerBlack 3s ease-in-out 1.2s infinite'
               : 'logoShimmer 3s ease-in-out 1.2s infinite',
             transition: 'filter 0.5s ease'
@@ -69,6 +73,7 @@ export function HeroHeader() {
           <img
             src={logoSrc}
             alt="davlo.io"
+            onClick={handleLogoClick}
             style={{
               width: '28px',
               height: '28px',
@@ -77,7 +82,14 @@ export function HeroHeader() {
               animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               animationDelay: '0.2s',
               display: 'block',
-              transition: 'opacity 0.5s ease'
+              transition: 'opacity 0.5s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.7';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
             }}
           />
         </div>
@@ -88,7 +100,8 @@ export function HeroHeader() {
           letterSpacing: '-0.06em',
           fontFamily: 'nexa, sans-serif',
           color: textColor,
-          transition: 'color 0.5s ease'
+          transition: 'color 0.5s ease',
+          cursor: 'default'
         }}>
           {headerText}
           {showCursor && (
@@ -110,7 +123,7 @@ export function HeroHeader() {
         </h2>
       </div>
 
-      {inDetailView && (
+      {inDetailView !== null && (
         <button
           onClick={handleBackClick}
           style={{
@@ -121,7 +134,7 @@ export function HeroHeader() {
             fontWeight: 400,
             letterSpacing: '0.03em',
             fontFamily: 'var(--font-geist-sans)',
-            color: inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+            color: inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
             background: 'none',
             border: 'none',
             padding: '0',
@@ -132,10 +145,10 @@ export function HeroHeader() {
             transition: 'color 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = inDetailView ? 'black' : 'white';
+            e.currentTarget.style.color = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+            e.currentTarget.style.color = inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
           }}
         >
           <svg
@@ -162,19 +175,17 @@ export function HeroHeader() {
 
 export default function Hero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const sloganRef = useRef<HTMLDivElement>(null);
   const typewriterRef = useRef<HTMLSpanElement>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [showCursor, setShowCursor] = useState(false);
   const cursorFading = false;
   const [typingComplete, setTypingComplete] = useState(false);
   const [showIDE, setShowIDE] = useState(true);
-  const [shuttleVisible, setShuttleVisible] = useState(false);
-  const [universeGlowing, setUniverseGlowing] = useState(false);
+  const [ideOpacity, setIdeOpacity] = useState(1);
 
   useEffect(() => {
     const typewriterSequence = async () => {
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      await new Promise(resolve => setTimeout(resolve, 4500));
 
       setShowCursor(true);
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -203,6 +214,9 @@ export default function Hero() {
 
       setShowCursor(false);
 
+      setIdeOpacity(0);
+      await new Promise(resolve => setTimeout(resolve, 400));
+
       setShowIDE(false);
 
       await new Promise(resolve => setTimeout(resolve, 300));
@@ -212,30 +226,13 @@ export default function Hero() {
 
     typewriterSequence();
 
-    if (sloganRef.current) {
-      gsap.fromTo(
-        sloganRef.current,
-        {
-          y: 30,
-          opacity: 0,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: 'power2.out',
-          delay: 2.0,
-        }
-      );
-    }
-
     const shuttleTimer = setTimeout(() => {
-      setShuttleVisible(true);
-    }, 4100);
+      window.dispatchEvent(new CustomEvent('showShuttle'));
+    }, 6100);
 
     const universeGlowTimer = setTimeout(() => {
-      setUniverseGlowing(true);
-    }, 6100);
+      window.dispatchEvent(new CustomEvent('activateUniverseGlow'));
+    }, 8100);
 
     return () => {
       clearTimeout(shuttleTimer);
@@ -244,17 +241,23 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero-section relative min-h-screen flex flex-col items-start justify-center">
+    <section className="hero-section relative min-h-screen flex flex-col items-start justify-center" style={{ paddingLeft: '0px' }}>
       {showIDE && (
-        <div className="text-left">
-          {/* Minimal IDE Header */}
-          <div style={{
-            marginBottom: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
+        <>
+          <div className="text-left" style={{
+            position: 'relative',
+            zIndex: 3,
+            padding: '40px 60px',
+            marginLeft: '0px',
+            opacity: ideOpacity,
+            transition: 'opacity 0.4s ease-out'
           }}>
-            {/* Window Controls + Filename */}
+            <div style={{
+              marginBottom: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+            }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -276,7 +279,6 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* Simple syntax-highlighted code context */}
             <div style={{
               fontFamily: 'var(--font-geist-mono)',
               fontSize: '13px',
@@ -290,7 +292,6 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Main typewriter content */}
           <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
             <div style={{
               fontFamily: 'var(--font-geist-mono)',
@@ -332,7 +333,6 @@ export default function Hero() {
                     position: 'relative',
                   }}
                 >
-                  {/* Small "Tab to accept" hint */}
                   <span style={{
                     position: 'absolute',
                     top: '-20px',
@@ -372,106 +372,8 @@ export default function Hero() {
             </div>
           </div>
         </div>
+        </>
       )}
-
-      <motion.div
-        ref={sloganRef}
-        className="absolute bottom-0 text-white text-center w-full"
-        style={{
-          fontSize: '80px',
-          fontWeight: 900,
-          letterSpacing: '-0.06em',
-          fontFamily: 'nexa, sans-serif',
-          marginBottom: '10vh',
-          mixBlendMode: 'difference',
-          lineHeight: '0.9',
-          opacity: 0,
-        }}
-      >
-        <div style={{ position: 'relative' }}>
-          software for the
-        </div>
-        <div
-          style={{
-            fontWeight: 900,
-            fontFamily: 'nexa, sans-serif',
-            color: 'white',
-            textShadow: '0 0 30px rgba(255, 255, 255, 0.5)',
-            animation: universeGlowing ? 'universeGlowActivatedBW 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards' : 'none',
-            position: 'relative',
-            paddingBottom: '4px'
-          }}
-        >
-          universe
-          <span
-            style={{
-              position: 'absolute',
-              top: '0.15em',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '400px',
-              height: '1px',
-              overflow: 'visible',
-              pointerEvents: 'none'
-            }}
-          >
-            <span
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                height: '1px',
-                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3) 50%, transparent)',
-                animation: shuttleVisible ? 'lineDrawIn 8s ease-in-out forwards' : 'none',
-                width: '0%',
-              }}
-            />
-            {shuttleVisible && (
-              <svg
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '28px',
-                  height: '28px',
-                  animation: 'spaceshipFlyToPlanet 6s ease-in-out forwards',
-                  filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
-                }}
-                viewBox="0 0 32 32"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-              <path
-                d="M20 8L26 16L20 24L18 22V10L20 8Z"
-                fill="white"
-              />
-              <path
-                d="M26 16L30 16L28 14L26 16L28 18L30 16Z"
-                fill="white"
-                opacity="0.9"
-              />
-              <path
-                d="M18 12L14 10L16 16L14 22L18 20V12Z"
-                fill="white"
-                opacity="0.7"
-              />
-              <circle
-                cx="20"
-                cy="16"
-                r="2"
-                fill="#666666"
-              />
-              <path
-                d="M14 14L10 16L14 18L12 16L14 14Z"
-                fill="#CCCCCC"
-                opacity="0.6"
-              />
-              </svg>
-            )}
-          </span>
-        </div>
-      </motion.div>
     </section>
   );
 }

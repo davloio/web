@@ -1,8 +1,0 @@
-# Temporary suppression of npm bundled dependency vulnerabilities
-# These will automatically expire and trigger again after the date specified
-
-# CVE-2025-64756 - glob CLI command injection
-# npm doesn't use glob's CLI, only library API (not vulnerable)
-# Waiting for npm to update: https://github.com/npm/cli/issues/8741
-# Expires: 2025-12-03
-CVE-2025-64756 exp:2025-12-03

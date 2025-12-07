@@ -7,7 +7,7 @@ export default function Footer() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [inDetailView, setInDetailView] = useState(false);
+  const [inDetailView, setInDetailView] = useState<'about' | 'project-pink' | 'project-dark' | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -63,20 +63,25 @@ export default function Footer() {
     window.dispatchEvent(new CustomEvent('navigateToAbout'));
   };
 
+  const handleProjectsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 225 } }));
+  };
+
   const links = [
-    { name: 'projects', href: '#projects', hoverText: 'ready for time travel?' },
+    { name: 'projects', href: '#projects', hoverText: 'ready for time travel?', onClick: handleProjectsClick },
     { name: 'about', href: '#about', hoverText: 'well, thats a shorter trip', onClick: handleAboutClick },
     { name: 'contact', href: 'mailto:hello@davlo.io', hoverIcon: 'spaceship' },
   ];
 
-  const linkIdleColor = inDetailView ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
-  const linkHoverColor = inDetailView ? 'black' : 'white';
-  const tooltipColor = inDetailView ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';
-  const watermarkColor = inDetailView ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
+  const linkIdleColor = inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+  const linkHoverColor = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
+  const tooltipColor = inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.4)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';
+  const watermarkColor = inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.3)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)';
 
   return (
     <footer className="flex flex-col gap-6" style={{ transition: 'color 0.5s ease' }}>
-      
       <nav className="flex flex-col gap-3">
         {links.map((link) => (
           <div key={link.name} className="relative">
@@ -105,7 +110,6 @@ export default function Footer() {
               {link.name}
             </a>
 
-            
             {link.hoverText && hoveredLink === link.name && (
               <div
                 className="fixed whitespace-nowrap pointer-events-none z-[60]"
@@ -127,7 +131,6 @@ export default function Footer() {
               </div>
             )}
 
-            
             {link.hoverIcon === 'spaceship' && hoveredLink === link.name && (
               <svg
                 className="fixed pointer-events-none z-[60]"
@@ -136,7 +139,9 @@ export default function Footer() {
                   top: `${cursorPosition.y - 12}px`,
                   width: '24px',
                   height: '24px',
-                  filter: inDetailView
+                  filter: inDetailView === 'project-dark'
+                    ? 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))'
+                    : inDetailView !== null
                     ? 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.3))'
                     : 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.8))',
                   animation: 'spaceshipJiggle 0.6s ease-in-out infinite',
@@ -145,100 +150,82 @@ export default function Footer() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                
                 <path
                   d="M20 8L26 16L20 24L18 22V10L20 8Z"
-                  fill={inDetailView ? 'black' : 'white'}
+                  fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                 />
-                
                 <path
                   d="M26 16L30 16L28 14L26 16L28 18L30 16Z"
-                  fill={inDetailView ? 'black' : 'white'}
+                  fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                   opacity="0.9"
                 />
-                
                 <path
                   d="M18 12L14 10L16 16L14 22L18 20V12Z"
-                  fill={inDetailView ? 'black' : 'white'}
+                  fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                   opacity="0.7"
                 />
-                
                 <circle
                   cx="20"
                   cy="16"
                   r="2"
-                  fill={inDetailView ? '#cccccc' : '#666666'}
+                  fill={inDetailView === 'project-dark' ? '#666666' : inDetailView !== null ? '#cccccc' : '#666666'}
                 />
-                
                 <path
                   d="M14 14L10 16L14 18L12 16L14 14Z"
-                  fill={inDetailView ? '#666666' : '#CCCCCC'}
+                  fill={inDetailView === 'project-dark' ? '#CCCCCC' : inDetailView !== null ? '#666666' : '#CCCCCC'}
                   opacity="0.6"
                 />
-
-                
                 <g style={{ animation: 'flameFlicker 0.3s ease-in-out infinite' }}>
-                  
                   <path
                     d="M14 15L6 16L14 17L8 16L14 15Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.9"
-                    filter={inDetailView ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
+                    filter={inDetailView === 'project-dark' ? 'url(#flameGlow)' : inDetailView !== null ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
                   />
-                  
                   <path
                     d="M12 15.5L4 16L12 16.5L6 16L12 15.5Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.7"
                   />
-                  
                   <path
                     d="M10 15.7L2 16L10 16.3L4 16L10 15.7Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.5"
                   />
                 </g>
-
-                
                 <g style={{ animation: 'flameFlicker 0.3s ease-in-out infinite 0.15s' }}>
                   <path
                     d="M13 14.5L5 16L13 17.5L7 16L13 14.5Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.6"
                   />
                 </g>
-
-                
                 <g style={{ animation: 'flameFlicker 0.25s ease-in-out infinite 0.1s' }}>
                   <path
                     d="M14 13.5L6 14L14 14.5L8 14L14 13.5Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.8"
-                    filter={inDetailView ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
+                    filter={inDetailView === 'project-dark' ? 'url(#flameGlow)' : inDetailView !== null ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
                   />
                   <path
                     d="M12 13.7L4 14L12 14.3L6 14L12 13.7Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.6"
                   />
                 </g>
-
-                
                 <g style={{ animation: 'flameFlicker 0.28s ease-in-out infinite 0.05s' }}>
                   <path
                     d="M14 17.5L6 18L14 18.5L8 18L14 17.5Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.8"
-                    filter={inDetailView ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
+                    filter={inDetailView === 'project-dark' ? 'url(#flameGlow)' : inDetailView !== null ? 'url(#flameGlowBlack)' : 'url(#flameGlow)'}
                   />
                   <path
                     d="M12 17.7L4 18L12 18.3L6 18L12 17.7Z"
-                    fill={inDetailView ? 'black' : 'white'}
+                    fill={inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white'}
                     opacity="0.6"
                   />
                 </g>
-
-                
                 <defs>
                   <filter id="flameGlow" x="-50%" y="-50%" width="200%" height="200%">
                     <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
@@ -260,7 +247,6 @@ export default function Footer() {
           </div>
         ))}
 
-        
         <a
           href="https://github.com/davloio"
           target="_blank"
@@ -290,12 +276,12 @@ export default function Footer() {
         </a>
       </nav>
 
-      
       <div
         className="text-xs font-light tracking-wider flex flex-col gap-1"
         style={{
           color: watermarkColor,
-          transition: 'color 0.5s ease'
+          transition: 'color 0.5s ease',
+          cursor: 'default'
         }}
       >
         <span>© 2025</span>

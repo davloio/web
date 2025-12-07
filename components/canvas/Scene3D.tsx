@@ -5,16 +5,36 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import Planet3D from './Planet3D';
 import DetailModal from '@/components/ui/DetailModal';
+import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
+import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
+import {
+  PROJECT_PLANETS,
+  PLACEHOLDER_PLANETS,
+  SOLAR_SYSTEM_CENTER,
+  OVERVIEW_DISTANCE,
+  DETAIL_ZOOM_DISTANCE,
+  ProjectPlanetConfig,
+} from '@/types/planet';
+import OrbitalRing from './OrbitalRing';
+import ProjectsTitle from './ProjectsTitle';
+import SpaceDust from './SpaceDust';
+import DecorativePlanet3D from './DecorativePlanet3D';
+
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
 
 function CameraController({
   inDetailView,
   modalOpen,
-  progress
+  progress,
+  activePlanetPosition,
+  telescopeZoomProgress,
 }: {
-  inDetailView: boolean;
+  inDetailView: DetailViewType;
   modalOpen: boolean;
   progress: number;
+  activePlanetPosition: [number, number, number] | null;
+  telescopeZoomProgress: number;
 }) {
   const { camera } = useThree();
 
@@ -56,35 +76,146 @@ function CameraController({
 
     const normalizedProgress = progress / 100;
 
-    const startZ = 50;
-    const endZ = 8;
-    const detailZ = 4.2;
+    const aboutPlanetX = -15;
+    const aboutPlanetY = 0;
+    const aboutPlanetZ = 0;
+    const solarSystemCenterX = SOLAR_SYSTEM_CENTER[0];
+    const solarSystemCenterY = SOLAR_SYSTEM_CENTER[1];
+    const solarSystemCenterZ = SOLAR_SYSTEM_CENTER[2];
+    const overviewZ = OVERVIEW_DISTANCE;
 
-    let targetZ = startZ - (startZ - endZ) * normalizedProgress;
-    if (inDetailView) {
-      targetZ = detailZ;
+    const telescopeStartZ = 100;
+    const normalStartZ = 50;
+    const effectiveStartZ = telescopeStartZ - (telescopeStartZ - normalStartZ) * telescopeZoomProgress;
+
+    const startZ = effectiveStartZ;
+    const zoomZ = 8;
+    const transitionZ = 12;
+
+    const startCameraX = 15;
+    const startCameraY = 0;
+
+    let targetZ: number;
+    let targetPosX: number;
+    let targetPosY: number;
+    let targetLookAtX: number;
+    let targetLookAtY: number;
+    let targetLookAtZ: number;
+
+    const lerpFactor = inDetailView !== null ? 0.08 : 0.12;
+
+    if (inDetailView === 'about') {
+      targetZ = DETAIL_ZOOM_DISTANCE;
+      targetPosX = aboutPlanetX;
+      targetPosY = aboutPlanetY;
+      targetLookAtX = aboutPlanetX;
+      targetLookAtY = aboutPlanetY;
+      targetLookAtZ = aboutPlanetZ;
+    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark') {
+      if (activePlanetPosition) {
+        targetPosX = activePlanetPosition[0];
+        targetPosY = activePlanetPosition[1];
+        targetZ = DETAIL_ZOOM_DISTANCE + activePlanetPosition[2];
+        targetLookAtX = activePlanetPosition[0];
+        targetLookAtY = activePlanetPosition[1];
+        targetLookAtZ = activePlanetPosition[2];
+      } else {
+        targetPosX = solarSystemCenterX;
+        targetPosY = solarSystemCenterY;
+        targetZ = overviewZ + solarSystemCenterZ;
+        targetLookAtX = solarSystemCenterX;
+        targetLookAtY = solarSystemCenterY;
+        targetLookAtZ = solarSystemCenterZ;
+      }
+    } else if (normalizedProgress < 1.0) {
+      const zoneProgress = normalizedProgress;
+      targetZ = startZ - (startZ - zoomZ) * zoneProgress;
+      targetPosX = startCameraX + (aboutPlanetX - startCameraX) * zoneProgress;
+      targetPosY = startCameraY + (aboutPlanetY - startCameraY) * zoneProgress;
+      targetLookAtX = aboutPlanetX * zoneProgress;
+      targetLookAtY = aboutPlanetY * zoneProgress;
+      targetLookAtZ = aboutPlanetZ;
+    } else if (normalizedProgress < 1.1) {
+      targetZ = zoomZ;
+      targetPosX = aboutPlanetX;
+      targetPosY = aboutPlanetY;
+      targetLookAtX = aboutPlanetX;
+      targetLookAtY = aboutPlanetY;
+      targetLookAtZ = aboutPlanetZ;
+    } else if (normalizedProgress < 2.2) {
+      if (normalizedProgress < 1.4) {
+        const subProgress = (normalizedProgress - 1.1) / 0.3;
+        targetZ = zoomZ + (transitionZ - zoomZ) * subProgress;
+        targetPosX = aboutPlanetX;
+        targetPosY = aboutPlanetY;
+        targetLookAtX = aboutPlanetX;
+        targetLookAtY = aboutPlanetY;
+        targetLookAtZ = aboutPlanetZ;
+      } else if (normalizedProgress < 1.8) {
+        const subProgress = (normalizedProgress - 1.4) / 0.4;
+        const pivotX = aboutPlanetX;
+        const pivotY = aboutPlanetY;
+        const pivotZ = transitionZ;
+
+        targetZ = pivotZ;
+        targetPosX = pivotX;
+        targetPosY = pivotY;
+        targetLookAtX = aboutPlanetX + (solarSystemCenterX - aboutPlanetX) * subProgress;
+        targetLookAtY = aboutPlanetY + (solarSystemCenterY - aboutPlanetY) * subProgress;
+        targetLookAtZ = aboutPlanetZ + (solarSystemCenterZ - aboutPlanetZ) * subProgress;
+      } else {
+        const subProgress = (normalizedProgress - 1.8) / 0.4;
+        const startPosX = aboutPlanetX;
+        const startPosY = aboutPlanetY;
+        const startPosZ = transitionZ;
+        const elevationHeight = 15;
+
+        targetPosX = startPosX + (solarSystemCenterX - startPosX) * subProgress;
+        targetPosY = startPosY + ((solarSystemCenterY + elevationHeight) - startPosY) * subProgress;
+        targetZ = startPosZ + (overviewZ + solarSystemCenterZ - startPosZ) * subProgress;
+        targetLookAtX = solarSystemCenterX;
+        targetLookAtY = solarSystemCenterY;
+        targetLookAtZ = solarSystemCenterZ;
+      }
+    } else {
+      const rotationProgress = Math.max(0, normalizedProgress - 2.2);
+      const maxRotationProgress = 3.5 - 2.2;
+      const rotationRatio = Math.min(1, rotationProgress / maxRotationProgress);
+      const initialAngle = 90;
+      const rotationAngle = initialAngle + (rotationRatio * 200);
+
+      const angleInRadians = (rotationAngle * Math.PI) / 180;
+
+      const allPlanets = [
+        ...PROJECT_PLANETS.map(p => ({ angle: p.angle })),
+        ...PLACEHOLDER_PLANETS.map(p => ({ angle: p.angle }))
+      ];
+
+      let minAngleDiff = 360;
+      for (const planet of allPlanets) {
+        let angleDiff = Math.abs(rotationAngle - planet.angle);
+        if (angleDiff > 180) angleDiff = 360 - angleDiff;
+        if (angleDiff < minAngleDiff) {
+          minAngleDiff = angleDiff;
+        }
+      }
+
+      const zoomFactor = 1 - (minAngleDiff / 180) * 0.3;
+      const dynamicDistance = overviewZ * zoomFactor;
+
+      const elevationHeight = 15;
+
+      targetPosX = solarSystemCenterX + Math.cos(angleInRadians) * dynamicDistance;
+      targetPosY = solarSystemCenterY + elevationHeight;
+      targetZ = solarSystemCenterZ + Math.sin(angleInRadians) * dynamicDistance;
+
+      targetLookAtX = solarSystemCenterX;
+      targetLookAtY = solarSystemCenterY;
+      targetLookAtZ = solarSystemCenterZ;
     }
 
     const currentZ = camera.position.z;
-    const lerpFactor = inDetailView ? 0.08 : 0.15;
     const newZ = currentZ + (targetZ - currentZ) * lerpFactor;
-
-    const planetX = -15;
-    const planetY = 15;
-    const planetZ = 0;
-
-    const startCameraX = 15;
-    const startCameraY = -15;
-    const endCameraX = -15;
-    const endCameraY = 15;
-
-    const targetPosX = inDetailView
-      ? planetX
-      : startCameraX + (endCameraX - startCameraX) * normalizedProgress;
-
-    const targetPosY = inDetailView
-      ? planetY
-      : startCameraY + (endCameraY - startCameraY) * normalizedProgress;
 
     const currentX = camera.position.x;
     const currentY = camera.position.y;
@@ -92,10 +223,6 @@ function CameraController({
     const newY = currentY + (targetPosY - currentY) * lerpFactor;
 
     camera.position.set(newX, newY, newZ);
-
-    const targetLookAtX = inDetailView ? planetX : planetX * normalizedProgress;
-    const targetLookAtY = inDetailView ? planetY : planetY * normalizedProgress;
-    const targetLookAtZ = planetZ;
 
     const currentLookAt = currentLookAtRef.current;
     currentLookAt.x += (targetLookAtX - currentLookAt.x) * lerpFactor;
@@ -114,25 +241,55 @@ interface Scene3DProps {
 
 export default function Scene3D({ progress }: Scene3DProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [inDetailView, setInDetailView] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [inDetailView, setInDetailView] = useState<DetailViewType>(null);
+  const [showModal, setShowModal] = useState<DetailViewType>(null);
+  const [activePlanetPosition, setActivePlanetPosition] = useState<[number, number, number] | null>(null);
+  const [telescopeZoomProgress, setTelescopeZoomProgress] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
+
+    const startDelay = setTimeout(() => {
+      const duration = 1800;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        setTelescopeZoomProgress(easedProgress);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      animate();
+    }, 2000);
+
+    return () => clearTimeout(startDelay);
   }, []);
 
   const handleModalClose = () => {
     setGlobalWheelDisabled(false);
+    setActivePlanetPosition(null);
 
-    setShowModal(false);
+    const wasShowingProject = showModal?.startsWith('project-');
+    const planetId = showModal?.replace('project-', '');
 
-    setInDetailView(false);
+    setShowModal(null);
+    setInDetailView(null);
 
-    window.dispatchEvent(new CustomEvent('whitePageClose'));
+    if (wasShowingProject) {
+      window.dispatchEvent(new CustomEvent('projectPageClose', { detail: { planetId } }));
+    } else {
+      window.dispatchEvent(new CustomEvent('whitePageClose'));
+    }
   };
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && inDetailView) {
+      if (e.key === 'Escape' && inDetailView !== null) {
         handleModalClose();
       }
     };
@@ -155,35 +312,39 @@ export default function Scene3D({ progress }: Scene3DProps) {
   }, [showModal]);
 
   useEffect(() => {
-    const handleZoomToPlanetAndOpen = () => {
-      if (progress >= 95) {
-        handlePlanetClick();
-      } else {
-        setGlobalWheelDisabled(true);
-
-        window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 100 } }));
-
-        setTimeout(() => {
-          handlePlanetClick();
-        }, 1000);
-      }
+    const handleNavigateToAbout = () => {
+      window.dispatchEvent(new CustomEvent('setZoomProgress', { detail: { progress: 105 } }));
     };
 
-    window.addEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
-    return () => window.removeEventListener('zoomToPlanetAndOpen', handleZoomToPlanetAndOpen);
-  }, [progress]);
+    window.addEventListener('navigateToAbout', handleNavigateToAbout);
+    return () => window.removeEventListener('navigateToAbout', handleNavigateToAbout);
+  }, []);
 
-  const handlePlanetClick = () => {
-    if (progress >= 95) {
+  const handleAboutClick = () => {
+    if (progress >= 80 && progress < 130) {
       setGlobalWheelDisabled(true);
 
       window.dispatchEvent(new CustomEvent('whitePageOpen'));
 
-      setInDetailView(true);
+      setInDetailView('about');
 
       setTimeout(() => {
-        setShowModal(true);
+        setShowModal('about');
       }, 200);
+    }
+  };
+
+  const handleProjectPlanetClick = (planetId: 'pink' | 'dark', config: ProjectPlanetConfig) => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(config.position);
+
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId, backgroundColor: config.modalBackgroundColor }
+      }));
+
+      setInDetailView(`project-${planetId}` as DetailViewType);
+      setTimeout(() => setShowModal(`project-${planetId}` as DetailViewType), 200);
     }
   };
 
@@ -195,17 +356,18 @@ export default function Scene3D({ progress }: Scene3DProps) {
         className="fixed inset-0 pointer-events-auto"
         style={{
           zIndex: 2,
-          opacity: showModal ? 0 : 1,
-          transform: inDetailView ? 'scale(1.5)' : 'scale(1)',
-          pointerEvents: showModal ? 'none' : 'auto',
+          opacity: showModal !== null ? 0 : 1,
+          transform: inDetailView !== null ? 'scale(1.5)' : 'scale(1)',
+          pointerEvents: showModal !== null ? 'none' : 'auto',
           transition: 'opacity 0.35s ease-in-out, transform 0.35s ease-in-out',
           transformOrigin: 'center center',
-          animation: 'planetMaterialize 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          animation: 'planetMaterialize 2.2s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards',
         }}
       >
       <Canvas
+        shadows
         camera={{
-          position: [25, -15, 50],
+          position: [15, 0, 100],
           fov: 75,
           near: 0.1,
           far: 1000,
@@ -213,34 +375,118 @@ export default function Scene3D({ progress }: Scene3DProps) {
         gl={{
           antialias: true,
           alpha: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.4,
         }}
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
-          <CameraController inDetailView={inDetailView} modalOpen={showModal} progress={progress} />
+          <CameraController
+            inDetailView={inDetailView}
+            modalOpen={showModal !== null}
+            progress={progress}
+            activePlanetPosition={activePlanetPosition}
+            telescopeZoomProgress={telescopeZoomProgress}
+          />
 
-          <ambientLight intensity={0.3} />
+          <ambientLight intensity={0.03} />
 
           <directionalLight
-            position={[10, 10, 5]}
-            intensity={1}
+            position={[90, 15, 0]}
+            intensity={6.0}
             castShadow
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+            shadow-camera-left={-200}
+            shadow-camera-right={200}
+            shadow-camera-top={200}
+            shadow-camera-bottom={-200}
+            shadow-camera-near={0.5}
+            shadow-camera-far={500}
           />
 
-          <directionalLight
-            position={[-10, -10, -5]}
-            intensity={0.3}
-          />
-
-          <pointLight
-            position={[0, 5, 10]}
-            intensity={0.5}
+          <SpaceDust
+            count={2200}
+            size={0.25}
+            opacity={0.4}
             color="#ffffff"
+            spread={150}
+            driftSpeed={0.02}
           />
+
+          <DecorativePlanet3D
+            position={[42, 0, 30]}
+            scale={50}
+            showMoon={true}
+            showCrater={true}
+            fadeStartDistance={50}
+            fadeRange={20}
+            asteroidBelt={{
+              orbitRadius: 1.1,
+              beltThickness: 1.0,
+              beltHeight: 2.0,
+              smallCount: 3500,
+              mediumCount: 800,
+              largeCount: 250,
+              baseColor: '#1a1a1a',
+              roughness: 0.95,
+              metalness: 0.05,
+              orbitSpeed: 0.0001,
+              tumbleSpeed: 0.0003,
+              wobbleAmount: 0.0,
+              renderOrder: 0.4,
+              castShadow: true,
+              receiveShadow: true,
+            }}
+          />
+
+          {PROJECT_PLANETS.map((planet) => {
+            const dx = planet.position[0] - SOLAR_SYSTEM_CENTER[0];
+            const dz = planet.position[2] - SOLAR_SYSTEM_CENTER[2];
+            const radius = Math.sqrt(dx * dx + dz * dz);
+            const ringCenter: [number, number, number] = [
+              SOLAR_SYSTEM_CENTER[0],
+              planet.position[1],
+              SOLAR_SYSTEM_CENTER[2]
+            ];
+
+            return (
+              <OrbitalRing
+                key={`ring-${planet.id}`}
+                radius={radius}
+                color="#ffffff"
+                center={ringCenter}
+                opacity={0.15}
+                progress={progress}
+              />
+            );
+          })}
+
+          {PLACEHOLDER_PLANETS.map((planet, index) => {
+            const dx = planet.position[0] - SOLAR_SYSTEM_CENTER[0];
+            const dz = planet.position[2] - SOLAR_SYSTEM_CENTER[2];
+            const radius = Math.sqrt(dx * dx + dz * dz);
+            const ringCenter: [number, number, number] = [
+              SOLAR_SYSTEM_CENTER[0],
+              planet.position[1],
+              SOLAR_SYSTEM_CENTER[2]
+            ];
+
+            return (
+              <OrbitalRing
+                key={`ring-placeholder-${index}`}
+                radius={radius}
+                color="#ffffff"
+                center={ringCenter}
+                opacity={0.15}
+                progress={progress}
+              />
+            );
+          })}
 
           <group>
             <Planet3D
-              position={[-15, 15, 0]}
+              position={[-15, 0, 0]}
               scale={4}
               color="#ffffff"
               emissive="#ffffff"
@@ -248,50 +494,189 @@ export default function Scene3D({ progress }: Scene3DProps) {
               name="davlo.io"
               roughness={0.7}
               metalness={0.1}
-              onClick={handlePlanetClick}
-              disableHover={inDetailView || progress < 95}
-              showLabel={true}
-              labelText="davlo.io"
-              zoomProgress={progress}
+              onClick={handleAboutClick}
+              disableHover={inDetailView !== null || progress < 80 || progress >= 130}
+              glowColor="#ffffff"
+              showClouds={true}
+              show3DLogo={false}
+              cloudConfig={{
+                cloudCount: 20,
+                rotationSpeed: 0.0008,
+                cloudOpacity: 0.85,
+                layerHeight: 1.03,
+              }}
+              logoConfig={{
+                scale: 0.2,
+                glowColor: "#ffffff",
+                glowIntensity: 0.3,
+              }}
+              showHolographicLogo={true}
+              holographicConfig={{
+                streamCount: 6,
+                streamHeight: 1.65,
+                particleSpeed: 0.008,
+                particleSize: 0.12,
+                particleColor: '#ffffff',
+                logoScale: 0.8,
+                logoOpacity: 0.6,
+                pulseSpeed: 1.2,
+                distortionAmount: 0.1,
+                svgPath: '/logo-white.svg',
+                text: 'about',
+                textSize: 0.3,
+              }}
             />
+
+            {PROJECT_PLANETS.map((config) => (
+              <Planet3D
+                key={config.id}
+                position={config.position}
+                scale={config.scale}
+                color={config.color}
+                emissive={config.emissive}
+                emissiveIntensity={config.emissiveIntensity}
+                name={config.name}
+                roughness={0.7}
+                metalness={0.1}
+                onClick={() => handleProjectPlanetClick(config.id, config)}
+                disableHover={inDetailView !== null || progress < 220}
+                glowColor={config.glowColor}
+                showClouds={false}
+                textureType={config.id === 'dark' ? 'rocky-dark' : undefined}
+                showParticleNetwork={config.id === 'dark'}
+                showScanner={config.id === 'pink'}
+                networkConfig={config.id === 'dark' ? {
+                  particleCount: 250,
+                  layerHeight: 1.08,
+                  connectionDistance: 0.3,
+                  rotationSpeed: 0.0003,
+                  particleSize: 0.18,
+                  opacity: 0.8,
+                } : undefined}
+                showHolographicLogo={true}
+                holographicConfig={config.id === 'pink' ? {
+                  streamCount: 4,
+                  streamHeight: 1.6,
+                  particleSpeed: 0.015,
+                  particleSize: 0.15,
+                  particleColor: '#ff69b4',
+                  logoScale: 0.9,
+                  logoOpacity: 0.65,
+                  pulseSpeed: 2.0,
+                  distortionAmount: 0.2,
+                  svgPath: '/logo-taiko.webp',
+                  disableHoverEffect: true,
+                } : {
+                  streamCount: 8,
+                  streamHeight: 2.0,
+                  particleSpeed: 0.01,
+                  particleSize: 0.13,
+                  particleColor: '#6b8fb8',
+                  logoScale: 1.0,
+                  logoOpacity: 0.7,
+                  distortionAmount: 0.15,
+                  svgPath: '/logo-intuition.svg',
+                  disableHoverEffect: true,
+                }}
+              />
+            ))}
+
+            {PLACEHOLDER_PLANETS.map((config, index) => (
+              <Planet3D
+                key={`placeholder-${index}`}
+                position={config.position}
+                scale={config.scale}
+                color={config.color}
+                emissive={config.color}
+                emissiveIntensity={0.2}
+                name={`placeholder-${index}`}
+                roughness={0.9}
+                metalness={0.05}
+                disableHover={false}
+                glowColor={config.color}
+                showClouds={false}
+                textureType="rocky-gray"
+                showComingSoonOnHover={true}
+              />
+            ))}
           </group>
+
+          <ProjectsTitle
+            position={SOLAR_SYSTEM_CENTER}
+            progress={progress}
+            scale={3.5}
+            color="#ffffff"
+            opacity={0.6}
+            radius={18}
+            startAngle={245}
+            arcLength={35}
+          />
         </Suspense>
       </Canvas>
     </div>
 
-    <DetailModal
-      isOpen={showModal}
+    <TaikoExplorerModal
+      isOpen={showModal === 'project-pink'}
       onClose={handleModalClose}
+    />
+
+    <IntuitionExplorerModal
+      isOpen={showModal === 'project-dark'}
+      onClose={handleModalClose}
+    />
+
+    <DetailModal
+      isOpen={showModal === 'about'}
+      onClose={handleModalClose}
+      backgroundColor={
+        showModal === 'project-dark' ? '#333333' : '#ffffff'
+      }
+      textColor={
+        showModal === 'project-dark' ? '#ffffff' : '#000000'
+      }
       textBlock={
-        <p style={{
-          fontSize: '18px',
-          lineHeight: '1.7',
-          fontWeight: 400,
-          color: '#000000',
-          margin: 0,
-        }}>
-          We are two colleagues with a shared obsession: building software that actually matters.
-          We spend our free time creating what doesn't exist yet not following trends, but setting them.
-          Anyone can copy what's already been done. We build what hasn't, bringing real innovation and value to every project.
-          We're always at the forefront of new technologies, turning cutting-edge ideas into working products.
-          Everything here is built in our free time. This shows that great engineering comes from passion.
-        </p>
+        showModal === 'project-dark' ? (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
+            margin: 0,
+          }}>
+            Our projects showcase innovative blockchain software. More coming soon.
+          </p>
+        ) : (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
+            color: '#000000',
+            margin: 0,
+          }}>
+            We are two colleagues with a shared obsession: building software that actually matters.
+            We spend our free time creating what doesn't exist yet not following trends, but setting them.
+            Anyone can copy what's already been done. We build what hasn't, bringing real innovation and value to every project.
+            We're always at the forefront of new technologies, turning cutting-edge ideas into working products.
+            Everything here is built in our free time. This shows that great engineering comes from passion.
+          </p>
+        )
       }
       missionText={
-        <p style={{
-          fontSize: '18px',
-          lineHeight: '1.7',
-          fontWeight: 400,
-          color: '#000000',
-          margin: 0,
-        }}>
-          Software for the universe means thinking bigger. We don't build basic tools that anyone can create.
-          We develop solutions that solve real problems, improve systems, and expand what's possible.
-          Every project pushes boundaries. Every line of code serves a purpose.
-          We're not here to add to the noise we're here to build what actually matters and makes the universe a better place.
-        </p>
+        showModal === 'about' ? (
+          <p style={{
+            fontSize: '18px',
+            lineHeight: '1.7',
+            fontWeight: 400,
+            color: '#000000',
+            margin: 0,
+          }}>
+            Software for the universe means thinking bigger. We don't build basic tools that anyone can create.
+            We develop solutions that solve real problems, improve systems, and expand what's possible.
+            Every project pushes boundaries. Every line of code serves a purpose.
+            We're not here to add to the noise we're here to build what actually matters and makes the universe a better place.
+          </p>
+        ) : undefined
       }
-      team={
+      team={showModal === 'about' ? (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -359,14 +744,13 @@ export default function Scene3D({ progress }: Scene3DProps) {
             </div>
           ))}
         </div>
-      }
-      techStack={
+      ) : undefined}
+      techStack={showModal === 'about' ? (
         <div style={{
           position: 'relative',
           width: 'calc(96px * 7)',
           height: '280px',
         }}>
-          
           <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
             <line x1="80" y1="60" x2="180" y2="60" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
             <line x1="180" y1="60" x2="280" y2="100" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
@@ -379,7 +763,6 @@ export default function Scene3D({ progress }: Scene3DProps) {
             <line x1="330" y1="180" x2="430" y2="180" stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
           </svg>
 
-          
           {[
             { name: 'Rust', icon: 'rust', x: 80, y: 60 },
             { name: 'Kubernetes', icon: 'kubernetes', x: 180, y: 60 },
@@ -429,7 +812,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
             </div>
           ))}
         </div>
-      }
+      ) : undefined}
     >
     </DetailModal>
     </>

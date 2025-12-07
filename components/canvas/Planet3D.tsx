@@ -4,6 +4,13 @@ import { useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, CanvasTexture, MeshStandardMaterial, SpriteMaterial } from 'three';
 import { Planet3DProps } from '@/types/planet';
+import CloudLayer from './CloudLayer';
+import Logo3DSatellite from './Logo3DSatellite';
+import ParticleNetwork from './ParticleNetwork';
+import ScannerEffect from './ScannerEffect';
+import ComingSoonOverlay from './ComingSoonOverlay';
+import HolographicLogo from './HolographicLogo';
+import AtmosphereLayer from './AtmosphereLayer';
 
 export default function Planet3D({
   position,
@@ -18,6 +25,20 @@ export default function Planet3D({
   disableHover = false,
   showLabel = false,
   zoomProgress = 0,
+  textFadeStart = 75,
+  textFadeRange = 25,
+  glowColor = '#ffffff',
+  showClouds = false,
+  show3DLogo = false,
+  cloudConfig,
+  logoConfig,
+  textureType,
+  showParticleNetwork = false,
+  networkConfig,
+  showScanner = false,
+  showComingSoonOnHover = false,
+  showHolographicLogo = false,
+  holographicConfig,
 }: Planet3DProps) {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -26,25 +47,32 @@ export default function Planet3D({
   const [currentGlow, setCurrentGlow] = useState(emissiveIntensity);
   const [currentGlowScale, setCurrentGlowScale] = useState(1);
   const [currentGlowOpacity, setCurrentGlowOpacity] = useState(0.7);
+  const [currentMeshScale, setCurrentMeshScale] = useState(1);
 
   const glowTexture = useMemo(() => {
+    if (!glowColor) return null;
+
     const canvas = document.createElement('canvas');
     canvas.width = 256;
     canvas.height = 256;
     const ctx = canvas.getContext('2d')!;
 
+    const r = parseInt(glowColor.slice(1, 3), 16);
+    const g = parseInt(glowColor.slice(3, 5), 16);
+    const b = parseInt(glowColor.slice(5, 7), 16);
+
     const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
-    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.3)');
-    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.15)');
-    gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.05)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+    gradient.addColorStop(0.2, `rgba(${r}, ${g}, ${b}, 0.3)`);
+    gradient.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, 0.15)`);
+    gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, 0.05)`);
+    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 256, 256);
 
     return new CanvasTexture(canvas);
-  }, []);
+  }, [glowColor]);
 
   const surfaceTexture = useMemo(() => {
     if (!showLabel) return null;
@@ -90,6 +118,77 @@ export default function Planet3D({
     return texture;
   }, [showLabel]);
 
+  const craterTexture = useMemo(() => {
+    if (!textureType) return null;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 2048;
+    canvas.height = 2048;
+    const ctx = canvas.getContext('2d')!;
+
+    const baseColor = textureType === 'rocky-dark' ? '#404040' : '#aaaaaa';
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, 2048, 2048);
+
+    const seededRandom = (seed: number) => {
+      const x = Math.sin(seed++) * 10000;
+      return x - Math.floor(x);
+    };
+
+    if (textureType === 'rocky-dark') {
+      const craterCount = 15;
+      for (let i = 0; i < craterCount; i++) {
+        const x = seededRandom(i * 2.5) * 2048;
+        const y = seededRandom(i * 3.7) * 2048;
+        const radius = 150 + seededRandom(i * 5.3) * 250;
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, '#0a0a0a');
+        gradient.addColorStop(0.3, '#1a1a1a');
+        gradient.addColorStop(0.5, '#2a2a2a');
+        gradient.addColorStop(0.7, '#404040');
+        gradient.addColorStop(0.85, '#606060');
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 2048, 2048);
+      }
+    } else {
+      const craterCount = 28;
+      for (let i = 0; i < craterCount; i++) {
+        const x = seededRandom(i * 1.8) * 2048;
+        const y = seededRandom(i * 2.3) * 2048;
+        const radius = 70 + seededRandom(i * 4.1) * 100;
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, '#8a8a8a');
+        gradient.addColorStop(0.3, '#939393');
+        gradient.addColorStop(0.5, '#9c9c9c');
+        gradient.addColorStop(0.7, '#aaaaaa');
+        gradient.addColorStop(0.85, '#b8b8b8');
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 2048, 2048);
+      }
+    }
+
+    const noiseImageData = ctx.getImageData(0, 0, 2048, 2048);
+    const data = noiseImageData.data;
+    const noiseStrength = textureType === 'rocky-dark' ? 30 : 25;
+    for (let i = 0; i < data.length; i += 4) {
+      const noise = (seededRandom(i / 4) - 0.5) * noiseStrength;
+      data[i] = Math.max(0, Math.min(255, data[i] + noise));
+      data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+      data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+    }
+    ctx.putImageData(noiseImageData, 0, 0);
+
+    const texture = new CanvasTexture(canvas);
+    texture.anisotropy = 16;
+    return texture;
+  }, [textureType]);
+
   useFrame(({ camera }) => {
     if (materialRef.current && !disableHover) {
       const targetGlow = hovered ? emissiveIntensity * 2 : emissiveIntensity;
@@ -104,14 +203,17 @@ export default function Planet3D({
       if (!disableHover) {
         const targetGlowScale = hovered ? 1.15 : 1;
         const targetGlowOpacity = hovered ? 1.1 : 0.7;
+        const targetMeshScale = hovered ? 1.2 : 1;
 
         const newGlowScale = currentGlowScale + (targetGlowScale - currentGlowScale) * 0.1;
         const newGlowOpacity = currentGlowOpacity + (targetGlowOpacity - currentGlowOpacity) * 0.1;
+        const newMeshScale = currentMeshScale + (targetMeshScale - currentMeshScale) * 0.1;
 
         setCurrentGlowScale(newGlowScale);
         setCurrentGlowOpacity(newGlowOpacity);
+        setCurrentMeshScale(newMeshScale);
 
-        glowSpriteRef.current.scale.set(4.5 * newGlowScale, 4.5 * newGlowScale, 1);
+        glowSpriteRef.current.scale.set(4.5 * newGlowScale * newMeshScale, 4.5 * newGlowScale * newMeshScale, 1);
         (glowSpriteRef.current.material as SpriteMaterial).opacity = newGlowOpacity;
       }
     }
@@ -141,6 +243,7 @@ export default function Planet3D({
     if (disableHover) {
       document.body.style.cursor = 'auto';
       setHovered(false);
+      setCurrentMeshScale(1);
     }
   }, [disableHover]);
 
@@ -152,7 +255,7 @@ export default function Planet3D({
 
   return (
     <group position={position} scale={scale}>
-      {!showLabel && (
+      {!showLabel && glowTexture && (
         <sprite ref={glowSpriteRef} scale={[4.5, 4.5, 1]} renderOrder={0}>
           <spriteMaterial
             map={glowTexture}
@@ -164,12 +267,59 @@ export default function Planet3D({
         </sprite>
       )}
 
+      {showClouds && (
+        <CloudLayer
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          hovered={hovered}
+          {...cloudConfig}
+        />
+      )}
+
+      {showParticleNetwork && (
+        <ParticleNetwork
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          particleColor="#aaaaaa"
+          lineColor="#6b8fb8"
+          {...networkConfig}
+        />
+      )}
+
+      {showScanner && (
+        <ScannerEffect
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          color={color}
+        />
+      )}
+
+      {showComingSoonOnHover && (
+        <ComingSoonOverlay
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          show={hovered}
+        />
+      )}
+
+      {showHolographicLogo && (
+        <HolographicLogo
+          planetRadius={1}
+          planetScale={currentMeshScale}
+          hovered={hovered}
+          {...holographicConfig}
+        />
+      )}
+
       <mesh
         ref={meshRef}
         onClick={handleClick}
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
         renderOrder={1}
+        scale={currentMeshScale}
+        castShadow
+        receiveShadow
       >
         <sphereGeometry args={[1, 32, 32]} />
 
@@ -181,6 +331,7 @@ export default function Planet3D({
               emissiveIntensity={emissiveIntensity}
               roughness={roughness}
               metalness={metalness}
+              map={craterTexture}
             />
           </>
         ) : (
@@ -191,9 +342,27 @@ export default function Planet3D({
             emissiveIntensity={currentGlow}
             roughness={roughness}
             metalness={metalness}
+            map={craterTexture}
           />
         )}
       </mesh>
+
+      <AtmosphereLayer
+        planetRadius={1}
+        planetScale={currentMeshScale}
+        atmosphereColor="#88ccff"
+        atmosphereIntensity={0.15}
+        fresnelPower={2.5}
+        enabled={true}
+      />
+
+      {show3DLogo && (
+        <Logo3DSatellite
+          position={logoConfig?.position || [0, 2.5, 0]}
+          hovered={hovered}
+          {...logoConfig}
+        />
+      )}
 
       {showLabel && (
         <mesh
@@ -205,7 +374,7 @@ export default function Planet3D({
           <meshBasicMaterial
             map={surfaceTexture}
             toneMapped={false}
-            opacity={zoomProgress <= 75 ? 0 : Math.min(1, (zoomProgress - 75) / 25)}
+            opacity={zoomProgress <= textFadeStart ? 0 : Math.min(1, (zoomProgress - textFadeStart) / textFadeRange)}
             transparent={true}
           />
         </mesh>
