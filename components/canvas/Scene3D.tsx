@@ -3,7 +3,13 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import Planet3D from './Planet3D';
+import ProceduralPlanet3D from './ProceduralPlanet3D';
+import { aboutPlanet } from '@/lib/planets/aboutPlanet';
+import { pinkPlanet } from '@/lib/planets/pinkPlanet';
+import { darkPlanet } from '@/lib/planets/darkPlanet';
+import { createPlaceholderPlanet } from '@/lib/planets/placeholderPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
@@ -389,11 +395,12 @@ export default function Scene3D({ progress }: Scene3DProps) {
             telescopeZoomProgress={telescopeZoomProgress}
           />
 
-          <ambientLight intensity={0.03} />
+          <ambientLight intensity={0.01} color="#ffffff" />
 
           <directionalLight
             position={[90, 15, 0]}
-            intensity={6.0}
+            intensity={1.0}
+            color="#ffffff"
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -485,118 +492,20 @@ export default function Scene3D({ progress }: Scene3DProps) {
           })}
 
           <group>
-            <Planet3D
-              position={[-15, 0, 0]}
-              scale={4}
-              color="#ffffff"
-              emissive="#ffffff"
-              emissiveIntensity={0.5}
-              name="davlo.io"
-              roughness={0.7}
-              metalness={0.1}
-              onClick={handleAboutClick}
-              disableHover={inDetailView !== null || progress < 80 || progress >= 130}
-              glowColor="#ffffff"
-              showClouds={true}
-              show3DLogo={false}
-              cloudConfig={{
-                cloudCount: 20,
-                rotationSpeed: 0.0008,
-                cloudOpacity: 0.85,
-                layerHeight: 1.03,
-              }}
-              logoConfig={{
-                scale: 0.2,
-                glowColor: "#ffffff",
-                glowIntensity: 0.3,
-              }}
-              showHolographicLogo={true}
-              holographicConfig={{
-                streamCount: 6,
-                streamHeight: 1.65,
-                particleSpeed: 0.008,
-                particleSize: 0.12,
-                particleColor: '#ffffff',
-                logoScale: 0.8,
-                logoOpacity: 0.6,
-                pulseSpeed: 1.2,
-                distortionAmount: 0.1,
-                svgPath: '/logo-white.svg',
-                text: 'about',
-                textSize: 0.3,
-              }}
-            />
+            <ProceduralPlanet3D config={aboutPlanet} />
 
-            {PROJECT_PLANETS.map((config) => (
-              <Planet3D
-                key={config.id}
-                position={config.position}
-                scale={config.scale}
-                color={config.color}
-                emissive={config.emissive}
-                emissiveIntensity={config.emissiveIntensity}
-                name={config.name}
-                roughness={0.7}
-                metalness={0.1}
-                onClick={() => handleProjectPlanetClick(config.id, config)}
-                disableHover={inDetailView !== null || progress < 220}
-                glowColor={config.glowColor}
-                showClouds={false}
-                textureType={config.id === 'dark' ? 'rocky-dark' : undefined}
-                showParticleNetwork={config.id === 'dark'}
-                showScanner={config.id === 'pink'}
-                networkConfig={config.id === 'dark' ? {
-                  particleCount: 250,
-                  layerHeight: 1.08,
-                  connectionDistance: 0.3,
-                  rotationSpeed: 0.0003,
-                  particleSize: 0.18,
-                  opacity: 0.8,
-                } : undefined}
-                showHolographicLogo={true}
-                holographicConfig={config.id === 'pink' ? {
-                  streamCount: 4,
-                  streamHeight: 1.6,
-                  particleSpeed: 0.015,
-                  particleSize: 0.15,
-                  particleColor: '#ff69b4',
-                  logoScale: 0.9,
-                  logoOpacity: 0.65,
-                  pulseSpeed: 2.0,
-                  distortionAmount: 0.2,
-                  svgPath: '/logo-taiko.webp',
-                  disableHoverEffect: true,
-                } : {
-                  streamCount: 8,
-                  streamHeight: 2.0,
-                  particleSpeed: 0.01,
-                  particleSize: 0.13,
-                  particleColor: '#6b8fb8',
-                  logoScale: 1.0,
-                  logoOpacity: 0.7,
-                  distortionAmount: 0.15,
-                  svgPath: '/logo-intuition.svg',
-                  disableHoverEffect: true,
-                }}
-              />
-            ))}
+            <ProceduralPlanet3D config={pinkPlanet} />
+
+            <ProceduralPlanet3D config={darkPlanet} />
 
             {PLACEHOLDER_PLANETS.map((config, index) => (
-              <Planet3D
+              <ProceduralPlanet3D
                 key={`placeholder-${index}`}
-                position={config.position}
-                scale={config.scale}
-                color={config.color}
-                emissive={config.color}
-                emissiveIntensity={0.2}
-                name={`placeholder-${index}`}
-                roughness={0.9}
-                metalness={0.05}
-                disableHover={false}
-                glowColor={config.color}
-                showClouds={false}
-                textureType="rocky-gray"
-                showComingSoonOnHover={true}
+                config={createPlaceholderPlanet(
+                  String(index),
+                  config.position,
+                  config.scale
+                )}
               />
             ))}
           </group>
@@ -611,6 +520,15 @@ export default function Scene3D({ progress }: Scene3DProps) {
             startAngle={245}
             arcLength={35}
           />
+
+          <EffectComposer>
+            <Bloom
+              intensity={0.2}
+              luminanceThreshold={0.0}
+              luminanceSmoothing={0.9}
+              radius={0.5}
+            />
+          </EffectComposer>
         </Suspense>
       </Canvas>
     </div>

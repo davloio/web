@@ -331,6 +331,7 @@ export default function AsteroidBelt({
           map={particleTexture}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          depthTest={true}
           sizeAttenuation={true}
         />
       </points>

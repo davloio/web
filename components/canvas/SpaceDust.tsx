@@ -118,6 +118,7 @@ const SpaceDust = ({
         opacity={opacity}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
+        depthTest={true}
         sizeAttenuation={true}
         map={particleTexture}
         alphaTest={0.01}

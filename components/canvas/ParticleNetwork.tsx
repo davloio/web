@@ -125,6 +125,7 @@ export default function ParticleNetwork({
           opacity={opacity}
           map={particleTexture}
           depthWrite={false}
+          depthTest={true}
           sizeAttenuation={true}
           blending={THREE.AdditiveBlending}
         />
@@ -136,6 +137,7 @@ export default function ParticleNetwork({
           transparent={true}
           opacity={opacity * 0.65}
           depthWrite={false}
+          depthTest={true}
           blending={THREE.AdditiveBlending}
         />
       </lineSegments>
