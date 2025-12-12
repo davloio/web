@@ -463,7 +463,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 radius={radius}
                 color="#ffffff"
                 center={ringCenter}
-                opacity={0.15}
+                opacity={0.03}
                 progress={progress}
               />
             );
@@ -485,7 +485,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 radius={radius}
                 color="#ffffff"
                 center={ringCenter}
-                opacity={0.15}
+                opacity={0.03}
                 progress={progress}
               />
             );
