@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -97,12 +97,6 @@ export default function ParticleNetwork({
     return new THREE.CanvasTexture(canvas);
   }, []);
 
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += rotationSpeed;
-    }
-  });
-
   const pointsGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -114,6 +108,20 @@ export default function ParticleNetwork({
     geometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
     return geometry;
   }, [linePositions]);
+
+  useEffect(() => {
+    return () => {
+      particleTexture.dispose();
+      pointsGeometry.dispose();
+      linesGeometry.dispose();
+    };
+  }, [particleTexture, pointsGeometry, linesGeometry]);
+
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += rotationSpeed;
+    }
+  });
 
   return (
     <group ref={groupRef} scale={planetScale}>

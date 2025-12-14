@@ -75,7 +75,7 @@ const AtmosphereLayer = ({
 
   return (
     <mesh ref={meshRef} scale={effectiveRadius} renderOrder={0.8} raycast={() => null}>
-      <sphereGeometry args={[1, 64, 64]} />
+      <sphereGeometry args={[1, 32, 32]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={vertexShader}

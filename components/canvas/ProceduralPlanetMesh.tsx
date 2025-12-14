@@ -12,10 +12,11 @@ interface ProceduralPlanetMeshProps {
   colors: ProceduralColorParams;
   lighting: ProceduralLightingParams;
   scale: number;
+  hovered?: boolean;
 }
 
 const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
-  ({ terrain, colors, lighting, scale }, ref) => {
+  ({ terrain, colors, lighting, scale, hovered = false }, ref) => {
     const materialRef = useRef<THREE.ShaderMaterial>(null);
 
     // Convert TerrainType to integer for shader
@@ -104,6 +105,8 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
           fragmentShader={fragmentShader}
           depthWrite={true}
           depthTest={true}
+          transparent={true}
+          opacity={hovered ? 0.5 : 1.0}
         />
       </mesh>
     );

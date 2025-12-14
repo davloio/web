@@ -19,11 +19,11 @@ export const pinkPlanet: ProceduralPlanetConfig = {
   },
 
   colors: {
-    color1: '#8B4A5A',
-    color2: '#A65968',
-    color3: '#C97585',
-    color4: '#D88A97',
-    color5: '#D99AA5',
+    color1: '#5A2E3A',
+    color2: '#6B3A45',
+    color3: '#7D4652',
+    color4: '#8E525E',
+    color5: '#9F5E6A',
     transition2: 0.08,
     transition3: 0.18,
     transition4: 0.35,

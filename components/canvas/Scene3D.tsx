@@ -354,6 +354,39 @@ export default function Scene3D({ progress }: Scene3DProps) {
     }
   };
 
+  const handleAboutPlanetClick = () => {
+    if (progress >= 80 && progress < 130) {
+      setGlobalWheelDisabled(true);
+      window.dispatchEvent(new CustomEvent('whitePageOpen'));
+      setInDetailView('about');
+      setTimeout(() => setShowModal('about'), 200);
+    }
+  };
+
+  const handlePinkPlanetClick = () => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(pinkPlanet.position);
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId: 'pink', backgroundColor: '#C55A7D' }
+      }));
+      setInDetailView('project-pink');
+      setTimeout(() => setShowModal('project-pink'), 200);
+    }
+  };
+
+  const handleDarkPlanetClick = () => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(darkPlanet.position);
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId: 'dark', backgroundColor: '#0a0a0a' }
+      }));
+      setInDetailView('project-dark');
+      setTimeout(() => setShowModal('project-dark'), 200);
+    }
+  };
+
   if (!isMounted) return null;
 
   return (
@@ -402,8 +435,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
             intensity={1.0}
             color="#ffffff"
             castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
             shadow-camera-left={-200}
             shadow-camera-right={200}
             shadow-camera-top={200}
@@ -492,11 +525,37 @@ export default function Scene3D({ progress }: Scene3DProps) {
           })}
 
           <group>
-            <ProceduralPlanet3D config={aboutPlanet} />
+            <ProceduralPlanet3D
+              config={aboutPlanet}
+              progress={progress}
+              onClick={handleAboutPlanetClick}
+              interactiveZoneStart={80}
+              interactiveZoneEnd={130}
+              labelText="ABOUT"
+              labelTextColor="#ffffff"
+            />
 
-            <ProceduralPlanet3D config={pinkPlanet} />
+            <ProceduralPlanet3D
+              config={pinkPlanet}
+              progress={progress}
+              onClick={handlePinkPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="TAIKO EXPLORER"
+              labelFontSize={480}
+              labelTextColor="#ffffff"
+            />
 
-            <ProceduralPlanet3D config={darkPlanet} />
+            <ProceduralPlanet3D
+              config={darkPlanet}
+              progress={progress}
+              onClick={handleDarkPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="INTUITION"
+              labelFontSize={480}
+              labelTextColor="#cccccc"
+            />
 
             {PLACEHOLDER_PLANETS.map((config, index) => (
               <ProceduralPlanet3D
@@ -506,6 +565,10 @@ export default function Scene3D({ progress }: Scene3DProps) {
                   config.position,
                   config.scale
                 )}
+                progress={progress}
+                interactiveZoneStart={220}
+                interactiveZoneEnd={350}
+                isPlaceholder={true}
               />
             ))}
           </group>

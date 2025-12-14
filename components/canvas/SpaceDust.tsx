@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -43,6 +43,12 @@ const SpaceDust = ({
     return new THREE.CanvasTexture(canvas)
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (particleTexture) particleTexture.dispose()
+    }
+  }, [particleTexture])
+
   const [positions, velocities, layers] = useMemo(() => {
     const positions = new Float32Array(count * 3)
     const velocities = new Float32Array(count * 3)
@@ -76,16 +82,16 @@ const SpaceDust = ({
     const positionAttribute = pointsRef.current.geometry.attributes.position
 
     for (let i = 0; i < count; i++) {
-      positionAttribute.array[i * 3] += velocities[i * 3]
-      positionAttribute.array[i * 3 + 1] += velocities[i * 3 + 1]
-      positionAttribute.array[i * 3 + 2] += velocities[i * 3 + 2]
-
       const layer = layers[i]
       const parallaxFactor = (1 - layer) * 0.002
 
-      const cameraOffset = new THREE.Vector3()
-      cameraOffset.copy(camera.position)
-      cameraOffset.multiplyScalar(parallaxFactor)
+      const cameraPosX = camera.position.x * parallaxFactor
+      const cameraPosY = camera.position.y * parallaxFactor
+      const cameraPosZ = camera.position.z * parallaxFactor
+
+      positionAttribute.array[i * 3] += velocities[i * 3] + cameraPosX
+      positionAttribute.array[i * 3 + 1] += velocities[i * 3 + 1] + cameraPosY
+      positionAttribute.array[i * 3 + 2] += velocities[i * 3 + 2] + cameraPosZ
 
       if (Math.abs(positionAttribute.array[i * 3]) > spread) {
         positionAttribute.array[i * 3] = -Math.sign(positionAttribute.array[i * 3]) * spread
