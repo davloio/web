@@ -5,7 +5,6 @@ import { useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface OrbitalLabelProps {
-  planetPosition: [number, number, number];
   planetRadius: number;
   text: string;
   progress: number;
@@ -19,7 +18,6 @@ interface OrbitalLabelProps {
 }
 
 export default function OrbitalLabel({
-  planetPosition,
   planetRadius,
   text,
   progress,

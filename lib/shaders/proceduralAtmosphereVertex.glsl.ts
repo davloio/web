@@ -1,5 +1,3 @@
-// Vertex Shader for Procedural Atmosphere Particles
-
 export const proceduralAtmosphereVertexShader = `
 precision highp float;
 

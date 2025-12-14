@@ -1,10 +1,9 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Suspense, useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import Planet3D from './Planet3D';
 import ProceduralPlanet3D from './ProceduralPlanet3D';
 import { aboutPlanet } from '@/lib/planets/aboutPlanet';
 import { pinkPlanet } from '@/lib/planets/pinkPlanet';
@@ -20,7 +19,6 @@ import {
   SOLAR_SYSTEM_CENTER,
   OVERVIEW_DISTANCE,
   DETAIL_ZOOM_DISTANCE,
-  ProjectPlanetConfig,
 } from '@/types/planet';
 import OrbitalRing from './OrbitalRing';
 import ProjectsTitle from './ProjectsTitle';
@@ -277,7 +275,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
     return () => clearTimeout(startDelay);
   }, []);
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setGlobalWheelDisabled(false);
     setActivePlanetPosition(null);
 
@@ -292,7 +290,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
     } else {
       window.dispatchEvent(new CustomEvent('whitePageClose'));
     }
-  };
+  }, [showModal]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && inDetailView !== null) {
@@ -302,7 +301,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inDetailView]);
+  }, [inDetailView, handleModalClose]);
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('detailViewChange', { detail: { inDetailView } }));
@@ -315,7 +314,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     window.addEventListener('exitDetailView', handleExitDetailView);
     return () => window.removeEventListener('exitDetailView', handleExitDetailView);
-  }, [showModal]);
+  }, [handleModalClose]);
 
   useEffect(() => {
     const handleNavigateToAbout = () => {
@@ -326,44 +325,16 @@ export default function Scene3D({ progress }: Scene3DProps) {
     return () => window.removeEventListener('navigateToAbout', handleNavigateToAbout);
   }, []);
 
-  const handleAboutClick = () => {
-    if (progress >= 80 && progress < 130) {
-      setGlobalWheelDisabled(true);
-
-      window.dispatchEvent(new CustomEvent('whitePageOpen'));
-
-      setInDetailView('about');
-
-      setTimeout(() => {
-        setShowModal('about');
-      }, 200);
-    }
-  };
-
-  const handleProjectPlanetClick = (planetId: 'pink' | 'dark', config: ProjectPlanetConfig) => {
-    if (progress >= 220) {
-      setGlobalWheelDisabled(true);
-      setActivePlanetPosition(config.position);
-
-      window.dispatchEvent(new CustomEvent('projectPageOpen', {
-        detail: { planetId, backgroundColor: config.modalBackgroundColor }
-      }));
-
-      setInDetailView(`project-${planetId}` as DetailViewType);
-      setTimeout(() => setShowModal(`project-${planetId}` as DetailViewType), 200);
-    }
-  };
-
-  const handleAboutPlanetClick = () => {
+  const handleAboutPlanetClick = useCallback(() => {
     if (progress >= 80 && progress < 130) {
       setGlobalWheelDisabled(true);
       window.dispatchEvent(new CustomEvent('whitePageOpen'));
       setInDetailView('about');
       setTimeout(() => setShowModal('about'), 200);
     }
-  };
+  }, [progress]);
 
-  const handlePinkPlanetClick = () => {
+  const handlePinkPlanetClick = useCallback(() => {
     if (progress >= 220) {
       setGlobalWheelDisabled(true);
       setActivePlanetPosition(pinkPlanet.position);
@@ -373,9 +344,9 @@ export default function Scene3D({ progress }: Scene3DProps) {
       setInDetailView('project-pink');
       setTimeout(() => setShowModal('project-pink'), 200);
     }
-  };
+  }, [progress]);
 
-  const handleDarkPlanetClick = () => {
+  const handleDarkPlanetClick = useCallback(() => {
     if (progress >= 220) {
       setGlobalWheelDisabled(true);
       setActivePlanetPosition(darkPlanet.position);
@@ -385,7 +356,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
       setInDetailView('project-dark');
       setTimeout(() => setShowModal('project-dark'), 200);
     }
-  };
+  }, [progress]);
 
   if (!isMounted) return null;
 

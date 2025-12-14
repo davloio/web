@@ -1,6 +1,3 @@
-// Fragment Shader for Procedural Atmosphere Particles
-// Uses noise-based density modulation and directional lighting
-
 export const proceduralAtmosphereFragmentShader = `
 precision highp float;
 

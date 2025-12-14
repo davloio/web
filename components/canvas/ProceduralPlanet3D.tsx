@@ -103,7 +103,6 @@ export default function ProceduralPlanet3D({
 
       {labelText && (
         <OrbitalLabel
-          planetPosition={config.position}
           planetRadius={config.terrain.radius * config.scale}
           text={labelText}
           progress={progress ?? 0}
@@ -117,7 +116,6 @@ export default function ProceduralPlanet3D({
 
       {isPlaceholder && (
         <OrbitalLabel
-          planetPosition={config.position}
           planetRadius={config.terrain.radius * config.scale}
           text="COMING SOON"
           progress={progress ?? 0}

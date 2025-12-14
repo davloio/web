@@ -19,12 +19,9 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
   ({ terrain, colors, lighting, scale, hovered = false }, ref) => {
     const materialRef = useRef<THREE.ShaderMaterial>(null);
 
-    // Convert TerrainType to integer for shader
     const terrainTypeMap: Record<string, number> = { simplex: 1, fractal: 2, ridged: 3 };
 
-    // Create shader uniforms
     const uniforms = useMemo(() => ({
-      // Terrain parameters
       type: { value: terrainTypeMap[terrain.type] },
       radius: { value: terrain.radius },
       amplitude: { value: terrain.amplitude },
@@ -35,7 +32,6 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
       lacunarity: { value: terrain.lacunarity },
       octaves: { value: terrain.octaves },
 
-      // Color parameters
       color1: { value: new THREE.Color(colors.color1) },
       color2: { value: new THREE.Color(colors.color2) },
       color3: { value: new THREE.Color(colors.color3) },
@@ -50,7 +46,6 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
       blend34: { value: colors.blend34 },
       blend45: { value: colors.blend45 },
 
-      // Lighting parameters
       ambientIntensity: { value: lighting.ambientIntensity },
       diffuseIntensity: { value: lighting.diffuseIntensity },
       specularIntensity: { value: lighting.specularIntensity },
@@ -74,7 +69,6 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
       }
     }, [terrain.radius, terrain.amplitude]);
 
-    // Inject noise functions into shaders
     const vertexShader = useMemo(() =>
       proceduralPlanetVertexShader.replace(
         'void main() {',

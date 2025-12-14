@@ -3,7 +3,6 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ProceduralAtmosphereParams } from '@/types/proceduralPlanet';
 import { noiseFunctions } from '@/lib/shaders/noise.glsl';
 import { proceduralAtmosphereVertexShader } from '@/lib/shaders/proceduralAtmosphereVertex.glsl';
 import { proceduralAtmosphereFragmentShader } from '@/lib/shaders/proceduralAtmosphereFragment.glsl';
@@ -36,20 +35,16 @@ export default function ProceduralAtmosphere({
   const pointsRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
-  // Load cloud texture
   const cloudTexture = useLoader(THREE.TextureLoader, '/textures/cloud.png');
 
-  // Generate particle positions
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     const verts: number[] = [];
     const sizes: number[] = [];
 
     for (let i = 0; i < particles; i++) {
-      // Random radius within atmosphere thickness
       const r = Math.random() * thickness + radius;
 
-      // Uniform sphere point picking (avoids pole clustering)
       const p = new THREE.Vector3(
         2 * Math.random() - 1,
         2 * Math.random() - 1,
@@ -57,7 +52,6 @@ export default function ProceduralAtmosphere({
       );
       p.normalize().multiplyScalar(r);
 
-      // Random particle size
       const size = Math.random() * (maxParticleSize - minParticleSize) + minParticleSize;
 
       verts.push(p.x, p.y, p.z);
@@ -70,7 +64,6 @@ export default function ProceduralAtmosphere({
     return geo;
   }, [particles, radius, thickness, minParticleSize, maxParticleSize]);
 
-  // Create shader uniforms
   const uniforms = useMemo(() => ({
     time: { value: 0 },
     speed: { value: speed },
@@ -81,7 +74,6 @@ export default function ProceduralAtmosphere({
     pointTexture: { value: cloudTexture },
   }), [speed, opacity, density, scale, color, cloudTexture]);
 
-  // Inject noise functions into fragment shader
   const fragmentShader = useMemo(() =>
     proceduralAtmosphereFragmentShader.replace(
       'void main() {',
@@ -89,7 +81,6 @@ export default function ProceduralAtmosphere({
     ), []
   );
 
-  // Animate time uniform and rotation
   useFrame(({ clock }) => {
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = clock.getElapsedTime();

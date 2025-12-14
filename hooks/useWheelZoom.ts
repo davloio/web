@@ -47,8 +47,9 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
           const baseSpeed = distance > 100 ? 0.02 : 0.05;
 
           if (Math.abs(diff) < 0.5) {
+            const finalProgress = targetProgressRef.current;
             targetProgressRef.current = null;
-            return targetProgressRef.current !== null ? targetProgressRef.current : currentProgress;
+            return finalProgress;
           }
 
           const newProgress = currentProgress + diff * baseSpeed;
