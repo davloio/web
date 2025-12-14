@@ -227,6 +227,24 @@ export default function AsteroidBelt({
     return geoArray;
   }, []);
 
+  const mediumIndexLookup = useMemo(() => {
+    const map = new Map<number, number[]>();
+    mediumAsteroidsData.geometryIndices.forEach((idx, i) => {
+      if (!map.has(idx)) map.set(idx, []);
+      map.get(idx)!.push(i);
+    });
+    return map;
+  }, [mediumAsteroidsData.geometryIndices]);
+
+  const largeIndexLookup = useMemo(() => {
+    const map = new Map<number, number[]>();
+    largeAsteroidsData.geometryIndices.forEach((idx, i) => {
+      if (!map.has(idx)) map.set(idx, []);
+      map.get(idx)!.push(i);
+    });
+    return map;
+  }, [largeAsteroidsData.geometryIndices]);
+
   let frameCount = 0;
 
   useFrame(({ clock }) => {
@@ -246,9 +264,7 @@ export default function AsteroidBelt({
     mediumMeshesRef.current.forEach((mesh, geoIndex) => {
       if (!mesh) return;
 
-      const asteroidIndices = mediumAsteroidsData.geometryIndices
-        .map((idx, i) => idx === geoIndex ? i : -1)
-        .filter(i => i !== -1);
+      const asteroidIndices = mediumIndexLookup.get(geoIndex) || [];
 
       asteroidIndices.forEach((asteroidIndex, localIndex) => {
         mediumAsteroidsData.matrices[asteroidIndex].decompose(tempPos, tempQuat, tempScale);
@@ -280,9 +296,7 @@ export default function AsteroidBelt({
     largeMeshesRef.current.forEach((mesh, geoIndex) => {
       if (!mesh) return;
 
-      const asteroidIndices = largeAsteroidsData.geometryIndices
-        .map((idx, i) => idx === geoIndex ? i : -1)
-        .filter(i => i !== -1);
+      const asteroidIndices = largeIndexLookup.get(geoIndex) || [];
 
       asteroidIndices.forEach((asteroidIndex, localIndex) => {
         largeAsteroidsData.matrices[asteroidIndex].decompose(tempPos, tempQuat, tempScale);
@@ -331,14 +345,13 @@ export default function AsteroidBelt({
           map={particleTexture}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          depthTest={true}
           sizeAttenuation={true}
         />
       </points>
 
       {geometries.map((geo, geoIndex) => {
-        const asteroidIndices = mediumAsteroidsData.geometryIndices
-          .map((idx, i) => idx === geoIndex ? i : -1)
-          .filter(i => i !== -1);
+        const asteroidIndices = mediumIndexLookup.get(geoIndex) || [];
 
         if (asteroidIndices.length === 0) return null;
 
@@ -371,9 +384,7 @@ export default function AsteroidBelt({
       })}
 
       {geometries.map((geo, geoIndex) => {
-        const asteroidIndices = largeAsteroidsData.geometryIndices
-          .map((idx, i) => idx === geoIndex ? i : -1)
-          .filter(i => i !== -1);
+        const asteroidIndices = largeIndexLookup.get(geoIndex) || [];
 
         if (asteroidIndices.length === 0) return null;
 

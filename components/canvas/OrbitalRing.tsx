@@ -38,6 +38,7 @@ export default function OrbitalRing({
       color: new THREE.Color(color),
       transparent: true,
       depthWrite: false,
+      depthTest: true,
       blending: THREE.AdditiveBlending,
     });
   }, [color]);

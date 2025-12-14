@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
 export interface AtmosphereLayerProps {
@@ -24,9 +24,18 @@ const AtmosphereLayer = ({
 
   if (!enabled) return null
 
-  const color = new THREE.Color(atmosphereColor)
+  const uniforms = useMemo(() => {
+    const color = new THREE.Color(atmosphereColor);
+    return {
+      atmosphereColor: { value: color },
+      atmosphereIntensity: { value: atmosphereIntensity },
+      fresnelPower: { value: fresnelPower },
+    };
+  }, [atmosphereColor, atmosphereIntensity, fresnelPower]);
 
   const vertexShader = `
+    precision highp float;
+
     varying vec3 vNormal;
     varying vec3 vViewPosition;
 
@@ -39,6 +48,8 @@ const AtmosphereLayer = ({
   `
 
   const fragmentShader = `
+    precision highp float;
+
     uniform vec3 atmosphereColor;
     uniform float atmosphereIntensity;
     uniform float fresnelPower;
@@ -48,28 +59,23 @@ const AtmosphereLayer = ({
 
     void main() {
       vec3 viewDirection = normalize(vViewPosition);
-      float fresnel = pow(1.0 - abs(dot(vNormal, viewDirection)), fresnelPower);
+      float dotProduct = clamp(abs(dot(vNormal, viewDirection)), 0.0, 1.0);
+      float fresnel = pow(1.0 - dotProduct, fresnelPower);
 
       float smoothFalloff = smoothstep(0.0, 1.0, fresnel);
       float gradientFalloff = fresnel * fresnel;
 
-      float alpha = smoothFalloff * gradientFalloff * atmosphereIntensity;
+      float alpha = clamp(smoothFalloff * gradientFalloff * atmosphereIntensity, 0.0, 1.0);
 
       gl_FragColor = vec4(atmosphereColor, alpha);
     }
   `
 
-  const uniforms = {
-    atmosphereColor: { value: color },
-    atmosphereIntensity: { value: atmosphereIntensity },
-    fresnelPower: { value: fresnelPower },
-  }
-
   const effectiveRadius = planetRadius * planetScale * 1.02
 
   return (
-    <mesh ref={meshRef} scale={effectiveRadius} renderOrder={0.8}>
-      <sphereGeometry args={[1, 64, 64]} />
+    <mesh ref={meshRef} scale={effectiveRadius} renderOrder={0.8} raycast={() => null}>
+      <sphereGeometry args={[1, 32, 32]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={vertexShader}
@@ -78,6 +84,7 @@ const AtmosphereLayer = ({
         side={THREE.BackSide}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
+        depthTest={true}
       />
     </mesh>
   )

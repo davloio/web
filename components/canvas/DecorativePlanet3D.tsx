@@ -45,8 +45,8 @@ export default function DecorativePlanet3D({
     const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
     gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
-    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.3)');
-    gradient.addColorStop(0.85, 'rgba(255, 255, 255, 0.15)');
+    gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.15)');
+    gradient.addColorStop(0.85, 'rgba(255, 255, 255, 0.08)');
     gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
     ctx.fillStyle = gradient;
@@ -75,12 +75,13 @@ export default function DecorativePlanet3D({
 
   return (
     <group ref={groupRef} position={position} rotation={[Math.PI * 0.04, Math.PI * 0.09, 0]}>
-      <sprite scale={[planetRadius * 2.3, planetRadius * 4.0, 1]} renderOrder={0.8}>
+      <sprite scale={[planetRadius * 1.8, planetRadius * 3.0, 1]} renderOrder={0}>
         <spriteMaterial
           map={glowTexture}
           transparent={true}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          depthTest={false}
         />
       </sprite>
 

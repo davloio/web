@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -95,6 +95,20 @@ const CloudLayer = ({
     return texture
   }
 
+  const baseCloudTextures = useMemo(() => {
+    const textures = []
+    for (let i = 0; i < 5; i++) {
+      textures.push(createCloudTexture(i * 10000, cloudColor))
+    }
+    return textures
+  }, [cloudColor])
+
+  useEffect(() => {
+    return () => {
+      baseCloudTextures.forEach(texture => texture.dispose())
+    }
+  }, [baseCloudTextures])
+
   const cloudData = useMemo(() => {
     const clouds = []
     for (let i = 0; i < cloudCount; i++) {
@@ -113,11 +127,11 @@ const CloudLayer = ({
         scale: 0.3 + Math.random() * 0.4,
         scaleX: 1.2 + Math.random() * 0.6,
         scaleY: 0.5 + Math.random() * 0.3,
-        texture: createCloudTexture(i * 1000 + Math.random() * 1000, cloudColor),
+        texture: baseCloudTextures[i % 5],
       })
     }
     return clouds
-  }, [planetRadius, cloudCount, layerHeight, cloudColor])
+  }, [planetRadius, cloudCount, layerHeight, baseCloudTextures])
 
 
   useFrame(() => {

@@ -166,6 +166,7 @@ export default function ScannerEffect({
           transparent={true}
           opacity={opacity}
           depthWrite={false}
+          depthTest={true}
           sizeAttenuation={true}
           blending={THREE.AdditiveBlending}
         />

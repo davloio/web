@@ -1,9 +1,14 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Suspense, useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import * as THREE from 'three';
-import Planet3D from './Planet3D';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import ProceduralPlanet3D from './ProceduralPlanet3D';
+import { aboutPlanet } from '@/lib/planets/aboutPlanet';
+import { pinkPlanet } from '@/lib/planets/pinkPlanet';
+import { darkPlanet } from '@/lib/planets/darkPlanet';
+import { createPlaceholderPlanet } from '@/lib/planets/placeholderPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
@@ -14,7 +19,6 @@ import {
   SOLAR_SYSTEM_CENTER,
   OVERVIEW_DISTANCE,
   DETAIL_ZOOM_DISTANCE,
-  ProjectPlanetConfig,
 } from '@/types/planet';
 import OrbitalRing from './OrbitalRing';
 import ProjectsTitle from './ProjectsTitle';
@@ -271,7 +275,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
     return () => clearTimeout(startDelay);
   }, []);
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setGlobalWheelDisabled(false);
     setActivePlanetPosition(null);
 
@@ -286,7 +290,8 @@ export default function Scene3D({ progress }: Scene3DProps) {
     } else {
       window.dispatchEvent(new CustomEvent('whitePageClose'));
     }
-  };
+  }, [showModal]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && inDetailView !== null) {
@@ -296,7 +301,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [inDetailView]);
+  }, [inDetailView, handleModalClose]);
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('detailViewChange', { detail: { inDetailView } }));
@@ -309,7 +314,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     window.addEventListener('exitDetailView', handleExitDetailView);
     return () => window.removeEventListener('exitDetailView', handleExitDetailView);
-  }, [showModal]);
+  }, [handleModalClose]);
 
   useEffect(() => {
     const handleNavigateToAbout = () => {
@@ -320,33 +325,38 @@ export default function Scene3D({ progress }: Scene3DProps) {
     return () => window.removeEventListener('navigateToAbout', handleNavigateToAbout);
   }, []);
 
-  const handleAboutClick = () => {
+  const handleAboutPlanetClick = useCallback(() => {
     if (progress >= 80 && progress < 130) {
       setGlobalWheelDisabled(true);
-
       window.dispatchEvent(new CustomEvent('whitePageOpen'));
-
       setInDetailView('about');
-
-      setTimeout(() => {
-        setShowModal('about');
-      }, 200);
+      setTimeout(() => setShowModal('about'), 200);
     }
-  };
+  }, [progress]);
 
-  const handleProjectPlanetClick = (planetId: 'pink' | 'dark', config: ProjectPlanetConfig) => {
+  const handlePinkPlanetClick = useCallback(() => {
     if (progress >= 220) {
       setGlobalWheelDisabled(true);
-      setActivePlanetPosition(config.position);
-
+      setActivePlanetPosition(pinkPlanet.position);
       window.dispatchEvent(new CustomEvent('projectPageOpen', {
-        detail: { planetId, backgroundColor: config.modalBackgroundColor }
+        detail: { planetId: 'pink', backgroundColor: '#C55A7D' }
       }));
-
-      setInDetailView(`project-${planetId}` as DetailViewType);
-      setTimeout(() => setShowModal(`project-${planetId}` as DetailViewType), 200);
+      setInDetailView('project-pink');
+      setTimeout(() => setShowModal('project-pink'), 200);
     }
-  };
+  }, [progress]);
+
+  const handleDarkPlanetClick = useCallback(() => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(darkPlanet.position);
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId: 'dark', backgroundColor: '#0a0a0a' }
+      }));
+      setInDetailView('project-dark');
+      setTimeout(() => setShowModal('project-dark'), 200);
+    }
+  }, [progress]);
 
   if (!isMounted) return null;
 
@@ -389,14 +399,15 @@ export default function Scene3D({ progress }: Scene3DProps) {
             telescopeZoomProgress={telescopeZoomProgress}
           />
 
-          <ambientLight intensity={0.03} />
+          <ambientLight intensity={0.01} color="#ffffff" />
 
           <directionalLight
             position={[90, 15, 0]}
-            intensity={6.0}
+            intensity={1.0}
+            color="#ffffff"
             castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
             shadow-camera-left={-200}
             shadow-camera-right={200}
             shadow-camera-top={200}
@@ -456,7 +467,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 radius={radius}
                 color="#ffffff"
                 center={ringCenter}
-                opacity={0.15}
+                opacity={0.03}
                 progress={progress}
               />
             );
@@ -478,125 +489,57 @@ export default function Scene3D({ progress }: Scene3DProps) {
                 radius={radius}
                 color="#ffffff"
                 center={ringCenter}
-                opacity={0.15}
+                opacity={0.03}
                 progress={progress}
               />
             );
           })}
 
           <group>
-            <Planet3D
-              position={[-15, 0, 0]}
-              scale={4}
-              color="#ffffff"
-              emissive="#ffffff"
-              emissiveIntensity={0.5}
-              name="davlo.io"
-              roughness={0.7}
-              metalness={0.1}
-              onClick={handleAboutClick}
-              disableHover={inDetailView !== null || progress < 80 || progress >= 130}
-              glowColor="#ffffff"
-              showClouds={true}
-              show3DLogo={false}
-              cloudConfig={{
-                cloudCount: 20,
-                rotationSpeed: 0.0008,
-                cloudOpacity: 0.85,
-                layerHeight: 1.03,
-              }}
-              logoConfig={{
-                scale: 0.2,
-                glowColor: "#ffffff",
-                glowIntensity: 0.3,
-              }}
-              showHolographicLogo={true}
-              holographicConfig={{
-                streamCount: 6,
-                streamHeight: 1.65,
-                particleSpeed: 0.008,
-                particleSize: 0.12,
-                particleColor: '#ffffff',
-                logoScale: 0.8,
-                logoOpacity: 0.6,
-                pulseSpeed: 1.2,
-                distortionAmount: 0.1,
-                svgPath: '/logo-white.svg',
-                text: 'about',
-                textSize: 0.3,
-              }}
+            <ProceduralPlanet3D
+              config={aboutPlanet}
+              progress={progress}
+              onClick={handleAboutPlanetClick}
+              interactiveZoneStart={80}
+              interactiveZoneEnd={130}
+              labelText="ABOUT"
+              labelTextColor="#ffffff"
             />
 
-            {PROJECT_PLANETS.map((config) => (
-              <Planet3D
-                key={config.id}
-                position={config.position}
-                scale={config.scale}
-                color={config.color}
-                emissive={config.emissive}
-                emissiveIntensity={config.emissiveIntensity}
-                name={config.name}
-                roughness={0.7}
-                metalness={0.1}
-                onClick={() => handleProjectPlanetClick(config.id, config)}
-                disableHover={inDetailView !== null || progress < 220}
-                glowColor={config.glowColor}
-                showClouds={false}
-                textureType={config.id === 'dark' ? 'rocky-dark' : undefined}
-                showParticleNetwork={config.id === 'dark'}
-                showScanner={config.id === 'pink'}
-                networkConfig={config.id === 'dark' ? {
-                  particleCount: 250,
-                  layerHeight: 1.08,
-                  connectionDistance: 0.3,
-                  rotationSpeed: 0.0003,
-                  particleSize: 0.18,
-                  opacity: 0.8,
-                } : undefined}
-                showHolographicLogo={true}
-                holographicConfig={config.id === 'pink' ? {
-                  streamCount: 4,
-                  streamHeight: 1.6,
-                  particleSpeed: 0.015,
-                  particleSize: 0.15,
-                  particleColor: '#ff69b4',
-                  logoScale: 0.9,
-                  logoOpacity: 0.65,
-                  pulseSpeed: 2.0,
-                  distortionAmount: 0.2,
-                  svgPath: '/logo-taiko.webp',
-                  disableHoverEffect: true,
-                } : {
-                  streamCount: 8,
-                  streamHeight: 2.0,
-                  particleSpeed: 0.01,
-                  particleSize: 0.13,
-                  particleColor: '#6b8fb8',
-                  logoScale: 1.0,
-                  logoOpacity: 0.7,
-                  distortionAmount: 0.15,
-                  svgPath: '/logo-intuition.svg',
-                  disableHoverEffect: true,
-                }}
-              />
-            ))}
+            <ProceduralPlanet3D
+              config={pinkPlanet}
+              progress={progress}
+              onClick={handlePinkPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="TAIKO EXPLORER"
+              labelFontSize={480}
+              labelTextColor="#ffffff"
+            />
+
+            <ProceduralPlanet3D
+              config={darkPlanet}
+              progress={progress}
+              onClick={handleDarkPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="INTUITION"
+              labelFontSize={480}
+              labelTextColor="#cccccc"
+            />
 
             {PLACEHOLDER_PLANETS.map((config, index) => (
-              <Planet3D
+              <ProceduralPlanet3D
                 key={`placeholder-${index}`}
-                position={config.position}
-                scale={config.scale}
-                color={config.color}
-                emissive={config.color}
-                emissiveIntensity={0.2}
-                name={`placeholder-${index}`}
-                roughness={0.9}
-                metalness={0.05}
-                disableHover={false}
-                glowColor={config.color}
-                showClouds={false}
-                textureType="rocky-gray"
-                showComingSoonOnHover={true}
+                config={createPlaceholderPlanet(
+                  String(index),
+                  config.position,
+                  config.scale
+                )}
+                progress={progress}
+                interactiveZoneStart={220}
+                interactiveZoneEnd={350}
+                isPlaceholder={true}
               />
             ))}
           </group>
@@ -611,6 +554,15 @@ export default function Scene3D({ progress }: Scene3DProps) {
             startAngle={245}
             arcLength={35}
           />
+
+          <EffectComposer>
+            <Bloom
+              intensity={0.2}
+              luminanceThreshold={0.0}
+              luminanceSmoothing={0.9}
+              radius={0.5}
+            />
+          </EffectComposer>
         </Suspense>
       </Canvas>
     </div>
