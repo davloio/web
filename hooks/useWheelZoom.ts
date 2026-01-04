@@ -14,7 +14,7 @@ export function setGlobalWheelDisabled(disabled: boolean) {
   globalWheelDisabled = disabled;
 }
 
-export function useWheelZoom(disabled: boolean = false): WheelZoomState {
+export function useWheelZoom(disabled: boolean = false, assetsLoaded: boolean = true): WheelZoomState {
   const [progress, setProgress] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isZooming, setIsZooming] = useState(false);
@@ -30,7 +30,7 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
       setProgress(savedProgressRef.current);
       savedProgressRef.current = null;
     }
-  }, [disabled]);
+  }, [disabled, progress]);
 
   useEffect(() => {
     const handleSetZoomProgress = (e: Event) => {
@@ -71,13 +71,20 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [assetsLoaded]);
 
   const disabledRef = useRef(disabled);
   disabledRef.current = disabled;
 
   useEffect(() => {
+    if (!assetsLoaded) {
+      return;
+    }
+
     const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
       if (globalWheelDisabled) {
         return;
       }
@@ -85,9 +92,6 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
       if (disabledRef.current) {
         return;
       }
-
-      e.preventDefault();
-      e.stopPropagation();
 
       const wheelDirection = e.deltaY > 0 ? 1 : -1;
       setDirection(wheelDirection);
@@ -115,7 +119,7 @@ export function useWheelZoom(disabled: boolean = false): WheelZoomState {
       window.removeEventListener('wheel', handleWheel, wheelOptions);
       window.removeEventListener('touchmove', handleTouchMove, touchOptions);
     };
-  }, []);
+  }, [assetsLoaded]);
 
   useEffect(() => {
     if (isZooming) {

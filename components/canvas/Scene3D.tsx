@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { Preload } from '@react-three/drei';
 import ProceduralPlanet3D from './ProceduralPlanet3D';
 import { aboutPlanet } from '@/lib/planets/aboutPlanet';
 import { pinkPlanet } from '@/lib/planets/pinkPlanet';
@@ -13,6 +14,7 @@ import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
+import LoadingTracker from './LoadingTracker';
 import {
   PROJECT_PLANETS,
   PLACEHOLDER_PLANETS,
@@ -563,6 +565,9 @@ export default function Scene3D({ progress }: Scene3DProps) {
               radius={0.5}
             />
           </EffectComposer>
+
+          <LoadingTracker />
+          <Preload all />
         </Suspense>
       </Canvas>
     </div>

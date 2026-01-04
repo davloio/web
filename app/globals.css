@@ -42,6 +42,13 @@ body {
   position: fixed;
   width: 100%;
 }
+
+body.loading {
+  overflow: hidden !important;
+  pointer-events: none;
+  user-select: none;
+  touch-action: none;
+}
 ::selection {
   background: rgba(139, 92, 246, 0.3);
   color: #ffffff;

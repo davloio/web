@@ -4,18 +4,44 @@ import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import LoadingSolarSystem from './LoadingSolarSystem';
+import { useLoading } from '@/contexts/LoadingContext';
+
+const EXIT_ANIMATION_DURATION = 800;
 
 export default function LoadingScreen() {
   const [isVisible, setIsVisible] = useState(true);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { assetsLoaded, setInteractionsEnabled } = useLoading();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsVisible(false);
+      setMinTimeElapsed(true);
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (assetsLoaded && minTimeElapsed) {
+      setIsVisible(false);
+      setTimeout(() => {
+        setInteractionsEnabled(true);
+      }, EXIT_ANIMATION_DURATION);
+    }
+  }, [assetsLoaded, minTimeElapsed, setInteractionsEnabled]);
+
+  useEffect(() => {
+    if (isVisible) {
+      document.body.classList.add('loading');
+    } else {
+      document.body.classList.remove('loading');
+    }
+
+    return () => {
+      document.body.classList.remove('loading');
+    };
+  }, [isVisible]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -99,7 +125,7 @@ export default function LoadingScreen() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            pointerEvents: 'none',
+            pointerEvents: 'auto',
           }}
         >
           <canvas

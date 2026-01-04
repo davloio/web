@@ -7,12 +7,14 @@ import SpaceBackground from '@/components/canvas/SpaceBackground';
 import Footer from '@/components/ui/Footer';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { useWheelZoom } from '@/hooks/useWheelZoom';
+import { LoadingProvider, useLoading } from '@/contexts/LoadingContext';
 const Scene3D = lazy(() => import('@/components/canvas/Scene3D'));
 
-export default function Home() {
+function HomeContent() {
   const [isMounted, setIsMounted] = useState(false);
   const [whitePageOpen, setWhitePageOpen] = useState(false);
-  const { progress } = useWheelZoom(whitePageOpen);
+  const { interactionsEnabled } = useLoading();
+  const { progress } = useWheelZoom(whitePageOpen, interactionsEnabled);
 
   useEffect(() => {
     setIsMounted(true);
@@ -113,5 +115,13 @@ export default function Home() {
       <HeroHeader />
 
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <LoadingProvider>
+      <HomeContent />
+    </LoadingProvider>
   );
 }
