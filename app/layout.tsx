@@ -6,7 +6,7 @@ import SmoothScroll from '@/components/ui/SmoothScroll';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://davlo.io'),
-  title: 'davlo.io - Advanced Blockchain Solutions',
+  title: 'davlo.io - software for the universe',
   description: 'Next generation blockchain explorers and innovative software solutions for modern blockchain ecosystems',
   keywords: ['blockchain', 'explorer', 'crypto', 'software'],
   icons: {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'davlo.io - Advanced Blockchain Solutions',
+    title: 'davlo.io - software for the universe',
     description: 'Next generation blockchain explorers and innovative software solutions for modern blockchain ecosystems',
     url: 'https://davlo.io',
     siteName: 'davlo.io',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'davlo.io - Advanced Blockchain Solutions',
+        alt: 'davlo.io - software for the universe',
       },
     ],
     locale: 'en_US',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'davlo.io - Advanced Blockchain Solutions',
+    title: 'davlo.io - software for the universe',
     description: 'Next generation blockchain explorers and innovative software solutions for modern blockchain ecosystems',
     images: ['/og-image.png'],
   },
