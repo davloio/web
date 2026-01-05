@@ -5,6 +5,7 @@ import './globals.css';
 import SmoothScroll from '@/components/ui/SmoothScroll';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://davlo.io'),
   title: 'davlo.io - Advanced Blockchain Solutions',
   description: 'Next generation blockchain explorers and innovative software solutions for modern blockchain ecosystems',
   keywords: ['blockchain', 'explorer', 'crypto', 'software'],
