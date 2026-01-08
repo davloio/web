@@ -284,7 +284,7 @@ export default function Footer() {
           cursor: 'default'
         }}
       >
-        <span>© 2025</span>
+        <span>© 2026</span>
         <span>not an ordinary software team</span>
       </div>
     </footer>

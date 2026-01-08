@@ -100,7 +100,7 @@ export default function IntuitionExplorerModal({ isOpen, onClose }: IntuitionExp
                 }}
               >
                 <p style={{ margin: '0 0 24px 0' }}>
-                  Blockchain explorer for Intuition, a new Layer 2 network built for the future of decentralized systems. First-class tooling from day one, providing real-time insights as the network grows.
+                  Blockchain explorer for Intuition, a new Layer 3 network built for the future of decentralized systems. First-class tooling from day one, providing real-time insights as the network grows.
                 </p>
                 <p style={{ margin: '0' }}>
                   Track every transaction, block, and address on this emerging blockchain. Built to scale alongside the network, delivering accurate data from genesis to the present moment.

@@ -214,7 +214,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                 check it out
               </motion.p>
 
-              <motion.div
+              {/* <motion.div
                 {...fadeSlideUp}
                 transition={{ duration: 0.6, delay: 0.65, ease: smoothEase }}
                 style={{
@@ -227,7 +227,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                 <SpaceshipLink href="https://taiko.davlo.io/" textColor="#000000">
                   <span style={{ fontSize: '18px', fontWeight: 400 }}>taiko.davlo.io</span>
                 </SpaceshipLink>
-              </motion.div>
+              </motion.div> */}
 
               <motion.div
                 {...fadeSlideUp}
