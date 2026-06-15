@@ -17,6 +17,7 @@ uniform float bumpStrength;
 uniform float bumpOffset;
 
 varying vec3 fragPosition;
+varying vec3 fragWorldPosition;
 varying vec3 fragNormal;
 varying vec3 fragTangent;
 varying vec3 fragBitangent;
@@ -37,6 +38,7 @@ void main() {
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   fragPosition = position;
+  fragWorldPosition = (modelMatrix * vec4(pos, 1.0)).xyz;
   fragNormal = normal;
   fragTangent = tangent;
   fragBitangent = cross(normal, tangent);

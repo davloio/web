@@ -35,10 +35,16 @@ export interface ProceduralLightingParams {
   diffuseIntensity: number;
   specularIntensity: number;
   shininess: number;
-  lightDirection: [number, number, number];
   lightColor: string;
   bumpStrength: number;
   bumpOffset: number;
+}
+
+export interface ProceduralRimParams {
+  enabled: boolean;
+  color: string;
+  intensity: number;
+  fresnelPower: number;
 }
 
 export interface ProceduralAtmosphereParams {
@@ -65,6 +71,7 @@ export interface ProceduralPlanetConfig {
   colors: ProceduralColorParams;
   lighting: ProceduralLightingParams;
   atmosphere: ProceduralAtmosphereParams;
+  rim: ProceduralRimParams;
 
   onClick?: () => void;
   onHover?: (isHovered: boolean) => void;

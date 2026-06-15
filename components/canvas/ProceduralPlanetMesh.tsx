@@ -11,12 +11,12 @@ interface ProceduralPlanetMeshProps {
   terrain: ProceduralTerrainParams;
   colors: ProceduralColorParams;
   lighting: ProceduralLightingParams;
+  lightDirection: [number, number, number];
   scale: number;
-  hovered?: boolean;
 }
 
 const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
-  ({ terrain, colors, lighting, scale, hovered = false }, ref) => {
+  ({ terrain, colors, lighting, lightDirection, scale }, ref) => {
     const materialRef = useRef<THREE.ShaderMaterial>(null);
 
     const terrainTypeMap: Record<string, number> = { simplex: 1, fractal: 2, ridged: 3 };
@@ -50,11 +50,11 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
       diffuseIntensity: { value: lighting.diffuseIntensity },
       specularIntensity: { value: lighting.specularIntensity },
       shininess: { value: lighting.shininess },
-      lightDirection: { value: new THREE.Vector3(...lighting.lightDirection) },
+      lightDirection: { value: new THREE.Vector3(...lightDirection) },
       lightColor: { value: new THREE.Color(lighting.lightColor) },
       bumpStrength: { value: lighting.bumpStrength },
       bumpOffset: { value: lighting.bumpOffset },
-    }), [terrain, colors, lighting]);
+    }), [terrain, colors, lighting, lightDirection]);
 
     const geometryRef = useRef<THREE.BufferGeometry>(null);
 
@@ -91,7 +91,7 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
         receiveShadow
         renderOrder={1}
       >
-        <sphereGeometry ref={geometryRef} args={[1, 64, 64]} />
+        <sphereGeometry ref={geometryRef} args={[1, 128, 128]} />
         <shaderMaterial
           ref={materialRef}
           uniforms={uniforms}
@@ -99,8 +99,6 @@ const ProceduralPlanetMesh = forwardRef<THREE.Mesh, ProceduralPlanetMeshProps>(
           fragmentShader={fragmentShader}
           depthWrite={true}
           depthTest={true}
-          transparent={true}
-          opacity={hovered ? 0.5 : 1.0}
         />
       </mesh>
     );

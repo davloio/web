@@ -8,17 +8,11 @@ uniform float density;
 uniform float scale;
 
 uniform vec3 color;
+uniform vec3 lightDirection;
+uniform vec3 planetCenter;
 uniform sampler2D pointTexture;
 
 varying vec3 fragPosition;
-
-vec2 rotateUV(vec2 uv, float rotation) {
-    float mid = 0.5;
-    return vec2(
-        cos(rotation) * (uv.x - mid) + sin(rotation) * (uv.y - mid) + mid,
-        cos(rotation) * (uv.y - mid) - sin(rotation) * (uv.x - mid) + mid
-    );
-}
 
 void main() {
   float n = simplex3((time * speed) + fragPosition / scale);
@@ -27,9 +21,13 @@ void main() {
   float distanceFromCamera = length(cameraPosition - fragPosition);
   float distanceFade = smoothstep(50.0, 15.0, distanceFromCamera);
 
+  vec3 R = normalize(fragPosition - planetCenter);
+  vec3 L = normalize(lightDirection);
+  float light = max(0.08, dot(R, L));
+
   float alpha = baseAlpha * distanceFade;
 
   vec4 texColor = texture2D(pointTexture, gl_PointCoord);
-  gl_FragColor = vec4(color * texColor.rgb, alpha * texColor.a);
+  gl_FragColor = vec4(light * color * texColor.rgb, alpha * texColor.a);
 }
 `;

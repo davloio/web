@@ -92,7 +92,7 @@ export interface Planet3DProps {
 }
 
 export interface ProjectPlanetConfig {
-  id: 'pink' | 'dark';
+  id: 'pink' | 'dark' | 'sigma';
   position: [number, number, number];
   angle: number;
   scale: number;
@@ -168,14 +168,27 @@ export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
     modalBackgroundColor: '#0a0a0a',
     modalTextColor: '#ffffff',
   },
+  {
+    id: 'sigma',
+    position: [-158.3, 19, -46.2],
+    angle: 140,
+    scale: 4,
+    color: '#8b5cf6',
+    emissive: '#8b5cf6',
+    emissiveIntensity: 0.5,
+    name: 'projects-sigma',
+    glowColor: '#8b5cf6',
+    modalBackgroundColor: '#1a0b30',
+    modalTextColor: '#c4b5fd',
+  },
 ];
 
 export const PLACEHOLDER_PLANETS: PlaceholderPlanetConfig[] = [
-  { position: [-158.3, 19, -46.2], angle: 140, scale: 3.5, color: '#999999' },
   { position: [-97.8, 13, -43.0], angle: 40, scale: 3, color: '#999999' },
   { position: [-83, 18, -70], angle: 0, scale: 3.5, color: '#999999' },
 ];
 
+export const SUN_POSITION = [42, 0, 30] as const;
 export const SOLAR_SYSTEM_CENTER = [-130, 15, -70] as const;
 export const SOLAR_SYSTEM_RADIUS = 35;
 export const OVERVIEW_DISTANCE = 25;

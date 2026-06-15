@@ -1,10 +1,12 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { ProceduralPlanetConfig } from '@/types/proceduralPlanet';
+import { SUN_POSITION } from '@/types/planet';
 import ProceduralPlanetMesh from './ProceduralPlanetMesh';
 import ProceduralAtmosphere from './ProceduralAtmosphere';
+import AtmosphereRim from './AtmosphereRim';
 import OrbitalLabel from './OrbitalLabel';
 
 interface ProceduralPlanet3DProps {
@@ -34,6 +36,17 @@ export default function ProceduralPlanet3D({
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const [inInteractiveZone, setInInteractiveZone] = useState(false);
+
+  const lightDirection = useMemo(() => {
+    const dir = new THREE.Vector3(
+      SUN_POSITION[0] - config.position[0],
+      SUN_POSITION[1] - config.position[1],
+      SUN_POSITION[2] - config.position[2]
+    ).normalize();
+    return [dir.x, dir.y, dir.z] as [number, number, number];
+  }, [config.position]);
+
+  const worldRadius = config.terrain.radius * config.scale;
 
   useEffect(() => {
     if (progress === undefined || interactiveZoneStart === undefined || interactiveZoneEnd === undefined) {
@@ -82,9 +95,19 @@ export default function ProceduralPlanet3D({
         terrain={config.terrain}
         colors={config.colors}
         lighting={config.lighting}
+        lightDirection={lightDirection}
         scale={config.scale}
-        hovered={isPlaceholder && hovered}
       />
+
+      {config.rim.enabled && (
+        <AtmosphereRim
+          radius={worldRadius * 1.08}
+          color={config.rim.color}
+          intensity={config.rim.intensity}
+          fresnelPower={config.rim.fresnelPower}
+          lightDirection={lightDirection}
+        />
+      )}
 
       {config.atmosphere.enabled && (
         <ProceduralAtmosphere
@@ -98,6 +121,8 @@ export default function ProceduralPlanet3D({
           scale={config.atmosphere.scale}
           color={config.atmosphere.color}
           speed={config.atmosphere.speed}
+          lightDirection={lightDirection}
+          planetCenter={config.position}
         />
       )}
 
@@ -121,7 +146,7 @@ export default function ProceduralPlanet3D({
           progress={progress ?? 0}
           interactiveZoneStart={interactiveZoneStart ?? 0}
           interactiveZoneEnd={interactiveZoneEnd ?? 350}
-          fontSize={500}
+          fontSize={400}
           textColor="#ffffff"
           centered={true}
           visible={hovered}

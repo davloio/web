@@ -9,16 +9,19 @@ import ProceduralPlanet3D from './ProceduralPlanet3D';
 import { aboutPlanet } from '@/lib/planets/aboutPlanet';
 import { pinkPlanet } from '@/lib/planets/pinkPlanet';
 import { darkPlanet } from '@/lib/planets/darkPlanet';
+import { sigmaPlanet } from '@/lib/planets/sigmaPlanet';
 import { createPlaceholderPlanet } from '@/lib/planets/placeholderPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
+import SigmaExplorerModal from '@/components/ui/SigmaExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import LoadingTracker from './LoadingTracker';
 import {
   PROJECT_PLANETS,
   PLACEHOLDER_PLANETS,
   SOLAR_SYSTEM_CENTER,
+  SUN_POSITION,
   OVERVIEW_DISTANCE,
   DETAIL_ZOOM_DISTANCE,
 } from '@/types/planet';
@@ -27,7 +30,7 @@ import ProjectsTitle from './ProjectsTitle';
 import SpaceDust from './SpaceDust';
 import DecorativePlanet3D from './DecorativePlanet3D';
 
-type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | null;
 
 function CameraController({
   inDetailView,
@@ -117,7 +120,7 @@ function CameraController({
       targetLookAtX = aboutPlanetX;
       targetLookAtY = aboutPlanetY;
       targetLookAtZ = aboutPlanetZ;
-    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark') {
+    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark' || inDetailView === 'project-sigma') {
       if (activePlanetPosition) {
         targetPosX = activePlanetPosition[0];
         targetPosY = activePlanetPosition[1];
@@ -360,6 +363,18 @@ export default function Scene3D({ progress }: Scene3DProps) {
     }
   }, [progress]);
 
+  const handleSigmaPlanetClick = useCallback(() => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(sigmaPlanet.position);
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId: 'sigma', backgroundColor: '#1a0b30' }
+      }));
+      setInDetailView('project-sigma');
+      setTimeout(() => setShowModal('project-sigma'), 200);
+    }
+  }, [progress]);
+
   if (!isMounted) return null;
 
   return (
@@ -428,7 +443,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
           />
 
           <DecorativePlanet3D
-            position={[42, 0, 30]}
+            position={[...SUN_POSITION]}
             scale={50}
             showMoon={true}
             showCrater={true}
@@ -515,7 +530,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
               interactiveZoneStart={220}
               interactiveZoneEnd={350}
               labelText="TAIKO EXPLORER"
-              labelFontSize={480}
+              labelFontSize={360}
               labelTextColor="#ffffff"
             />
 
@@ -526,8 +541,19 @@ export default function Scene3D({ progress }: Scene3DProps) {
               interactiveZoneStart={220}
               interactiveZoneEnd={350}
               labelText="INTUITION"
-              labelFontSize={480}
+              labelFontSize={360}
               labelTextColor="#cccccc"
+            />
+
+            <ProceduralPlanet3D
+              config={sigmaPlanet}
+              progress={progress}
+              onClick={handleSigmaPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="SIGMA"
+              labelFontSize={360}
+              labelTextColor="#c4b5fd"
             />
 
             {PLACEHOLDER_PLANETS.map((config, index) => (
@@ -579,6 +605,11 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     <IntuitionExplorerModal
       isOpen={showModal === 'project-dark'}
+      onClose={handleModalClose}
+    />
+
+    <SigmaExplorerModal
+      isOpen={showModal === 'project-sigma'}
       onClose={handleModalClose}
     />
 

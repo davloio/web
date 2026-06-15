@@ -38,6 +38,7 @@ uniform vec3 lightDirection;
 uniform vec3 lightColor;
 
 varying vec3 fragPosition;
+varying vec3 fragWorldPosition;
 varying vec3 fragNormal;
 varying vec3 fragTangent;
 varying vec3 fragBitangent;
@@ -86,13 +87,13 @@ void main() {
   vec3 N = normalize(mix(fragNormal, bumpNormal, bumpStrength));
 
   vec3 L = normalize(-lightDirection);
-  vec3 V = normalize(cameraPosition - pos);
+  vec3 V = normalize(cameraPosition - fragWorldPosition);
   vec3 R = normalize(reflect(L, N));
 
   float diffuse = diffuseIntensity * max(0.0, dot(N, -L));
 
   float specularFalloff = clamp((transition3 - h) / transition3, 0.0, 1.0);
-  float specular = max(0.0, specularFalloff * specularIntensity * 0.2 * pow(dot(V, R), shininess));
+  float specular = specularFalloff * specularIntensity * pow(max(0.0, dot(V, R)), shininess);
 
   float light = clamp(ambientIntensity + diffuse + specular, 0.0, 10.0);
 

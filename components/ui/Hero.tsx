@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-type DetailViewType = 'about' | 'project-pink' | 'project-dark' | null;
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | null;
 
 export function HeroHeader() {
   const [showAsHeader, setShowAsHeader] = useState(false);
@@ -48,8 +48,9 @@ export function HeroHeader() {
 
   if (!showAsHeader) return null;
 
-  const textColor = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
-  const logoSrc = inDetailView === 'project-dark' ? '/logo-white.svg' : inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
+  const isDarkBackground = inDetailView === 'project-dark' || inDetailView === 'project-sigma';
+  const textColor = isDarkBackground ? 'white' : inDetailView !== null ? 'black' : 'white';
+  const logoSrc = isDarkBackground ? '/logo-white.svg' : inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
 
   const handleBackClick = () => {
     window.dispatchEvent(new CustomEvent('exitDetailView'));
@@ -134,7 +135,7 @@ export function HeroHeader() {
             fontWeight: 400,
             letterSpacing: '0.03em',
             fontFamily: 'var(--font-geist-sans)',
-            color: inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
+            color: isDarkBackground ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)',
             background: 'none',
             border: 'none',
             padding: '0',
@@ -145,10 +146,10 @@ export function HeroHeader() {
             transition: 'color 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = inDetailView === 'project-dark' ? 'white' : inDetailView !== null ? 'black' : 'white';
+            e.currentTarget.style.color = isDarkBackground ? 'white' : inDetailView !== null ? 'black' : 'white';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = inDetailView === 'project-dark' ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+            e.currentTarget.style.color = isDarkBackground ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
           }}
         >
           <svg

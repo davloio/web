@@ -18,6 +18,8 @@ interface ProceduralAtmosphereProps {
   scale: number;
   color: string;
   speed: number;
+  lightDirection: [number, number, number];
+  planetCenter: [number, number, number];
 }
 
 export default function ProceduralAtmosphere({
@@ -30,7 +32,9 @@ export default function ProceduralAtmosphere({
   opacity,
   scale,
   color,
-  speed
+  speed,
+  lightDirection,
+  planetCenter
 }: ProceduralAtmosphereProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
@@ -71,8 +75,10 @@ export default function ProceduralAtmosphere({
     density: { value: density },
     scale: { value: scale },
     color: { value: new THREE.Color(color) },
+    lightDirection: { value: new THREE.Vector3(...lightDirection) },
+    planetCenter: { value: new THREE.Vector3(...planetCenter) },
     pointTexture: { value: cloudTexture },
-  }), [speed, opacity, density, scale, color, cloudTexture]);
+  }), [speed, opacity, density, scale, color, lightDirection, planetCenter, cloudTexture]);
 
   const fragmentShader = useMemo(() =>
     proceduralAtmosphereFragmentShader.replace(
@@ -97,7 +103,7 @@ export default function ProceduralAtmosphere({
         uniforms={uniforms}
         vertexShader={proceduralAtmosphereVertexShader}
         fragmentShader={fragmentShader}
-        blending={THREE.AdditiveBlending}
+        blending={THREE.NormalBlending}
         depthWrite={false}
         depthTest={true}
         transparent
