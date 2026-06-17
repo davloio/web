@@ -31,7 +31,8 @@
     "three": "^0.182.0"
   },
   "overrides": {
-    "minimatch": "^10.2.1"
+    "minimatch": "^10.2.1",
+    "postcss": "$postcss"
   },
   "devDependencies": {
     "@types/node": "^25.2.3",
@@ -41,7 +42,7 @@
     "baseline-browser-mapping": "^2.9.19",
     "eslint": "^10.0.1",
     "eslint-config-next": "^16.1.6",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.10",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3"
   }
