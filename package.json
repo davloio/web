@@ -17,7 +17,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "^4.3.1",
     "@types/three": "^0.182.0",
     "framer-motion": "^12.34.0",
     "geist": "^1.7.0",
@@ -40,10 +40,14 @@
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.24",
     "baseline-browser-mapping": "^2.9.19",
-    "eslint": "^10.0.1",
+    "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
     "postcss": "^8.5.10",
-    "tailwindcss": "^4.1.17",
+    "tailwindcss": "^4.3.1",
     "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.11.1": true
   }
 }

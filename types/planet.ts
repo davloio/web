@@ -92,7 +92,7 @@ export interface Planet3DProps {
 }
 
 export interface ProjectPlanetConfig {
-  id: 'pink' | 'dark' | 'sigma';
+  id: 'pink' | 'dark' | 'sigma' | 'rsgo';
   position: [number, number, number];
   angle: number;
   scale: number;
@@ -181,10 +181,22 @@ export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
     modalBackgroundColor: '#1a0b30',
     modalTextColor: '#c4b5fd',
   },
+  {
+    id: 'rsgo',
+    position: [-97.8, 13, -43.0],
+    angle: 40,
+    scale: 4,
+    color: '#e8791d',
+    emissive: '#e8791d',
+    emissiveIntensity: 0.5,
+    name: 'projects-rsgo',
+    glowColor: '#e8791d',
+    modalBackgroundColor: '#0a0e1a',
+    modalTextColor: '#ff8c42',
+  },
 ];
 
 export const PLACEHOLDER_PLANETS: PlaceholderPlanetConfig[] = [
-  { position: [-97.8, 13, -43.0], angle: 40, scale: 3, color: '#999999' },
   { position: [-83, 18, -70], angle: 0, scale: 3.5, color: '#999999' },
 ];
 

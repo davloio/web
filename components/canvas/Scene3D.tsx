@@ -10,11 +10,13 @@ import { aboutPlanet } from '@/lib/planets/aboutPlanet';
 import { pinkPlanet } from '@/lib/planets/pinkPlanet';
 import { darkPlanet } from '@/lib/planets/darkPlanet';
 import { sigmaPlanet } from '@/lib/planets/sigmaPlanet';
+import { rsgoPlanet } from '@/lib/planets/rsgoPlanet';
 import { createPlaceholderPlanet } from '@/lib/planets/placeholderPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
 import SigmaExplorerModal from '@/components/ui/SigmaExplorerModal';
+import RsgoExplorerModal from '@/components/ui/RsgoExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import LoadingTracker from './LoadingTracker';
 import {
@@ -30,7 +32,7 @@ import ProjectsTitle from './ProjectsTitle';
 import SpaceDust from './SpaceDust';
 import DecorativePlanet3D from './DecorativePlanet3D';
 
-type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | null;
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | null;
 
 function CameraController({
   inDetailView,
@@ -120,7 +122,7 @@ function CameraController({
       targetLookAtX = aboutPlanetX;
       targetLookAtY = aboutPlanetY;
       targetLookAtZ = aboutPlanetZ;
-    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark' || inDetailView === 'project-sigma') {
+    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo') {
       if (activePlanetPosition) {
         targetPosX = activePlanetPosition[0];
         targetPosY = activePlanetPosition[1];
@@ -375,6 +377,18 @@ export default function Scene3D({ progress }: Scene3DProps) {
     }
   }, [progress]);
 
+  const handleRsgoPlanetClick = useCallback(() => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(rsgoPlanet.position);
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId: 'rsgo', backgroundColor: '#0a0e1a' }
+      }));
+      setInDetailView('project-rsgo');
+      setTimeout(() => setShowModal('project-rsgo'), 200);
+    }
+  }, [progress]);
+
   if (!isMounted) return null;
 
   return (
@@ -556,6 +570,17 @@ export default function Scene3D({ progress }: Scene3DProps) {
               labelTextColor="#c4b5fd"
             />
 
+            <ProceduralPlanet3D
+              config={rsgoPlanet}
+              progress={progress}
+              onClick={handleRsgoPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="RSGO"
+              labelFontSize={360}
+              labelTextColor="#ff8c42"
+            />
+
             {PLACEHOLDER_PLANETS.map((config, index) => (
               <ProceduralPlanet3D
                 key={`placeholder-${index}`}
@@ -610,6 +635,11 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     <SigmaExplorerModal
       isOpen={showModal === 'project-sigma'}
+      onClose={handleModalClose}
+    />
+
+    <RsgoExplorerModal
+      isOpen={showModal === 'project-rsgo'}
       onClose={handleModalClose}
     />
 
