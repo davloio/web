@@ -45,7 +45,7 @@
     "eslint-config-next": "^16.1.6",
     "postcss": "^8.5.25",
     "tailwindcss": "^4.3.1",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "allowScripts": {
     "sharp@0.34.5": true,
