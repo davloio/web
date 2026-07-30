@@ -7,7 +7,7 @@ export default function Footer() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [typewriterText, setTypewriterText] = useState('');
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [inDetailView, setInDetailView] = useState<'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | null>(null);
+  const [inDetailView, setInDetailView] = useState<'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | 'project-penumbra' | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -75,7 +75,7 @@ export default function Footer() {
     { name: 'contact', href: 'mailto:hello@davlo.io', hoverIcon: 'spaceship' },
   ];
 
-  const isDarkBackground = inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo';
+  const isDarkBackground = inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo' || inDetailView === 'project-penumbra';
   const linkIdleColor = isDarkBackground ? 'rgba(255, 255, 255, 0.6)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
   const linkHoverColor = isDarkBackground ? 'white' : inDetailView !== null ? 'black' : 'white';
   const tooltipColor = isDarkBackground ? 'rgba(255, 255, 255, 0.4)' : inDetailView !== null ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)';

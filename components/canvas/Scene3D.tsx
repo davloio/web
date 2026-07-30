@@ -11,12 +11,14 @@ import { pinkPlanet } from '@/lib/planets/pinkPlanet';
 import { darkPlanet } from '@/lib/planets/darkPlanet';
 import { sigmaPlanet } from '@/lib/planets/sigmaPlanet';
 import { rsgoPlanet } from '@/lib/planets/rsgoPlanet';
+import { penumbraPlanet } from '@/lib/planets/penumbraPlanet';
 import { createPlaceholderPlanet } from '@/lib/planets/placeholderPlanet';
 import DetailModal from '@/components/ui/DetailModal';
 import TaikoExplorerModal from '@/components/ui/TaikoExplorerModal';
 import IntuitionExplorerModal from '@/components/ui/IntuitionExplorerModal';
 import SigmaExplorerModal from '@/components/ui/SigmaExplorerModal';
 import RsgoExplorerModal from '@/components/ui/RsgoExplorerModal';
+import PenumbraExplorerModal from '@/components/ui/PenumbraExplorerModal';
 import { setGlobalWheelDisabled } from '@/hooks/useWheelZoom';
 import LoadingTracker from './LoadingTracker';
 import {
@@ -32,7 +34,7 @@ import ProjectsTitle from './ProjectsTitle';
 import SpaceDust from './SpaceDust';
 import DecorativePlanet3D from './DecorativePlanet3D';
 
-type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | null;
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | 'project-penumbra' | null;
 
 function CameraController({
   inDetailView,
@@ -122,7 +124,7 @@ function CameraController({
       targetLookAtX = aboutPlanetX;
       targetLookAtY = aboutPlanetY;
       targetLookAtZ = aboutPlanetZ;
-    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo') {
+    } else if (inDetailView === 'project-pink' || inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo' || inDetailView === 'project-penumbra') {
       if (activePlanetPosition) {
         targetPosX = activePlanetPosition[0];
         targetPosY = activePlanetPosition[1];
@@ -389,6 +391,18 @@ export default function Scene3D({ progress }: Scene3DProps) {
     }
   }, [progress]);
 
+  const handlePenumbraPlanetClick = useCallback(() => {
+    if (progress >= 220) {
+      setGlobalWheelDisabled(true);
+      setActivePlanetPosition(penumbraPlanet.position);
+      window.dispatchEvent(new CustomEvent('projectPageOpen', {
+        detail: { planetId: 'penumbra', backgroundColor: '#14100c' }
+      }));
+      setInDetailView('project-penumbra');
+      setTimeout(() => setShowModal('project-penumbra'), 200);
+    }
+  }, [progress]);
+
   if (!isMounted) return null;
 
   return (
@@ -543,7 +557,7 @@ export default function Scene3D({ progress }: Scene3DProps) {
               onClick={handlePinkPlanetClick}
               interactiveZoneStart={220}
               interactiveZoneEnd={350}
-              labelText="TAIKO EXPLORER"
+              labelText="TAIKO"
               labelFontSize={360}
               labelTextColor="#ffffff"
             />
@@ -579,6 +593,17 @@ export default function Scene3D({ progress }: Scene3DProps) {
               labelText="RSGO"
               labelFontSize={360}
               labelTextColor="#ff8c42"
+            />
+
+            <ProceduralPlanet3D
+              config={penumbraPlanet}
+              progress={progress}
+              onClick={handlePenumbraPlanetClick}
+              interactiveZoneStart={220}
+              interactiveZoneEnd={350}
+              labelText="PENUMBRA"
+              labelFontSize={360}
+              labelTextColor="#c9a072"
             />
 
             {PLACEHOLDER_PLANETS.map((config, index) => (
@@ -640,6 +665,11 @@ export default function Scene3D({ progress }: Scene3DProps) {
 
     <RsgoExplorerModal
       isOpen={showModal === 'project-rsgo'}
+      onClose={handleModalClose}
+    />
+
+    <PenumbraExplorerModal
+      isOpen={showModal === 'project-penumbra'}
       onClose={handleModalClose}
     />
 

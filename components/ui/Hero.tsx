@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | null;
+type DetailViewType = 'about' | 'project-pink' | 'project-dark' | 'project-sigma' | 'project-rsgo' | 'project-penumbra' | null;
 
 export function HeroHeader() {
   const [showAsHeader, setShowAsHeader] = useState(false);
@@ -48,7 +48,7 @@ export function HeroHeader() {
 
   if (!showAsHeader) return null;
 
-  const isDarkBackground = inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo';
+  const isDarkBackground = inDetailView === 'project-dark' || inDetailView === 'project-sigma' || inDetailView === 'project-rsgo' || inDetailView === 'project-penumbra';
   const textColor = isDarkBackground ? 'white' : inDetailView !== null ? 'black' : 'white';
   const logoSrc = isDarkBackground ? '/logo-white.svg' : inDetailView !== null ? '/logo-black.svg' : '/logo-white.svg';
 

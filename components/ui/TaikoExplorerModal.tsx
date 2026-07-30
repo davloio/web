@@ -280,7 +280,7 @@ export default function TaikoExplorerModal({ isOpen, onClose }: TaikoExplorerMod
                   right: '120px',
                 }}
               >
-                Taiko Explorer
+                Taiko
               </motion.h1>
             </div>
           </div>

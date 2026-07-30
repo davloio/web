@@ -92,7 +92,7 @@ export interface Planet3DProps {
 }
 
 export interface ProjectPlanetConfig {
-  id: 'pink' | 'dark' | 'sigma' | 'rsgo';
+  id: 'pink' | 'dark' | 'sigma' | 'rsgo' | 'penumbra';
   position: [number, number, number];
   angle: number;
   scale: number;
@@ -194,11 +194,22 @@ export const PROJECT_PLANETS: ProjectPlanetConfig[] = [
     modalBackgroundColor: '#0a0e1a',
     modalTextColor: '#ff8c42',
   },
+  {
+    id: 'penumbra',
+    position: [-83, 18, -70],
+    angle: 0,
+    scale: 4,
+    color: '#4d3324',
+    emissive: '#4d3324',
+    emissiveIntensity: 0.5,
+    name: 'projects-penumbra',
+    glowColor: '#a67c52',
+    modalBackgroundColor: '#14100c',
+    modalTextColor: '#c9a072',
+  },
 ];
 
-export const PLACEHOLDER_PLANETS: PlaceholderPlanetConfig[] = [
-  { position: [-83, 18, -70], angle: 0, scale: 3.5, color: '#999999' },
-];
+export const PLACEHOLDER_PLANETS: PlaceholderPlanetConfig[] = [];
 
 export const SUN_POSITION = [42, 0, 30] as const;
 export const SOLAR_SYSTEM_CENTER = [-130, 15, -70] as const;
