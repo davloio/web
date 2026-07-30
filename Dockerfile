@@ -5,9 +5,10 @@ RUN apk update && apk upgrade --no-cache && \
     apk add --no-cache libc6-compat && \
     apk add --no-cache --upgrade busybox>=1.37.0-r20 ssl_client>=1.37.0-r20
 
+FROM base AS build-base
 RUN npm install -g npm@latest
 
-FROM base AS deps
+FROM build-base AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -16,7 +17,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --only=production --ignore-scripts && \
     npm cache clean --force
 
-FROM base AS builder-deps
+FROM build-base AS builder-deps
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -25,7 +26,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --ignore-scripts && \
     npm cache clean --force
 
-FROM base AS builder
+FROM build-base AS builder
 WORKDIR /app
 
 COPY --from=builder-deps /app/node_modules ./node_modules
@@ -37,6 +38,8 @@ RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
+
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
